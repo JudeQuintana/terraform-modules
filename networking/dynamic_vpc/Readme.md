@@ -56,14 +56,14 @@ variable "region_az_short_names" {
   }
 }
 
-module "stg_use1_vpc" {
+module "stage_use1_vpc" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.0"
 
   providers = {
     aws = aws.use1
   }
 
-  env_prefix            = "stg"
+  env_prefix            = "stage"
   region_az_short_names = var.region_az_short_names
   vpc_attributes = {
     vpc_cidr = "10.0.0.0/16"
