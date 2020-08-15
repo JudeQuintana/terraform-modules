@@ -4,7 +4,7 @@ variable "env_prefix" {
 }
 
 variable "cidr_block" {
-  description = "Base VPC CIDR Block ie 10.10.0.0/16"
+  description = "Base VPC CIDR Block ie 10.0.0.0/16"
   type        = string
 }
 
