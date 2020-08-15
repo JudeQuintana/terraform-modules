@@ -1,0 +1,7 @@
+.terraform
+*.tfstate*
+*/files/secrets
+*/personal.tfvars
+*.DS_Store
+*/secrets/*
+
