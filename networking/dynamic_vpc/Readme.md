@@ -57,7 +57,7 @@ variable "region_az_short_names" {
 }
 
 module "stg_use1_vpc" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc?ref=v1.0.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.0"
 
   providers = {
     aws = aws.use1
