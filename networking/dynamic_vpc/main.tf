@@ -2,8 +2,6 @@
 data "aws_region" "current" {}
 
 locals {
-  vpc_cidr          = var.vpc_attributes.vpc_cidr
-  azs               = var.vpc_attributes.azs
   route_out_cidr    = "0.0.0.0/0"
   region_name       = data.aws_region.current.name
   region_short_name = lookup(var.region_az_short_names, local.region_name)
@@ -27,7 +25,7 @@ locals {
 ######################################################
 
 resource "aws_vpc" "vpc" {
-  cidr_block           = local.vpc_cidr
+  cidr_block           = var.cidr_block
   instance_tenancy     = var.vpc_tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -56,11 +54,11 @@ resource "aws_internet_gateway" "igw" {
 ######################################################
 
 resource "aws_subnet" "public" {
-  for_each = local.azs
+  for_each = var.azs
 
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = format("%s%s", local.region_name, each.key)
-  cidr_block              = cidrsubnet(local.vpc_cidr, 8, each.value + 32)
+  cidr_block              = cidrsubnet(var.cidr_block, 8, each.value + 32)
   map_public_ip_on_launch = true
   tags = merge(
     local.default_tags,
@@ -97,7 +95,7 @@ resource "aws_route" "public_route_out" {
 }
 
 resource "aws_route_table_association" "public" {
-  for_each = local.azs
+  for_each = var.azs
 
   subnet_id      = lookup(aws_subnet.public, each.key).id
   route_table_id = aws_route_table.public.id
@@ -116,11 +114,11 @@ resource "aws_route_table_association" "public" {
 ######################################################
 
 resource "aws_subnet" "private" {
-  for_each = local.azs
+  for_each = var.azs
 
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = format("%s%s", local.region_name, each.key)
-  cidr_block              = cidrsubnet(local.vpc_cidr, 8, each.value)
+  cidr_block              = cidrsubnet(var.cidr_block, 8, each.value)
   map_public_ip_on_launch = false
   tags = merge(
     local.default_tags,
@@ -136,7 +134,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table" "private" {
-  for_each = local.azs
+  for_each = var.azs
 
   vpc_id = aws_vpc.vpc.id
   tags = merge(
@@ -153,7 +151,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "private_route_out" {
-  for_each = local.azs
+  for_each = var.azs
 
   destination_cidr_block = local.route_out_cidr
   route_table_id         = lookup(aws_route_table.private, each.key).id
@@ -165,7 +163,7 @@ resource "aws_route" "private_route_out" {
 }
 
 resource "aws_route_table_association" "private" {
-  for_each = local.azs
+  for_each = var.azs
 
   subnet_id      = lookup(aws_subnet.private, each.key).id
   route_table_id = lookup(aws_route_table.private, each.key).id
@@ -183,7 +181,7 @@ resource "aws_route_table_association" "private" {
 ######################################################
 
 resource "aws_eip" "nat_ips" {
-  for_each = local.azs
+  for_each = var.azs
 
   vpc = true
   tags = merge(
@@ -210,7 +208,7 @@ resource "aws_eip" "nat_ips" {
 ######################################################
 
 resource "aws_nat_gateway" "ngws" {
-  for_each = local.azs
+  for_each = var.azs
 
   allocation_id = lookup(aws_eip.nat_ips, each.key).id
   subnet_id     = lookup(aws_subnet.public, each.key).id
@@ -248,7 +246,7 @@ output "private_subnet_ids" {
 
 # Each Public Route Table has the same Route Table
 output "public_route_table_ids" {
-  value = { for az, subnet in local.azs : az => aws_route_table.public.id }
+  value = { for az, subnet in var.azs : az => aws_route_table.public.id }
 }
 
 output "private_route_table_ids" {

@@ -65,13 +65,11 @@ module "stage_use1_vpc" {
 
   env_prefix            = "stage"
   region_az_short_names = var.region_az_short_names
-  vpc_attributes = {
-    vpc_cidr = "10.0.0.0/16"
-    azs = {
-      a = 1
-      b = 2
-      c = 3
-    }
+  cidr_block            = "10.0.0.0/16"
+  azs = {
+    a = 1
+    b = 2
+    c = 3
   }
 }
 ```

@@ -3,12 +3,14 @@ variable "env_prefix" {
   type        = string
 }
 
-variable "vpc_attributes" {
-  description = "Need base CIDR and AZ to Subnet map"
-  type = object({
-    vpc_cidr = string
-    azs      = map(number)
-  })
+variable "cidr_block" {
+  description = "Base VPC CIDR Block ie 10.10.0.0/16"
+  type        = string
+}
+
+variable "azs" {
+  description = "AZ (letter) to Subnet (number for 3rd octet)"
+  type        = map(number)
 }
 
 variable "region_az_short_names" {
