@@ -252,3 +252,4 @@ output "public_route_table_ids" {
 output "private_route_table_ids" {
   value = { for az, route_table in aws_route_table.private : az => route_table.id }
 }
+
