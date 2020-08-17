@@ -201,7 +201,7 @@ resource "aws_eip" "nat_ips" {
 #
 # NAT Gatways:
 # - For routing the respective private AZ traffic and
-#   is built an a public subnet
+#   is built in a public subnet
 # - Needs explicit depends_on IGW because we need
 #   an IGW first.
 #
