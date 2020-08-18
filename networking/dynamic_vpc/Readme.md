@@ -5,7 +5,7 @@ architecture in AWS based on structured input using `for_each` and `for`
 constructs. It will build a VPC with private and public subnets per AZ with the
 proper routing and labeling.
 
-For a more details on the the design go to jq1.io/dynamic_vpc
+For a more details on the design go to [Dynamic VPC Module](https://jq1.io/posts/dynamic_vpc/)
 
 Here is the related VPC network diagram for visual reference.
 ![example_vpc](https://docs.aws.amazon.com/vpc/latest/userguide/images/nat-gateway-diagram.png)
@@ -46,10 +46,8 @@ variable "region_az_short_names" {
   default = {
     us-east-1  = "use1"
     us-east-1a = "use1a"
-    us-west-1  = "usw1"
-    us-west-1a = "usw1a"
-    us-west-1b = "usw1b"
-    us-west-1c = "usw1c"
+    us-east-1b = "use1b"
+    us-east-1c = "use1c"
     us-west-2  = "usw2"
     us-west-2a = "usw2a"
     us-west-2b = "usw2b"
