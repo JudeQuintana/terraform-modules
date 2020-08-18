@@ -63,6 +63,8 @@ resource "aws_subnet" "public" {
   tags = merge(
     local.default_tags,
     {
+      # I have to use format to build the AZ name by combining the region with the
+      # letter designated for the AZ.
       Name = format(
         "%s-%s-%s",
         upper(var.env_prefix),
