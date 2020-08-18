@@ -5,7 +5,7 @@ architecture in AWS based on structured input using `for_each` and `for`
 constructs. It will build a VPC with private and public subnets per AZ with the
 proper routing and labeling.
 
-For a more details on the design go to [Dynamic VPC Module](https://jq1.io/posts/dynamic_vpc/)
+For a more details on the design go to the [Dynamic VPC Module Blog Post](https://jq1.io/posts/dynamic_vpc/)
 
 Here is the related VPC network diagram for visual reference.
 ![example_vpc](https://docs.aws.amazon.com/vpc/latest/userguide/images/nat-gateway-diagram.png)
