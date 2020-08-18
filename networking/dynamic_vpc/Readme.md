@@ -1,6 +1,6 @@
 # Overview
 
-This is a [Dynamic VPC Module](http://localhost) that builds a redundant network
+This is a Dynamic VPC Module that builds a redundant network
 architecture in AWS based on structured input using `for_each` and `for`
 constructs. It will build a VPC with private and public subnets per AZ with the
 proper routing and labeling.
