@@ -232,8 +232,8 @@ resource "aws_nat_gateway" "ngws" {
     },
   )
 
-  # required because NAT GW needs an IGW to route to
-  # but there is not implicit dependency via it's attributes
+  # depends_on is required because NAT GW needs an IGW to route through
+  # but there is not an implicit dependency via it's attributes
   # so we must be explicit.
   depends_on = [aws_internet_gateway.igw]
 
