@@ -107,7 +107,7 @@ resource "aws_route_table_association" "public" {
 
   lifecycle {
     # route_table_id is not needed here because the value
-    # is not a part of the for_each iteration and there
+    # is not a part of the for_each iteration and therefore
     # wont trigger forcing a new resource
     ignore_changes = [subnet_id]
   }
