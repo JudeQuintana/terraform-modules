@@ -63,8 +63,8 @@ resource "aws_subnet" "public" {
   tags = merge(
     local.default_tags,
     {
-      # I have to use format to build the AZ name by combining the region with the
-      # letter designated for the AZ.
+      # I use format to build the AZ name on the fly (region + az letter)
+      # by combining the region with the letter designated for the AZ.
       Name = format(
         "%s-%s-%s",
         upper(var.env_prefix),
@@ -80,6 +80,9 @@ resource "aws_route_table" "public" {
   tags = merge(
     local.default_tags,
     {
+      # This name doesnt change on the fly because I'm not setting the AZ
+      # in the name and all public subnets route out the same IGW for
+      # the whole region. This name can be pre-built like local.vpc_tag_name.
       Name = format(
         "%s-%s-%s",
         upper(var.env_prefix),
@@ -103,6 +106,9 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 
   lifecycle {
+    # route_table_id is not needed here because the value
+    # is not a part of the for_each iteration and there
+    # wont trigger forcing a new resource
     ignore_changes = [subnet_id]
   }
 }
@@ -226,6 +232,9 @@ resource "aws_nat_gateway" "ngws" {
     },
   )
 
+  # required because NAT GW needs an IGW to route to
+  # but there is not implicit dependency via it's attributes
+  # so we must be explicit.
   depends_on = [aws_internet_gateway.igw]
 
   lifecycle {
