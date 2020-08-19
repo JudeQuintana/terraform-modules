@@ -49,7 +49,8 @@ resource "aws_internet_gateway" "igw" {
 # - Route out IGW
 #
 # Note: format("%s%s", local.region_name, each.key) is
-#       building the AZ name on the fly
+#       building the AZ name on the fly by combining
+#       the region with the letter designated for the AZ.
 #
 ######################################################
 
@@ -63,8 +64,6 @@ resource "aws_subnet" "public" {
   tags = merge(
     local.default_tags,
     {
-      # I use format to build the AZ name on the fly (region + az letter)
-      # by combining the region with the letter designated for the AZ.
       Name = format(
         "%s-%s-%s",
         upper(var.env_prefix),
@@ -210,8 +209,10 @@ resource "aws_eip" "nat_ips" {
 # NAT Gatways:
 # - For routing the respective private AZ traffic and
 #   is built in a public subnet
-# - Needs explicit depends_on IGW because we need
-#   an IGW first.
+# - depends_on is required because NAT GW needs an IGW
+#   to route through but there is not an implicit
+#   dependency via it's attributes so we must be
+#   explicit.
 #
 ######################################################
 
@@ -232,9 +233,6 @@ resource "aws_nat_gateway" "ngws" {
     },
   )
 
-  # depends_on is required because NAT GW needs an IGW to route through
-  # but there is not an implicit dependency via it's attributes
-  # so we must be explicit.
   depends_on = [aws_internet_gateway.igw]
 
   lifecycle {
