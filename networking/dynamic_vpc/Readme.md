@@ -21,7 +21,7 @@ Also, I like being explicit about passing in an aliased `provider` into the modu
 easier to identify which region or account I'm applying module resources into.
 ```
 terraform {
-  required_version = ">= 0.12.6"
+  required_version = "~> 0.12.6"
   required_providers {
     aws = "2.70.0"
   }
