@@ -10,7 +10,7 @@ locals {
     Environment = lower(var.env_prefix)
   }
 
-  vpc_name_tag  = format("%s-%s-%s", upper(var.env_prefix), local.region_name, "default")
+  vpc_name_tag  = format("%s-%s-%s", upper(var.env_prefix), local.region_short_name, "default")
   public_label  = "public"
   private_label = "private"
   nat_gw_label  = "nat-gw"
