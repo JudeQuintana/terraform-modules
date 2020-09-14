@@ -92,7 +92,7 @@ When it comes to scaling out networks via peer links it's best practice to segme
 private app subnet, public load balancer subnet, etc). Network segmentation makes it easier configure security groups across the VPC Peer links
 because you can't share security group IDs across VPCs, only subnets!
 
-#### Terraform 0.13 Usage Example
+#### Terraform 0.13 Example
 
 ```
 terraform {
