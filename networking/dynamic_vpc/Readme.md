@@ -36,8 +36,6 @@ provider "aws" {
   region = "us-east-1"
   alias  = "use1"
 }
-```
-```
 
 variable "region_az_short_names" {
   description = "Region and AZ names mapped to short naming conventions for labeling"
@@ -56,7 +54,7 @@ variable "region_az_short_names" {
 }
 
 module "stage_use1_vpc" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.2"
 
   providers = {
     aws = aws.use1
@@ -93,4 +91,74 @@ This VPC module more of a learning excersize and it does generate resources that
 When it comes to scaling out networks via peer links it's best practice to segment your network tiers with their own subnets per AZ (ie
 private app subnet, public load balancer subnet, etc). Network segmentation makes it easier configure security groups across the VPC Peer links
 because you can't share security group IDs across VPCs, only subnets!
+
+#### Terraform 0.13 Usage Example
+
+```
+terraform {
+  required_version = ">= 0.13"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.60.0"
+    }
+  }
+}
+
+# base provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+provider "aws" {
+  region = "us-east-1"
+  alias  = "use1"
+}
+
+
+variable "region_az_short_names" {
+  description = "Region and AZ names mapped to short naming conventions for labeling"
+  type = map(string)
+
+  default = {
+    us-east-1  = "use1"
+    us-east-1a = "use1a"
+    us-east-1b = "use1b"
+    us-east-1c = "use1c"
+    us-west-2  = "usw2"
+    us-west-2a = "usw2a"
+    us-west-2b = "usw2b"
+    us-west-2c = "usw2c"
+  }
+}
+
+variable "vpc_cidrs "{
+  description = "list of vpc cidr blocks"
+  type = list(string)
+  default = [
+    "10.0.0.0/16",
+    "10.1.0.0/16"
+  ]
+}
+
+module "staging_vpc" {
+  source   = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.2"
+  for_each = toset(local.vpc_cidrs)
+
+  providers = {
+    aws = aws.use1
+  }
+
+  env_prefix            = "stage"
+  region_az_short_names = var.staging_az_short_names
+  cidr_block            = each.value
+  azs = {
+    a = 1
+    b = 2
+    c = 3
+  }
+}
+
+```
 
