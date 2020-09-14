@@ -23,7 +23,7 @@ easier to identify which region or account I'm applying module resources into.
 terraform {
   required_version = "~> 0.12.6"
   required_providers {
-    aws = "2.70.0"
+    aws = "~> 2.70.0"
   }
 }
 
@@ -96,7 +96,7 @@ because you can't share security group IDs across VPCs, only subnets!
 
 ```
 terraform {
-  required_version = ">= 0.13"
+  required_version = "~> 0.13.2"
 
   required_providers {
     aws = {
