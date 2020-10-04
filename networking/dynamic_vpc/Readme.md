@@ -56,7 +56,7 @@ variable "region_az_short_names" {
 }
 
 module "stage_use1_vpc" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.3"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.4"
 
   providers = {
     aws = aws.use1
@@ -145,7 +145,7 @@ variable "vpc_cidrs "{
 }
 
 module "staging_vpcs" {
-  source   = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.2"
+  source   = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.4"
   for_each = toset(local.vpc_cidrs)
 
   providers = {
