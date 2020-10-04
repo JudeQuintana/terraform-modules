@@ -15,7 +15,9 @@ Here is the related VPC network diagram for visual reference.
 This configuration will create a VPC in the us-east-1 region with a NAT Gatway per AZ with
 routing for each private and public subnets. Every taggable resource
 will have proper naming including environment, region and AZ. Everything
-is in `main.tf` and `variables.tf` because I wanted less directory structure focus.
+is in [main.tf](https://github.com/JudeQuintana/terraform-modules/blob/master/networking/dynamic_vpc/main.tf) and
+[variables.tf](https://github.com/JudeQuintana/terraform-modules/blob/master/networking/dynamic_vpc/variables.tf)
+because I wanted less focus on the directory structure.
 
 Also, I like being explicit about passing in an aliased `provider` into the module. It makes it
 easier to identify which region or account I'm applying module resources into.
@@ -54,7 +56,7 @@ variable "region_az_short_names" {
 }
 
 module "stage_use1_vpc" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.2"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/dynamic_vpc?ref=v1.0.3"
 
   providers = {
     aws = aws.use1
