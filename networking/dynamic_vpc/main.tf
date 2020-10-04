@@ -255,7 +255,7 @@ output "private_subnet_ids" {
 
 # Each Public Subnet has the same Route Table
 # Have to construct the AZ to public route table output from aws_subnet.public because I cant iterate
-# over aws_route_table.public because there is only one
+# over aws_route_table.public since there is only one
 output "public_route_table_ids" {
   value = { for az, subnet in aws_subnet.public : az => aws_route_table.public.id }
 }
