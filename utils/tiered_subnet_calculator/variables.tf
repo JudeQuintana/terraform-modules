@@ -3,7 +3,7 @@ variable "vpc_cidr_block" {
 }
 
 variable "tiers" {
-  type = list(object({
+  type = set(object({
     name   = string
     acl    = string
     newbit = number

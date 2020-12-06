@@ -8,7 +8,7 @@ locals {
   # generate azs to subnet map per tier
   tier_az_subnets = { for t, s in local.tier_subnets : t => zipmap(keys(var.az_newbits), s) }
 
-  # build new tiers list with their associated az to subnets map
+  # build new tiers list with their associated netawork and az to subnets map
   tiers_with_subnets_per_az = [
     for t in var.tiers : {
       name    = t.name,
