@@ -1,8 +1,10 @@
 locals {
   # generate top level networks for each tier based on tier newbit + vpc_cidr_block mask ie /4 + /16 = /20
   tier_networks = zipmap(var.tiers[*].name, cidrsubnets(var.vpc_cidr_block, var.tiers[*].newbit...))
+
   # generate a subnet based on az newbit (in azs_new_bits map) per tier network ie /4 + /20 = /24
   tier_subnets = { for t, n in local.tier_networks : t => cidrsubnets(n, values(var.az_newbits)...) }
+
   # generate azs to subnet map per tier
   tier_az_subnets = { for t, s in local.tier_subnets : t => zipmap(keys(var.az_newbits), s) }
 
@@ -14,7 +16,6 @@ locals {
       network = lookup(local.tier_networks, t.name)
       azs     = lookup(local.tier_az_subnets, t.name),
   }]
-
 }
 
 output "calculated_tiers" {
