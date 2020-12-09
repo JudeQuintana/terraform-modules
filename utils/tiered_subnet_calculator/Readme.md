@@ -6,7 +6,7 @@ Calculator](https://jq1.io/posts/tiered_subnet_calculator/) blog post for a more
 # Usage
 `tiers.auto.tfvars`
 ```
-vpc_cidr_block = "10.0.0.0/16"
+base_cidr_block = "10.0.0.0/16"
 
 tiers = [
   {
