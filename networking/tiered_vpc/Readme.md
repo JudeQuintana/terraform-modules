@@ -63,46 +63,46 @@ variable "region_az_labels" {
 locals {
   tiers = [
     {
-      "azs" = {
-        "a" = {
+      azs = {
+        a = {
           private = ["10.0.8.0/24", "10.0.9.0/24"]
           public  = ["10.0.0.0/24", "10.0.1.0/24"]
         },
-        "b" = {
+        b = {
           private = ["10.0.11.0/24", "10.0.12.0/24"]
           public  = ["10.0.3.0/24", "10.0.4.0/24"]
         },
       }
-      "name"    = "app"
-      "network" = "10.0.0.0/20"
+      name    = "app"
+      network = "10.0.0.0/20"
     },
     {
-      "azs" = {
-        "a" = {
+      azs = {
+        a = {
           private = ["10.0.16.0/24", "10.0.17.0/24"]
           public  = ["10.0.28.0/28"] # 10.0.28.0/24 chopped up into /28
         },
-        "b" = {
+        b = {
           private = ["10.0.20.0/24", "10.0.21.0/24"]
           public  = ["10.0.28.16/28"] # 10.0.28.0/24 chopped up into /28
         },
       }
-      "name"    = "db"
-      "network" = "10.0.16.0/20"
+      name    = "db"
+      network = "10.0.16.0/20"
     },
     {
-      "azs" = {
-        "a" = {
+      azs = {
+        a = {
           private = ["10.47.11.0/24", "10.47.12.0/24"]
           public  = ["10.47.0.0/28", "10.47.0.16/28"] # 10.47.0.0/24 chopped up into /28
         },
-        "c" = {
+        c = {
           private = null
           public  = ["10.47.6.0/24", "10.47.7.0/24"]
         },
       }
-      "name"    = "general"
-      "network" = "10.47.0.0/20"
+      name    = "general"
+      network = "10.47.0.0/20"
     }
   ]
 }
