@@ -11,10 +11,10 @@ locals {
   # build new tiers list with their associated network and az to subnets map
   tiers_with_subnets_per_az = [
     for t in var.tiers : {
-      name    = t.name,
-      acl     = t.acl,
+      name    = t.name
+      acl     = t.acl
       network = lookup(local.tier_networks, t.name)
-      azs     = lookup(local.tier_az_subnets, t.name),
+      azs     = lookup(local.tier_az_subnets, t.name)
   }]
 }
 
