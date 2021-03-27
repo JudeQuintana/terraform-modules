@@ -37,7 +37,7 @@ locals {
   tier_bundle = {
     for az, acl in var.tier.azs : az => {
       private                = acl.private != null ? acl.private : []
-      private_ids            = lookup(local.private_subnet_ids_per_az, az, null)
+      private_ids            = lookup(local.private_subnet_ids_per_az, az, [])
       private_route_table_id = lookup(local.private_route_table_ids_per_az, az, null)
       public                 = acl.public
       public_ids             = lookup(local.public_subnet_ids_per_az, az)
