@@ -93,8 +93,7 @@ locals {
       [for rtb_id in rtb_ids : {
         rtb_id = rtb_id
         routes = [for n in keys(local.vpc_network_to_private_and_public_route_table_ids) : n if n != network]
-    }]]
-  )
+  }]])
 
   # { rtb-id|route => route, ... }
   private_and_public_routes_to_other_networks = merge(
