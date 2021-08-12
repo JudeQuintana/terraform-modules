@@ -29,6 +29,8 @@ locals {
   # this means routing will go through a public subnet to get to a private subnet in the same AZ
   # private subnets could be used too but i'm not sure about security implications of this pattern
   # but i dont think it matters.
+  #
+  # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
   vpc_to_single_public_subnet_ids_per_az = {
     for vpc_name, this in var.vpcs :
     this.id => [for az, public_subnet_ids in this.az_to_public_subnet_ids : element(public_subnet_ids, 0)]
@@ -79,13 +81,13 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 
 # Create routes to other VPC networks in private and public route tables for each VPC
 locals {
-  # { vpc-network => [ "vpc-private-rtb-ids", "vpc-public-rtb-ids" ], ...}
+  # { vpc-1-network => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
   vpc_network_to_private_and_public_route_table_ids = {
     for vpc_name, this in var.vpcs :
     this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
   }
 
-  # [ { rtb_id = "vpc-1-rtb-id-123", routes = [ "other-vpc-2-network", "other-vpc3-network" ] }, ...]
+  # [ { rtb_id = "vpc-1-rtb-id-123", routes = [ "other-vpc-2-network", "other-vpc3-network", ... ] }, ...]
   associate_private_and_public_route_table_ids_with_other_networks = flatten(
     [for network, rtb_ids in local.vpc_network_to_private_and_public_route_table_ids :
       [for rtb_id in rtb_ids : {
