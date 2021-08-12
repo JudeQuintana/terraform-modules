@@ -1,6 +1,12 @@
 # Coming Soon
 Terraform Networking Trifecta Blog Post + Demo
 
+# Description
+This Transit Gateway Centralized Router module will attach all Tiered VPCs for each AZ to the TGW.
+All attachments will be associated and routes propagated to one TGW Route Table.
+Each Tiered VPC will have all their route tables updated in each VPC with a route to all other VPC networks via
+the TGW.
+
 ## Requirements
 
 | Name | Version |

@@ -11,6 +11,7 @@ locals {
   }, var.tags)
 }
 
+# one tgw that will route between all tiered vpcs.
 resource "aws_ec2_transit_gateway" "this" {
   amazon_side_asn                 = var.amazon_side_asn
   default_route_table_association = "disable"
@@ -52,6 +53,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   })
 }
 
+# one route table for all vpc networks, associate vpc attachments and propagate routes
 resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(
@@ -77,6 +79,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 
 # Create routes to other VPC networks in private and public route tables for each VPC
 locals {
+  # { vpc-network => [ "vpc-private-rtb-ids", "vpc-public-rtb-ids" ], ...}
   vpc_network_to_private_and_public_route_table_ids = {
     for vpc_name, this in var.vpcs :
     this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
@@ -88,8 +91,8 @@ locals {
       [for rtb_id in rtb_ids : {
         rtb_id = rtb_id
         routes = [for n in keys(local.vpc_network_to_private_and_public_route_table_ids) : n if n != network]
-      }]
-  ])
+    }]]
+  )
 
   # { rtb-id|route => route, ... }
   private_and_public_routes_to_other_networks = merge(

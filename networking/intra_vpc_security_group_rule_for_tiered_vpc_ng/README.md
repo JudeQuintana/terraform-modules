@@ -1,6 +1,10 @@
 # Coming Soon
 Terraform Networking Trifecta Blog Post + Demo
 
+# Description
+This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports
+from all other VPC networks (excluding itself).
+
 ## Requirements
 
 | Name | Version |
