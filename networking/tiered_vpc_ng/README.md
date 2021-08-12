@@ -19,6 +19,8 @@ Baseline Tiered VPC-NG features (same as prototype):
 
 - Internal and external VPC routing is automatic.
 
+Whats new in NG?
+
 - An Intra VPC Security Group is created by default.
   - This will be for adding security group rules that are inbound only
     for access across VPCs.

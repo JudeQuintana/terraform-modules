@@ -103,7 +103,7 @@ locals {
   }]...)
 }
 
-resource "aws_route" "vpc_private_and_public_routes_to_other_networks" {
+resource "aws_route" "this" {
   for_each = local.private_and_public_routes_to_other_networks
 
   destination_cidr_block = each.value
