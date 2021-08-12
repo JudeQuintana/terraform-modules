@@ -1,6 +1,6 @@
 locals {
   # Each VPC id should have an inbound rule from all other VPC networks except itself
-  # The next 3 for loops will build the following structure
+  # The next 3 for loops will build the following structure for local.vpc_id_to_inbound_networks
   # {
   #   vpc1_id = [vpc2_network, vpc3_network]
   #   vpc2_id = [vpc1_network, vpc3_network]
