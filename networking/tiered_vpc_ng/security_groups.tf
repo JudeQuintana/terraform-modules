@@ -8,7 +8,9 @@ resource "aws_security_group" "intra_vpc" {
   name        = local.intra_vpc_security_group_name
   description = "Intra VPC traffic over Transit Gateway"
   vpc_id      = aws_vpc.this.id
-  tags = {
-    Name = local.intra_vpc_security_group_name
-  }
+  tags = merge(local.default_tags,
+    {
+      Name = local.intra_vpc_security_group_name
+    }
+  )
 }
