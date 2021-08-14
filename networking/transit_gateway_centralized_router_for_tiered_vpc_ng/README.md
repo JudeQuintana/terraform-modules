@@ -1,6 +1,6 @@
 ## Networking Trifecta Demo
 Blog Post:
-[Terraform Networking Trifecta ](https://jq1.io/posts/tiered_vpc/)
+[Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
 
 Main:
 - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
