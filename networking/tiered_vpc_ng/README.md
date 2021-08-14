@@ -4,7 +4,7 @@ Blog Post:
 
 Main:
 - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-  - See [Trifecta Demo Time](/posts/tnt/#trifecta-demo-time) for instructions.
+  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
 # Description
 Baseline Tiered VPC-NG features (same as prototype):

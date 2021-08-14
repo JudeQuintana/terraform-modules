@@ -4,7 +4,7 @@ Blog Post:
 
 Main:
 - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-  - See [Trifecta Demo Time](/posts/tnt/#trifecta-demo-time) for instructions.
+  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
 # Description
 This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
