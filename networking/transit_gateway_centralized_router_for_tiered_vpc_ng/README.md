@@ -1,5 +1,10 @@
-# Coming Soon
-Terraform Networking Trifecta Blog Post + Demo
+## Networking Trifecta Demo
+Blog Post:
+[Terraform Networking Trifecta ](https://jq1.io/posts/tiered_vpc/)
+
+Main:
+- [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
+  - See [Trifecta Demo Time](/posts/tnt/#trifecta-demo-time) for instructions.
 
 # Description
 This Transit Gateway Centralized Router module will attach all AZs in each Tiered VPC to the TGW.
