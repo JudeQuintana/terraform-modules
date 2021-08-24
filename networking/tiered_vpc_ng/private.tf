@@ -79,7 +79,6 @@ resource "aws_route_table" "private" {
 # one private route out through natgw per az
 resource "aws_route" "private_route_out" {
   for_each = local.natgw_private_az_to_subnets
-  #for_each = local.private_az_to_subnets
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.private, each.key).id
