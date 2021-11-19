@@ -11,16 +11,16 @@
 #   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
 #
 # - public_label for tags that are related to the public subnets
-# - public_az_to_subnets is map of azs to public subnets (cidrs)
-# - public_subnet_to_azs is a map of public subnets to azs used for subnet name tagging
+# - public_az_to_subnets is map of azs to public subnets list (cidrs)
+# - public_subnet_to_az is a map of public subnets to az used for subnet name tagging
 # - public_subnets is a set of all public subnets
 ############################################################################################################
 
 locals {
   public_label         = "public"
   public_az_to_subnets = { for az, acls in local.tier.azs : az => acls.public }
-  public_subnet_to_azs = { for subnet, az in transpose(local.public_az_to_subnets) : subnet => element(az, 0) }
-  public_subnets       = toset(keys(local.public_subnet_to_azs))
+  public_subnet_to_az  = { for subnet, azs in transpose(local.public_az_to_subnets) : subnet => element(azs, 0) }
+  public_subnets       = toset(keys(local.public_subnet_to_az))
 }
 
 # generate single word random pet name for each public subnet's name tag
@@ -34,7 +34,7 @@ resource "aws_subnet" "public" {
   for_each = local.public_subnets
 
   vpc_id                  = aws_vpc.this.id
-  availability_zone       = format("%s%s", local.region_name, lookup(local.public_subnet_to_azs, each.value))
+  availability_zone       = format("%s%s", local.region_name, lookup(local.public_subnet_to_az, each.value))
   cidr_block              = each.value
   map_public_ip_on_launch = true
   tags = merge(
@@ -43,7 +43,7 @@ resource "aws_subnet" "public" {
       Name = format(
         "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_azs, each.value))),
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_az, each.value))),
         local.tier.name,
         local.public_label,
         lookup(random_pet.public, each.value).id
