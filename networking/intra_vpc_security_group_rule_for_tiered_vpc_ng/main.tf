@@ -12,7 +12,7 @@ locals {
   #   vpc2_id = [vpc1_network, vpc3_network]
   #   vpc3_id = [vpc1_network, vpc2_network]
   # }
-  # local.vpc_id_to_inbound_network will then use as a lookup table for local.vpc_to_intra_vpc_security_group_rules
+  # local.vpc_id_to_inbound_network will then be used as a lookup table for local.vpc_to_intra_vpc_security_group_rules
   vpc_id_to_inbound_networks = {
     for vpc_id_network in local.vpc_ids_vpc_networks_product :
     vpc_id_network[0] => vpc_id_network[1]...
