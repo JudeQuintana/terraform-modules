@@ -45,7 +45,7 @@ Whats new in NG?
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0.4 |
+| terraform | ~> 1.0.4 |
 | aws | ~> 3.53.0 |
 
 ## Providers

@@ -13,7 +13,7 @@ This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC all
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0.4 |
+| terraform | ~> 1.0.4 |
 | aws | ~> 3.53.0 |
 
 ## Providers
