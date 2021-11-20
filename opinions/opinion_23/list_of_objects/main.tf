@@ -53,3 +53,14 @@ output "set_of_attribute1_values" {
 output "set_of_names" {
   value = local.set_of_names
 }
+
+# getting to a map of maps is just as easy.
+# output "map_of_maps" {
+#   value = {
+#     for o in local.list_of_objects : o.name => {
+#       attribute1 = o.attribute1
+#       attribute2 = o.attribute2
+#       attribute3 = o.attribute3
+#     }
+#   }
+# }
