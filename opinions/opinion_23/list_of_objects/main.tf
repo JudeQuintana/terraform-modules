@@ -21,16 +21,6 @@ locals {
   ]
 }
 
-#  Then using local.list_of_objects to create a map of resource objects.
-#
-#  resource "some_resource" "this" {
-#    for_each = { for r in local.list_of_objects : r.name => r }
-#
-#    attribute1 = each.value.attribute1
-#    attribute2 = each.value.attribute2
-#    attribute3 = each.value.attribute3
-#  }
-
 locals {
   map_of_attribute1_value_to_name   = zipmap(local.list_of_objects[*].attribute1, local.list_of_objects[*].name)
   map_of_attribute1_value_to_object = { for o in local.list_of_objects : o.attribute1 => o }
@@ -55,8 +45,8 @@ output "set_of_names" {
 }
 
 # getting to a map of maps is just as easy.
-# output "map_of_maps" {
-#   value = {
+# locals {
+#   map_of_maps = {
 #     for o in local.list_of_objects : o.name => {
 #       attribute1 = o.attribute1
 #       attribute2 = o.attribute2
@@ -64,3 +54,18 @@ output "set_of_names" {
 #     }
 #   }
 # }
+#
+# output "map_of_maps" {
+#   value = local.map_of_maps
+# }
+
+# then using the map of maps directly to create a resource,
+# just like before but starting with list of objects.
+#
+#  resource "some_resource" "this" {
+#    for_each = local.map_of_maps
+#
+#    attribute1 = each.value.attribute1
+#    attribute2 = each.value.attribute2
+#    attribute3 = each.value.attribute3
+#  }
