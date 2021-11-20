@@ -1,13 +1,4 @@
 locals {
-  # Each VPC id should have an inbound rule from all other VPC networks except itself
-  # The next 2 for loops will build the following structure for local.vpc_id_to_inbound_networks
-  # {
-  #   vpc1_id = [vpc2_network, vpc3_network]
-  #   vpc2_id = [vpc1_network, vpc3_network]
-  #   vpc3_id = [vpc1_network, vpc2_network]
-  #   ...
-  # }
-  # then use as a lookup table for local.vpc_to_intra_vpc_security_group_rules
   vpc_id_to_networks = { for vpc_name, this in var.vpcs : this.id => this.network }
 
   vpc_ids_vpc_networks_product = setproduct(
@@ -15,6 +6,13 @@ locals {
     values(local.vpc_id_to_networks)
   )
 
+  # Each VPC id should have an inbound rule from all other VPC networks except itself
+  # {
+  #   vpc1_id = [vpc2_network, vpc3_network]
+  #   vpc2_id = [vpc1_network, vpc3_network]
+  #   vpc3_id = [vpc1_network, vpc2_network]
+  # }
+  # local.vpc_id_to_inbound_network will then be used as a lookup table for local.vpc_to_intra_vpc_security_group_rules
   vpc_id_to_inbound_networks = {
     for vpc_id_network in local.vpc_ids_vpc_networks_product :
     vpc_id_network[0] => vpc_id_network[1]...
@@ -27,6 +25,7 @@ locals {
     vpc_name => merge({
       intra_vpc_security_group_id = this.intra_vpc_security_group_id
       networks                    = lookup(local.vpc_id_to_inbound_networks, this.id)
+      type                        = "ingress"
     }, var.rule)
   }
 }
@@ -36,7 +35,7 @@ resource "aws_security_group_rule" "this" {
 
   security_group_id = each.value.intra_vpc_security_group_id
   cidr_blocks       = each.value.networks
-  type              = "ingress"
+  type              = each.value.type
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
