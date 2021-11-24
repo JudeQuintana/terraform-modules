@@ -47,7 +47,8 @@ output "set_of_names" {
 # getting to a map of maps is just as easy.
 # locals {
 #   map_of_maps = {
-#     for o in local.list_of_objects : o.name => {
+#     for o in local.list_of_objects :
+#     o.name => {
 #       attribute1 = o.attribute1
 #       attribute2 = o.attribute2
 #       attribute3 = o.attribute3
