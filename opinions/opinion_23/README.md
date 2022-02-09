@@ -1,6 +1,6 @@
 # Terraform Opinion #23: Use list of objects over map of maps.
 
-See the [blog post](https://jq1.io/opinion_23) for more details.
+See the [blog post](https://jq1.io/posts/opinion_23) for more details.
 
 Use `terraform refresh` in each directory to show the same collection types output below for `list_of_objects` and `map_of_maps`.
 
