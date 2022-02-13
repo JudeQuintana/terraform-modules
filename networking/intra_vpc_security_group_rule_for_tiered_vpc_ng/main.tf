@@ -10,7 +10,7 @@ locals {
   vpc_id_to_inbound_networks = {
     for vpc_id_and_network in setproduct(var.vpcs[*].id, var.vpcs[*].network) :
     vpc_id_and_network[0] => vpc_id_and_network[1]...
-    if lookup(local.vpc_id_to_networks, vpc_id_and_network[0]) != vpc_id_and_network[1]
+    if lookup(local.vpc_id_and_networks, vpc_id_and_network[0]) != vpc_id_and_network[1]
   }
 
   # build a security group rule object for each vpc with vpc_name for the key
