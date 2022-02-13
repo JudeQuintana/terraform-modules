@@ -27,8 +27,8 @@ locals {
   # collect the first public subnet for each az per tiered vpc to be used for each vpc attachment.
   # i'm using public subnets because they will always exist for a tiered vpc.
   # this means routing will go through a public subnet to get to a private subnet in the same AZ
-  # private subnets could be used too but i'm not sure about security implications of this pattern
-  # but i dont think it matters.
+  # private subnets could be used too
+  # i'm not sure about security implications of this pattern but i dont think it matters.
   #
   # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
   vpc_id_to_single_public_subnet_ids_per_az = {
@@ -40,6 +40,7 @@ locals {
   vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => vpc_name }
 }
 
+# associate vpc attachments
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
 
@@ -55,7 +56,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   })
 }
 
-# one route table for all vpc networks, associate vpc attachments and propagate routes
+# one route table for all vpc networks and propagate routes
 resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(
@@ -98,8 +99,8 @@ locals {
   # { rtb-id|route => route, ... }
   private_and_public_routes_to_other_networks = merge(
     [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
-      { for rtb_id_route in setproduct([r.rtb_id], r.other_networks) :
-        format("%s|%s", rtb_id_route[0], rtb_id_route[1]) => rtb_id_route[1] # each key must be unique, dont group by key
+      { for rtb_id_and_route in setproduct([r.rtb_id], r.other_networks) :
+        format("%s|%s", rtb_id_and_route[0], rtb_id_and_route[1]) => rtb_id_and_route[1] # each key must be unique, dont group by key
   }]...)
 }
 
