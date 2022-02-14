@@ -1,9 +1,9 @@
 locals {
   # Each VPC id should have an inbound rule from all other VPC networks except itself
   # {
-  #   vpc1_id = [vpc2_network, vpc3_network, ...]
-  #   vpc2_id = [vpc1_network, vpc3_network, ...]
-  #   vpc3_id = [vpc1_network, vpc2_network, ...]
+  #   vpc1-id = [vpc2-network, vpc3-network, ...]
+  #   vpc2-id = [vpc1-network, vpc3-network, ...]
+  #   vpc3-id = [vpc1-network, vpc2-network, ...]
   #   ...
   # }
   # local.vpc_id_to_inbound_networks will then be used as a lookup table for local.vpc_to_intra_vpc_security_group_rules
@@ -12,7 +12,7 @@ locals {
   vpc_id_to_networks = { for vpc_name, this in var.vpcs : this.id => this.network }
 
   vpc_id_to_inbound_networks = {
-    for vpc_id_and_network in setproduct(var.vpcs[*].id, var.vpcs[*].network) :
+    for vpc_id_and_network in setproduct(keys(local.vpc_id_to_networks), values(local.vpc_id_to_networks)) :
     vpc_id_and_network[0] => vpc_id_and_network[1]...
     if lookup(local.vpc_id_to_networks, vpc_id_and_network[0]) != vpc_id_and_network[1]
   }
