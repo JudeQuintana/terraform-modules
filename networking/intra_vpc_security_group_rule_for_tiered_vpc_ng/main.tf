@@ -1,23 +1,17 @@
 locals {
-  # Each VPC id should have an inbound rule from all other VPC networks except itself
-  # {
-  #   vpc1-id = [vpc2-network, vpc3-network, ...]
-  #   vpc2-id = [vpc1-network, vpc3-network, ...]
-  #   vpc3-id = [vpc1-network, vpc2-network, ...]
-  #   ...
-  # }
+  # Each VPC id should have an inbound rule from all other VPC networks except itself.
 
-  # local.vpc_id_to_networks is used as a lookup table for local.vpc_id_to_inbound_networks 'if' logic
+  # { vpc1-id => "vpc1-network", vpc2-id => "vpc2-network", vpc3-id => "vpc3-network" }
   vpc_id_to_networks = { for vpc_name, this in var.vpcs : this.id => this.network }
 
-  # local.vpc_id_to_inbound_networks will then be used as a lookup table for local.vpc_to_intra_vpc_security_group_rules
+  # { vpc1-id = ["vpc2-network", "vpc3-network", ...], vpc2-id = ["vpc1-network", "vpc3-network", ...], vpc3-id = ["vpc1-network", "vpc2-network", ...] ...  }
   vpc_id_to_inbound_networks = {
     for vpc_id_and_network in setproduct(keys(local.vpc_id_to_networks), values(local.vpc_id_to_networks)) :
     vpc_id_and_network[0] => vpc_id_and_network[1]...
     if lookup(local.vpc_id_to_networks, vpc_id_and_network[0]) != vpc_id_and_network[1]
   }
 
-  # build a security group rule object for each vpc with vpc_name for the key
+  # complete the security group rule object for each vpc
   vpc_to_intra_vpc_security_group_rules = {
     for vpc_name, this in var.vpcs :
     vpc_name => merge({
