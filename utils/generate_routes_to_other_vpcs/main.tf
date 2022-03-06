@@ -1,4 +1,4 @@
-# Create routes to other VPC networks in private and public route tables for each VPC
+# generate routes to other VPC networks in private and public route tables for each VPC
 locals {
   # { vpc-1-network => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
   vpc_network_to_private_and_public_route_table_ids = {
