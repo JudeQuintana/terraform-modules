@@ -1,6 +1,5 @@
 # Generate Routes to Other VPCs Description
-
-See Building a generate routes function using Terraform test blog post.
+See [Building a generate routes function using Terraform test](https://jq1.io/posts/generating_routes) blog post.
 
 This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects.
 
@@ -12,11 +11,11 @@ Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to
 
 The test suite will help when refactoring is needed.
 
-Example future use in TGW Centralized Router:
+Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
 ```
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=1.3.0"
 
   vpcs = var.vpcs
 }
@@ -29,7 +28,6 @@ resource "aws_route" "this" {
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
 ```
-
 
 ## Requirements
 
