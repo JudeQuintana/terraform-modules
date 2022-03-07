@@ -30,9 +30,6 @@ variable "tier" {
     }))
   })
 
-  # in TF 0.14 you can remove the length comparison
-  # and wrap the for loop in alltrue() to get the
-  # same behavior
   validation {
     condition = length([
       for az in var.tier.azs : true
