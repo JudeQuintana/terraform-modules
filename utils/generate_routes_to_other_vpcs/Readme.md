@@ -1,9 +1,9 @@
 # Generate Routes to Other VPCs Description
 See [Building a generate routes function using Terraform test](https://jq1.io/posts/generating_routes) blog post.
 
-This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects.
+This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects with [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng).
 
-It will output a map of routes to other VPCs to be consumed by route resources.
+It will create a map of routes to other VPC networks (execept itself) which will then be consumed by route resources.
 
 The `call` output is `{ "rtb-id|route" => "route", ... }`.
 
