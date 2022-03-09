@@ -40,7 +40,7 @@ locals {
   vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => vpc_name }
 }
 
-# associate vpc attachments
+# attach vpcs to tgw
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
 
@@ -56,7 +56,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   })
 }
 
-# one route table for all vpc networks and propagate routes
+# one route table for all vpc networks
 resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(
@@ -66,6 +66,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
   })
 }
 
+# associate attachments to route table
 resource "aws_ec2_transit_gateway_route_table_association" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
 
@@ -73,6 +74,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 }
 
+# route table propagation
 resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
 
