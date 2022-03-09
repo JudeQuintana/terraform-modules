@@ -1,5 +1,5 @@
 # terraform-modules
-A collection of ideas as code.
+A collection of ideas.
 
 Experimentation is the path to discovery.
 
