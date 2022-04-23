@@ -22,6 +22,8 @@ variable "tags" {
 variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
+    account_id                   = string
+    region                       = string
     id                           = string
     network                      = string
     az_to_private_route_table_id = map(string)
