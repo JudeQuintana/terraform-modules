@@ -31,9 +31,10 @@ variable "vpcs" {
     az_to_public_route_table_id  = map(string)
     az_to_public_subnet_ids      = map(list(string))
   }))
+  default = {}
 
-  validation {
-    condition     = length(var.vpcs) > 1
-    error_message = "There must be at least 2 VPCs."
-  }
+  #validation {
+  #condition     = length(var.vpcs) > 1
+  #error_message = "There must be at least 2 VPCs."
+  #}
 }

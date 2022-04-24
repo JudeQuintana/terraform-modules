@@ -15,6 +15,11 @@ locals {
   }, var.tags)
 }
 
+# generate single word random pet name for tgw
+resource "random_pet" "this" {
+  length = 1
+}
+
 # one tgw that will route between all tiered vpcs.
 resource "aws_ec2_transit_gateway" "this" {
   amazon_side_asn                 = var.amazon_side_asn
@@ -23,7 +28,7 @@ resource "aws_ec2_transit_gateway" "this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s", local.upper_env_prefix, local.region_label)
+      Name = format("%s-%s-%s", local.upper_env_prefix, random_pet.this.id, local.region_label)
   })
 }
 
@@ -66,7 +71,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s", local.upper_env_prefix, local.region_label)
+      Name = format("%s-%s-%s", local.upper_env_prefix, random_pet.this.id, local.region_label)
   })
 }
 
