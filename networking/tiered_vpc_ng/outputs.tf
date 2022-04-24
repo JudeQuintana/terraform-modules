@@ -16,27 +16,25 @@ output "intra_vpc_security_group_id" {
 }
 
 locals {
-  private_subnet_to_subnet_id   = { for subnet, this in aws_subnet.private : subnet => this.id }
-  private_subnet_ids_per_az     = { for subnet, private_subnet_id in local.private_subnet_to_subnet_id : lookup(local.private_subnet_to_az, subnet) => private_subnet_id... } # group subnet_ids by AZ of subnet
-  private_route_table_id_per_az = { for az, route_table in aws_route_table.private : az => route_table.id }
+  az_to_private_subnet_ids     = { for subnet, this in aws_subnet.private : lookup(local.private_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
+  az_to_private_route_table_id = { for az, route_table in aws_route_table.private : az => route_table.id }
 
-  public_subnet_to_subnet_id   = { for subnet, this in aws_subnet.public : subnet => this.id }
-  public_subnet_ids_per_az     = { for subnet, public_subnet_id in local.public_subnet_to_subnet_id : lookup(local.public_subnet_to_az, subnet) => public_subnet_id... } # group subnet_ids by AZ of subnet
-  public_route_table_id_per_az = { for az, subnet_id in local.public_subnet_ids_per_az : az => aws_route_table.public.id }                                               # Each public subnet shares the same route table
+  az_to_public_subnet_ids     = { for subnet, this in aws_subnet.public : lookup(local.public_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
+  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.public.id }            # Each public subnet shares the same route table
 }
 
 output "az_to_private_subnet_ids" {
-  value = local.private_subnet_ids_per_az
+  value = local.az_to_private_subnet_ids
 }
 
 output "az_to_private_route_table_id" {
-  value = local.private_route_table_id_per_az
+  value = local.az_to_private_route_table_id
 }
 
 output "az_to_public_subnet_ids" {
-  value = local.public_subnet_ids_per_az
+  value = local.az_to_public_subnet_ids
 }
 
 output "az_to_public_route_table_id" {
-  value = local.public_route_table_id_per_az
+  value = local.az_to_public_route_table_id
 }

@@ -43,14 +43,14 @@ What’s new in NG?
 
 | Name | Version |
 |------|---------|
-| terraform | ~> 1.0.4 |
-| aws | ~> 3.53.0 |
+| terraform | ~> 1 |
+| aws | ~> 3.53 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.53.0 |
+| aws | ~> 3.53 |
 | random | n/a |
 
 ## Inputs

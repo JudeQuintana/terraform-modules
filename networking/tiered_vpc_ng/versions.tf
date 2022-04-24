@@ -1,9 +1,9 @@
 terraform {
-  required_version = "~> 1.0.4"
+  required_version = "~> 1"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.53.0"
+      version = "~> 3.53"
     }
   }
   # needed for utilizing optional() and defaults() until they're GA
