@@ -47,10 +47,14 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
 
   for_each = local.local_centralized_routers
 
-  peer_account_id         = each.value.account_id
-  peer_region             = each.value.region
-  peer_transit_gateway_id = each.value.id
-  transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
+  #peer_account_id         = each.value.account_id
+  #peer_region             = each.value.region
+  #peer_transit_gateway_id = each.value.id
+  #transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
+  peer_account_id         = local.local_account_id
+  peer_region             = local.local_region_name
+  peer_transit_gateway_id = aws_ec2_transit_gateway.local_this.id
+  transit_gateway_id      = each.value.id
   tags = {
     Name = "tgw peer"
     Side = "Creator"
