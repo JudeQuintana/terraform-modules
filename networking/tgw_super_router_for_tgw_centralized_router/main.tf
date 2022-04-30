@@ -36,8 +36,8 @@ resource "aws_ec2_transit_gateway" "local_this" {
   })
 }
 
-# Create the Peering attachment in the second account for the local provider
-# iteration of over same regions
+# Create the Peering attachment in same region/acct for the local provider
+# iteration of over centralized router in same region
 locals {
   local_centralized_routers = { for lcr in var.local_centralized_routers : lcr.id => lcr }
 }
@@ -47,7 +47,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
 
   for_each = local.local_centralized_routers
 
-  #peer_account_id         = each.value.account_id
+  peer_account_id         = each.value.account_id
   peer_region             = each.value.region
   peer_transit_gateway_id = each.value.id
   transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
@@ -61,7 +61,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
   }
 }
 
-# ...and accept it in the first account.
+# accept it in the same region.
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
   provider = aws.local
 
