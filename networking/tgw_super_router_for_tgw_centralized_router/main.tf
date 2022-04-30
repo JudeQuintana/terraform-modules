@@ -32,7 +32,7 @@ resource "aws_ec2_transit_gateway" "local_this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
+      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
   })
 }
 
