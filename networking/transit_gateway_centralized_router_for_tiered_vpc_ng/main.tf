@@ -28,7 +28,7 @@ resource "aws_ec2_transit_gateway" "this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s-%s", local.upper_env_prefix, random_pet.this.id, local.region_label)
+      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
   })
 }
 

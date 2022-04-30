@@ -17,6 +17,11 @@ locals {
   }, var.tags)
 }
 
+# generate single word random pet name for tgw
+resource "random_pet" "this" {
+  length = 1
+}
+
 # one tgw that will route between all centralized routers.
 resource "aws_ec2_transit_gateway" "local_this" {
   provider = aws.local
@@ -27,7 +32,7 @@ resource "aws_ec2_transit_gateway" "local_this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-super-router-%s", local.upper_env_prefix, local.local_region_label)
+      Name = format("%s-%s-%s", local.upper_env_prefix, "super-router", randomd_pet.this.id, local.local_region_label)
   })
 }
 
