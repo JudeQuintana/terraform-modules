@@ -4,7 +4,7 @@ terraform {
     aws = {
       source                = "hashicorp/aws"
       version               = "~> 4.12"
-      configuration_aliases = [aws.local] # add aws.peer here
+      configuration_aliases = [aws.local, aws.peer]
     }
     random = {
       source  = "hashicorp/random"

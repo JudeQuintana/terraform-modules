@@ -47,16 +47,18 @@ variable "local_tgw_routes" {
   #validation
 }
 
-variable "remote_centralized_routers" {
+variable "peer_centralized_routers" {
   description = "list of centralized router objects for remote provider"
   type = list(object({
     id             = string
     route_table_id = string
-    vpcs = map(object({
-      network                      = string
-      az_to_public_route_table_id  = map(string)
-      az_to_private_route_table_id = map(string)
-    }))
+    region         = string
+    account_id     = string
+    #vpcs = map(object({
+    #network                      = string
+    #az_to_public_route_table_id  = map(string)
+    #az_to_private_route_table_id = map(string)
+    #}))
   }))
   default = []
   # validation
