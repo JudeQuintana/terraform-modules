@@ -6,5 +6,9 @@ terraform {
       version               = "~> 4.12"
       configuration_aliases = [aws.local] # add aws.peer here
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "v3.1.3"
+    }
   }
 }
