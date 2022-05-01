@@ -1,6 +1,5 @@
 variable "amazon_side_asn" {
-  type    = number
-  default = null
+  type = number
 }
 
 variable "env_prefix" {

@@ -15,8 +15,7 @@ variable "tags" {
 }
 
 variable "local_amazon_side_asn" {
-  type    = number
-  default = null
+  type = number
 }
 
 variable "local_centralized_routers" {
@@ -60,6 +59,5 @@ variable "peer_centralized_routers" {
     #az_to_private_route_table_id = map(string)
     #}))
   }))
-  default = []
   # validation
 }
