@@ -129,6 +129,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "peer_locals" {
 }
 
 #TODO
+# figure out routing between tgws
 # add routes to each vpc, use generate_routes_to_other_vpcs module??
 # figure out tgw route overrides
 # whatever else comes up
