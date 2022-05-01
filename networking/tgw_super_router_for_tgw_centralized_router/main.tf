@@ -97,7 +97,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
 
 # Create the Peering attachment in cross region to super router (same acct) for the peer provider
 locals {
-  peer_centralized_routers = { for lcr in var.peer_centralized_routers : lcr.id => lcr }
+  peer_centralized_routers = { for pcr in var.peer_centralized_routers : pcr.id => pcr }
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment" "peer_peers" {
