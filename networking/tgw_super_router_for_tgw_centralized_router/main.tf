@@ -47,9 +47,9 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
 
   for_each = local.local_centralized_routers
 
-  #peer_account_id         = each.value.account_id
+  peer_account_id         = each.value.account_id
   peer_region             = each.value.region
-  peer_transit_gateway_id = each.value.id
+  peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
   tags = {
     Name = "tgw peer"
@@ -66,7 +66,7 @@ data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" 
 
   filter {
     name   = "transit-gateway-id"
-    values = [each.value.id]
+    values = [each.key]
   }
 
   depends_on = [aws_ec2_transit_gateway_peering_attachment.local_peers]
