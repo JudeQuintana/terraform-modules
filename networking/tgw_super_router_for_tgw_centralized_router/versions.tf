@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = "~> 3.53"
+      version               = "~> 4.12"
       configuration_aliases = [aws.local] # add aws.peer here
     }
   }

@@ -47,18 +47,28 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
 
   for_each = local.local_centralized_routers
 
-  peer_account_id         = each.value.account_id
+  #peer_account_id         = each.value.account_id
   peer_region             = each.value.region
   peer_transit_gateway_id = each.value.id
   transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
-  #peer_account_id         = local.local_account_id
-  #peer_region             = local.local_region_name
-  #peer_transit_gateway_id = aws_ec2_transit_gateway.local_this.id
-  #transit_gateway_id      = each.value.id
   tags = {
     Name = "tgw peer"
     Side = "Creator"
   }
+}
+
+# data source needed for intra-region peering.
+data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" {
+  provider = aws.local
+
+  for_each = local.local_centralized_routers
+
+  filter {
+    name   = "transit-gateway-id"
+    values = [each.value.id]
+  }
+
+  depends_on = [aws_ec2_transit_gateway_peering_attachment.local_peers]
 }
 
 # accept it in the same region.
@@ -67,7 +77,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
 
   for_each = local.local_centralized_routers
 
-  transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.key).id
+  transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.local_acceptor_peering_data, each.key).id
   tags = {
     Name = "tgw local"
     Side = "Acceptor"
