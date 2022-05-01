@@ -58,6 +58,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
 }
 
 # data source needed for intra-region peering.
+# ref: https://github.com/hashicorp/terraform-provider-aws/issues/23828
 data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" {
   provider = aws.local
 
