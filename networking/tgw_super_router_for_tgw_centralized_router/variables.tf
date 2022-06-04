@@ -25,11 +25,11 @@ variable "local_centralized_routers" {
     route_table_id = string
     region         = string
     account_id     = string
-    #vpcs                         = map(object({
-    #network                      = string
-    #az_to_public_route_table_id  = map(string)
-    #az_to_private_route_table_id = map(string)
-    #}))
+    vpcs = map(object({
+      network = string
+      #az_to_public_route_table_id  = map(string)
+      #az_to_private_route_table_id = map(string)
+    }))
   }))
   # include region and caller_identity.account_id?
   # validation
@@ -53,11 +53,11 @@ variable "peer_centralized_routers" {
     route_table_id = string
     region         = string
     account_id     = string
-    #vpcs = map(object({
-    #network                      = string
-    #az_to_public_route_table_id  = map(string)
-    #az_to_private_route_table_id = map(string)
-    #}))
+    vpcs = map(object({
+      network = string
+      #az_to_public_route_table_id  = map(string)
+      #az_to_private_route_table_id = map(string)
+    }))
   }))
   # validation
 }
