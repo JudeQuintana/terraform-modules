@@ -1,8 +1,7 @@
-
 # Create the Peering attachment in same region/acct for the local provider
 # iteration of over centralized router in same region
 locals {
-  local_centralized_routers = { for lcr in var.local_centralized_routers : lcr.id => lcr }
+  local_centralized_routers = { for this in var.local_centralized_routers : this.id => this }
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
@@ -60,7 +59,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
 
 # Create the Peering attachment in cross region to super router (same acct) for the peer provider
 locals {
-  peer_centralized_routers = { for pcr in var.peer_centralized_routers : pcr.id => pcr }
+  peer_centralized_routers = { for this in var.peer_centralized_routers : this.id => this }
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment" "peer_peers" {
