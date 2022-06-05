@@ -50,20 +50,21 @@ locals {
 }
 
 # attach vpcs to tgw
-#resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
-#for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
+  #for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = {}
 
-#subnet_ids                                      = each.value
-#transit_gateway_id                              = aws_ec2_transit_gateway.this.id
-#transit_gateway_default_route_table_association = false
-#transit_gateway_default_route_table_propagation = false
-#vpc_id                                          = each.key
-#tags = merge(
-#local.default_tags,
-#{
-#Name = lookup(local.vpc_id_to_names, each.key)
-#})
-#}
+  subnet_ids                                      = each.value
+  transit_gateway_id                              = aws_ec2_transit_gateway.this.id
+  transit_gateway_default_route_table_association = false
+  transit_gateway_default_route_table_propagation = false
+  vpc_id                                          = each.key
+  tags = merge(
+    local.default_tags,
+    {
+      #Name = lookup(local.vpc_id_to_names, each.key)
+  })
+}
 
 ## one route table for all vpc networks
 resource "aws_ec2_transit_gateway_route_table" "this" {
@@ -76,20 +77,22 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 }
 
 ## associate attachments to route table
-#resource "aws_ec2_transit_gateway_route_table_association" "this" {
-#for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+resource "aws_ec2_transit_gateway_route_table_association" "this" {
+  #for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = {}
 
-#transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
-#transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
-#}
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
+}
 
-## route table propagation
-#resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
-#for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+# route table propagation
+resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
+  #for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = {}
 
-#transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
-#transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
-#}
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
+}
 
 # Create routes to other VPC networks in private and public route tables for each VPC
 #locals {
@@ -115,10 +118,11 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 #}]...)
 #}
 
-#resource "aws_route" "this" {
-#for_each = local.private_and_public_routes_to_other_networks
+resource "aws_route" "this" {
+  #for_each = local.private_and_public_routes_to_other_networks
+  for_each = {}
 
-#destination_cidr_block = each.value
-#route_table_id         = split("|", each.key)[0]
-#transit_gateway_id     = aws_ec2_transit_gateway.this.id
-#}
+  destination_cidr_block = each.value
+  route_table_id         = split("|", each.key)[0]
+  transit_gateway_id     = aws_ec2_transit_gateway.this.id
+}
