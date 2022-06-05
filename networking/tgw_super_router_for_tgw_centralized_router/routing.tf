@@ -32,6 +32,14 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
   # need lifecycle precondition here to make sure the peer links are up before adding the route.
   # otherwise have to double apply (1st error, 2nd success) in its current state.
+  #│ Error: error creating EC2 Transit Gateway Route (tgw-rtb-06bc3ee428d3d8f34_10.0.0.0/20): IncorrectState: tgw-attach-036b94b7a33b579c2 is in invalid state
+  #│       status code: 400, request id: d3a0e811-a7c3-4e93-811d-f1426547bf90
+  #│
+  #│   with module.tgw_super_router_usw2.aws_ec2_transit_gateway_route.local_this["tgw-0437861a2a09627bd"],
+  #│   on .terraform/modules/tgw_super_router_usw2/routing.tf line 13, in resource "aws_ec2_transit_gateway_route" "local_this":
+  #│   13: resource "aws_ec2_transit_gateway_route" "local_this" {
+  #│
+  #╵
 }
 
 locals {
