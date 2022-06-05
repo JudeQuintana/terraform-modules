@@ -18,8 +18,8 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
-  # might need depends_on to make sure the peer links are up before adding the route.
-  # have to double apply (1st error, 2nd success) in its current state.
+  # need lifecycle precondition here to make sure the peer links are up before adding the route.
+  # otherwise have to double apply (1st error, 2nd success) in its current state.
 }
 
 locals {
@@ -42,7 +42,7 @@ resource "aws_ec2_transit_gateway_route" "peer_this" {
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
-  # might need depends_on to make sure the peer links are up before adding the route.
-  # have to double apply (1st error, 2nd success) in its current state.
+  # need lifecycle precondition here to make sure the peer links are up before adding the route.
+  # otherwise have to double apply (1st error, 2nd success) in its current state.
 }
 
