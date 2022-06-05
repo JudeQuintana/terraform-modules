@@ -1,3 +1,15 @@
+# one route table for all networks
+resource "aws_ec2_transit_gateway_route_table" "local_this" {
+  provider = aws.local
+
+  transit_gateway_id = aws_ec2_transit_gateway.local_this.id
+  tags = merge(
+    local.default_tags,
+    {
+      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
+  })
+}
+
 locals {
   local_networks = flatten([
     for this in var.local_centralized_routers :
