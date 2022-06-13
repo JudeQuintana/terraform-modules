@@ -37,6 +37,25 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
   #}
 }
 
+resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
+  provider = aws.local
+
+  for_each = { for r in local.local_networks : r.tgw_id => r }
+
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.key).id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+}
+#
+# You cannot propagate a peering attachment to a Transit Gateway Route Table
+#resource "aws_ec2_transit_gateway_route_table_propagation" "local_this" {
+#provider = aws.local
+
+#for_each = { for r in local.local_networks : r.tgw_id => r }
+
+#transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.key).id
+#transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+#}
+
 locals {
   peer_networks = flatten(
     [for this in var.peer_centralized_routers :
@@ -62,5 +81,14 @@ resource "aws_ec2_transit_gateway_route" "peer_this" {
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
   #}
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
+  provider = aws.local
+
+  for_each = { for r in local.peer_networks : r.tgw_id => r }
+
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, each.key).id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
 }
 
