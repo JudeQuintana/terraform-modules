@@ -19,12 +19,15 @@ locals {
         tgw_peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id
         tgw_route_table_id        = this.route_table_id
   }]])
+
+  tgw_id_to_local_networks = { for r in local.local_networks : r.tgw_id => r }
 }
+
 
 resource "aws_ec2_transit_gateway_route" "local_this" {
   provider = aws.local
 
-  for_each = { for r in local.local_networks : r.tgw_id => r }
+  for_each = local.tgw_id_to_local_networks
 
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
@@ -32,6 +35,7 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
 
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
+
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
   #}
@@ -40,13 +44,17 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
 resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
   provider = aws.local
 
-  for_each = { for r in local.local_networks : r.tgw_id => r }
+  for_each = local.tgw_id_to_local_networks
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
 }
 #
-# You cannot propagate a peering attachment to a Transit Gateway Route Table
+# You cannot propagate a tgw peering attachment to a Transit Gateway Route Table
 #resource "aws_ec2_transit_gateway_route_table_propagation" "local_this" {
 #provider = aws.local
 
@@ -65,12 +73,14 @@ locals {
         tgw_peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, this.id).id
         tgw_route_table_id        = this.route_table_id
   }]])
+
+  tgw_id_to_peer_networks = { for r in local.peer_networks : r.tgw_id => r }
 }
 
 resource "aws_ec2_transit_gateway_route" "peer_this" {
   provider = aws.local
 
-  for_each = { for r in local.peer_networks : r.tgw_id => r }
+  for_each = local.tgw_id_to_peer_networks
 
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
@@ -86,9 +96,13 @@ resource "aws_ec2_transit_gateway_route" "peer_this" {
 resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
   provider = aws.local
 
-  for_each = { for r in local.peer_networks : r.tgw_id => r }
+  for_each = local.tgw_id_to_peer_networks
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
 }
 
