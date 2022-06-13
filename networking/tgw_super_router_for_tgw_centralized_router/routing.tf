@@ -48,6 +48,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+  #
+  # make sure the peer links are up before adding the route table association.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
@@ -100,6 +103,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
+  # make sure the peer links are up before adding the route table association.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
 
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
