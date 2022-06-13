@@ -29,11 +29,12 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
   # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
   #}
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 }
 
 locals {
@@ -55,10 +56,11 @@ resource "aws_ec2_transit_gateway_route" "peer_this" {
   destination_cidr_block         = each.value.vpc_network
   transit_gateway_attachment_id  = each.value.tgw_peering_attachment_id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
   # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
   #lifecycle {
   #ignore_changes = [transit_gateway_attachment_id] ??
   #}
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
 }
 
