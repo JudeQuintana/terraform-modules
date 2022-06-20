@@ -15,7 +15,7 @@ Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/t
 ```
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=1.3.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
 
   vpcs = var.vpcs
 }
