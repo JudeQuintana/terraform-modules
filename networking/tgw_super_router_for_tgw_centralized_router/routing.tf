@@ -67,6 +67,8 @@ module "local_generate_routes_to_other_vpcs" {
   for_each = { for this in var.local_centralized_routers : this.id => this.vpcs }
 
   vpcs = each.value
+
+  depends_on = [aws_ec2_transit_gateway_route_table_association.local_this] # for now
 }
 
 locals {
@@ -136,6 +138,8 @@ module "peer_generate_routes_to_other_vpcs" {
   for_each = { for this in var.peer_centralized_routers : this.id => this.vpcs }
 
   vpcs = each.value
+
+  depends_on = [aws_ec2_transit_gateway_route_table_association.peer_this] # for now
 }
 
 locals {
