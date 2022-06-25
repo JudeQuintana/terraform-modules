@@ -147,8 +147,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
 }
 
 module "peer_generate_routes_to_other_vpcs" {
-  #source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
-  source = "/Users/jude/projects/terraform-modules/utils/generate_routes_to_other_vpcs"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
 
   for_each = { for this in var.peer_centralized_routers : this.id => this.vpcs }
 
