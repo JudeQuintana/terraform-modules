@@ -11,9 +11,8 @@ resource "aws_ec2_transit_gateway_route_table" "local_this" {
 }
 
 locals {
-  local_tgws = [
-    for this in var.local_centralized_routers : merge(
-      this, { peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id }
+  local_tgws = [for this in var.local_centralized_routers : merge(
+    this, { peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id }
   )]
 
   #output "local_tgws_per_vpc_network" {
