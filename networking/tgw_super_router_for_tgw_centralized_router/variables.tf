@@ -29,6 +29,7 @@ variable "local_centralized_routers" {
       network                      = string
       az_to_public_route_table_id  = map(string)
       az_to_private_route_table_id = map(string)
+      #routes                       = map(string)
     }))
   }))
   # include region and caller_identity.account_id?
@@ -57,6 +58,7 @@ variable "peer_centralized_routers" {
       network                      = string
       az_to_public_route_table_id  = map(string)
       az_to_private_route_table_id = map(string)
+      #routes                       = map(string)
     }))
   }))
   # validation

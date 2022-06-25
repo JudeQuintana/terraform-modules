@@ -14,7 +14,8 @@ locals {
   local_tgws_per_vpc_network = flatten(
     [for this in var.local_centralized_routers :
       [for vpc_name, vpc in this.vpcs : {
-        vpc_network               = vpc.network
+        vpc_network = vpc.network
+        #vpc_routes                   = vpc.routes
         tgw_id                    = this.id
         tgw_peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id
         tgw_route_table_id        = this.route_table_id
@@ -61,6 +62,8 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
 # resource "aws_ec2_transit_gateway_route_table_propagation" "local_this" {}
 
 # snippet
+#
+#
 module "local_generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
 
@@ -72,11 +75,21 @@ module "local_generate_routes_to_other_vpcs" {
 }
 
 locals {
-  generated_local = { for tgw_id, this in module.local_generate_routes_to_other_vpcs : tgw_id => this.call }
+  local_tgw_id_to_vpc_networks = { for this in local.local_tgws_per_vpc_network : this.tgw_id => this.vpc_network... }
+  # should be output from centralized router
+  generated_local_call = [
+    for tgw_id, this in module.local_generate_routes_to_other_vpcs : {
+      tgw_id       = tgw_id
+      vpc_networks = lookup(local.local_tgw_id_to_vpc_networks, tgw_id)
+      routes       = this.call
+  }]
 }
 
-output "generated_local_vpc_routes" {
-  value = local.generated_local
+output "local_tgw_id_to_vpc_networks" {
+  value = local.local_tgw_id_to_vpc_networks
+}
+output "generated_local_call" {
+  value = local.generated_local_call
 }
 
 #resource "aws_route" "this" {
@@ -91,7 +104,8 @@ locals {
   peer_tgws_per_vpc_network = flatten(
     [for this in var.peer_centralized_routers :
       [for vpc_name, vpc in this.vpcs : {
-        vpc_network               = vpc.network
+        vpc_network = vpc.network
+        #vpc_routes                = vpc.routes
         tgw_id                    = this.id
         tgw_peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, this.id).id
         tgw_route_table_id        = this.route_table_id
@@ -143,9 +157,20 @@ module "peer_generate_routes_to_other_vpcs" {
 }
 
 locals {
-  generated_peer = { for tgw_id, this in module.peer_generate_routes_to_other_vpcs : tgw_id => this.call }
+  peer_tgw_id_to_vpc_networks = { for this in local.peer_tgws_per_vpc_network : this.tgw_id => this.vpc_network... }
+  # should be output from centralized router
+  generated_peer_call = [
+    for tgw_id, this in module.peer_generate_routes_to_other_vpcs : {
+      tgw_id       = tgw_id
+      vpc_networks = lookup(local.peer_tgw_id_to_vpc_networks, tgw_id)
+      routes       = this.call
+  }]
 }
 
-output "generated_peer_vpc_routes" {
-  value = local.generated_peer
+output "peer_tgw_id_to_vpc_networks" {
+  value = local.peer_tgw_id_to_vpc_networks
+}
+
+output "generated_peer_call" {
+  value = local.generated_peer_call
 }

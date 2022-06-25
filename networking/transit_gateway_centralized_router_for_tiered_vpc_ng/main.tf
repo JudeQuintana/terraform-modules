@@ -99,11 +99,11 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 # Create routes to other VPC networks in private and public route tables for each VPC
 locals {
   # { vpc-1-network => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
-  vpc_network_to_private_and_public_route_table_ids = {}
-  #vpc_network_to_private_and_public_route_table_ids = {
-  #for vpc_name, this in var.vpcs :
-  #this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
-  #}
+  #vpc_network_to_private_and_public_route_table_ids = {}
+  vpc_network_to_private_and_public_route_table_ids = {
+    for vpc_name, this in var.vpcs :
+    this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
+  }
 
   # [ { rtb_id = "vpc-1-rtb-id-123", other_networks = [ "other-vpc-2-network", "other-vpc3-network", ... ] }, ...]
   associate_private_and_public_route_table_ids_with_other_networks = flatten(
@@ -122,8 +122,8 @@ locals {
 }
 
 resource "aws_route" "this" {
-  for_each = local.private_and_public_routes_to_other_networks
-  #for_each = {}
+  #for_each = local.private_and_public_routes_to_other_networks
+  for_each = {}
 
   destination_cidr_block = each.value
   route_table_id         = split("|", each.key)[0]
