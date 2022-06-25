@@ -97,35 +97,17 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 }
 
 # Create routes to other VPC networks in private and public route tables for each VPC
-locals {
-  # { vpc-1-network => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
-  #vpc_network_to_private_and_public_route_table_ids = {}
-  vpc_network_to_private_and_public_route_table_ids = {
-    for vpc_name, this in var.vpcs :
-    this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
-  }
+module "generate_routes_to_other_vpcs" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
 
-  # [ { rtb_id = "vpc-1-rtb-id-123", other_networks = [ "other-vpc-2-network", "other-vpc3-network", ... ] }, ...]
-  associate_private_and_public_route_table_ids_with_other_networks = flatten(
-    [for network, rtb_ids in local.vpc_network_to_private_and_public_route_table_ids :
-      [for rtb_id in rtb_ids : {
-        rtb_id         = rtb_id
-        other_networks = [for n in keys(local.vpc_network_to_private_and_public_route_table_ids) : n if n != network]
-  }]])
-
-  # { rtb-id|route => route, ... }
-  private_and_public_routes_to_other_networks = merge(
-    [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
-      { for rtb_id_and_route in setproduct([r.rtb_id], r.other_networks) :
-        format("%s|%s", rtb_id_and_route[0], rtb_id_and_route[1]) => rtb_id_and_route[1] # each key must be unique, dont group by key
-  }]...)
+  vpcs = var.vpcs
 }
 
 resource "aws_route" "this" {
-  #for_each = local.private_and_public_routes_to_other_networks
+  #for_each = module.generate_routes_to_other_vpcs.call_routes
   for_each = {}
 
-  destination_cidr_block = each.value
-  route_table_id         = split("|", each.key)[0]
+  destination_cidr_block = each.value.route
+  route_table_id         = each.value.rtb_id
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
