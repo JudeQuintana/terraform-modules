@@ -65,7 +65,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
 #
 #
 module "local_generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
 
   for_each = { for this in var.local_centralized_routers : this.id => this.vpcs }
 
@@ -81,7 +81,7 @@ locals {
     for tgw_id, this in module.local_generate_routes_to_other_vpcs : {
       tgw_id       = tgw_id
       vpc_networks = lookup(local.local_tgw_id_to_vpc_networks, tgw_id)
-      routes       = this.call
+      routes       = this.call_routes
   }]
 }
 
@@ -147,7 +147,8 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
 }
 
 module "peer_generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
+  #source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
+  source = "/Users/jude/projects/terraform-modules/utils/generate_routes_to_other_vpcs"
 
   for_each = { for this in var.peer_centralized_routers : this.id => this.vpcs }
 
@@ -163,7 +164,7 @@ locals {
     for tgw_id, this in module.peer_generate_routes_to_other_vpcs : {
       tgw_id       = tgw_id
       vpc_networks = lookup(local.peer_tgw_id_to_vpc_networks, tgw_id)
-      routes       = this.call
+      routes       = this.call_routes
   }]
 }
 
