@@ -29,6 +29,7 @@ variable "local_centralized_routers" {
     routes = list(object({
       rtb_id = string
       route  = string
+      tgw_id = string
     }))
     vpcs = map(object({
       network                      = string
@@ -62,6 +63,7 @@ variable "peer_centralized_routers" {
     routes = list(object({
       rtb_id = string
       route  = string
+      tgw_id = string
     }))
     vpcs = map(object({
       network                      = string

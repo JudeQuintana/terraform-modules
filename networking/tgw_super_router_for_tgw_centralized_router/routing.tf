@@ -24,6 +24,25 @@ locals {
       { for vpc_name, vpc in this.vpcs :
         vpc.network => this
   }]...)
+
+  # generate routes for vpcs in other peer tgws
+  local_tgw_all_vpc_routes = flatten(local.local_tgws[*].routes)
+  local_vpc_routes_to_other_tgws = [
+    for rtb_id_and_peer_tgw_networks in setproduct(local.local_tgw_all_vpc_routes[*].rtb_id, flatten(local.peer_tgws[*].networks)) : {
+      rtb_id = rtb_id_and_peer_tgw_networks[0]
+      route  = rtb_id_and_peer_tgw_networks[1]
+  }]
+
+  local_tgw_rtb_id_to_local_tgw_id = zipmap(local.local_tgw_all_vpc_routes[*].rtb_id, local.local_tgw_all_vpc_routes[*].tgw_id)
+
+  local_tgw_all_new_vpc_routes = [for this in local.local_vpc_routes_to_other_tgws :
+    merge(this, { tgw_id = lookup(local.local_tgw_rtb_id_to_local_tgw_id, this.rtb_id) }
+  )]
+}
+
+output "local_vpc_routes_to_other_tgws" {
+  #value = local.local_tgw_all_vpc_routes
+  value = local.local_tgw_all_new_vpc_routes
 }
 
 resource "aws_ec2_transit_gateway_route" "local_this" {
@@ -84,6 +103,24 @@ locals {
       { for vpc_name, vpc in this.vpcs :
         vpc.network => this
   }]...)
+
+  # generate routes for vpcs in other local tgws
+  peer_tgw_all_vpc_routes = flatten(local.peer_tgws[*].routes)
+  peer_vpc_routes_to_other_tgws = [
+    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgw_all_vpc_routes[*].rtb_id, flatten(local.local_tgws[*].networks)) : {
+      rtb_id = rtb_id_and_peer_tgw_networks[0]
+      route  = rtb_id_and_peer_tgw_networks[1]
+  }]
+
+  peer_tgw_rtb_id_to_peer_tgw_id = zipmap(local.peer_tgw_all_vpc_routes[*].rtb_id, local.peer_tgw_all_vpc_routes[*].tgw_id)
+
+  peer_tgw_all_new_vpc_routes = [for this in local.peer_vpc_routes_to_other_tgws :
+    merge(this, { tgw_id = lookup(local.peer_tgw_rtb_id_to_peer_tgw_id, this.rtb_id) }
+  )]
+}
+
+output "peer_vpc_routes_to_other_tgws" {
+  value = local.peer_tgw_all_new_vpc_routes
 }
 
 resource "aws_ec2_transit_gateway_route" "peer_this" {

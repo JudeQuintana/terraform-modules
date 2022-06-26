@@ -6,8 +6,13 @@ output "region" {
   value = local.region_name
 }
 
+locals {
+  tgw_id = aws_ec2_transit_gateway.this.id
+}
+
 output "id" {
-  value = aws_ec2_transit_gateway.this.id
+  value = local.tgw_id
+  #value = aws_ec2_transit_gateway.this.id
 }
 
 output "route_table_id" {
@@ -22,6 +27,13 @@ output "networks" {
   value = [for vpc_name, this in var.vpcs : this.network]
 }
 
+#output "routes" {
+#value = module.generate_routes_to_other_vpcs.call_routes
+#}
+
 output "routes" {
-  value = module.generate_routes_to_other_vpcs.call_routes
+  value = [
+    for this in module.generate_routes_to_other_vpcs.call_routes :
+    merge(this, { tgw_id = local.tgw_id })
+  ]
 }
