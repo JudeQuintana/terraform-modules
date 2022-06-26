@@ -31,6 +31,7 @@ output "networks" {
 #value = module.generate_routes_to_other_vpcs.call_routes
 #}
 
+# vpc routes, rename later
 output "routes" {
   value = [
     for this in module.generate_routes_to_other_vpcs.call_routes :
