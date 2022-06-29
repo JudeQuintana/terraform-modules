@@ -38,6 +38,10 @@ resource "aws_vpc" "this" {
     local.default_tags,
     local.vpc_igw_name_tag
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_internet_gateway" "this" {

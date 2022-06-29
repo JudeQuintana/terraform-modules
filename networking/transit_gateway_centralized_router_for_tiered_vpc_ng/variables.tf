@@ -21,14 +21,14 @@ variable "tags" {
 variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
-    #account_id                  = string
-    #region                      = string
-    #id                          = string
+    account_id                   = string
+    region                       = string
+    id                           = string
     network                      = string
     az_to_private_route_table_id = map(string)
-    #az_to_private_subnet_ids    = map(list(string))
-    az_to_public_route_table_id = map(string)
-    #az_to_public_subnet_ids     = map(list(string))
+    az_to_private_subnet_ids     = map(list(string))
+    az_to_public_route_table_id  = map(string)
+    az_to_public_subnet_ids      = map(list(string))
   }))
 
   validation {

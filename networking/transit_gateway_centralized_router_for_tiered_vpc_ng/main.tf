@@ -40,15 +40,15 @@ locals {
   # i'm not sure about security implications of this pattern but i dont think it matters.
   #
   # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
-  vpc_id_to_single_public_subnet_ids_per_az = {}
-  #vpc_id_to_single_public_subnet_ids_per_az = {
-  #for vpc_name, this in var.vpcs :
-  #this.id => [for az, public_subnet_ids in this.az_to_public_subnet_ids : element(public_subnet_ids, 0)]
-  #}
+  #vpc_id_to_single_public_subnet_ids_per_az = {}
+  vpc_id_to_single_public_subnet_ids_per_az = {
+    for vpc_name, this in var.vpcs :
+    this.id => [for az, public_subnet_ids in this.az_to_public_subnet_ids : element(public_subnet_ids, 0)]
+  }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_names = {}
-  #vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => vpc_name }
+  #vpc_id_to_names = {}
+  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => format("%s-%s", vpc_name, lookup(var.region_az_labels, this.region)) }
 }
 
 # attach vpcs to tgw
@@ -64,7 +64,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   tags = merge(
     local.default_tags,
     {
-      #Name = lookup(local.vpc_id_to_names, each.key)
+      Name = lookup(local.vpc_id_to_names, each.key)
   })
 }
 
@@ -90,7 +90,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "this" {
 # route table propagation
 resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
-  #for_each = {}
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
@@ -104,8 +103,12 @@ module "generate_routes_to_other_vpcs" {
 }
 
 resource "aws_route" "this" {
-  #for_each = module.generate_routes_to_other_vpcs.call_routes
-  for_each = {}
+  #for_each = {}
+
+  for_each = {
+    for this in module.generate_routes_to_other_vpcs.call_routes :
+    format("%s|%s", this.rtb_id, this.route) => this
+  }
 
   destination_cidr_block = each.value.route
   route_table_id         = each.value.rtb_id

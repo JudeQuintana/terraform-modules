@@ -33,8 +33,10 @@ output "networks" {
 
 # vpc routes, rename later
 output "routes" {
-  value = [
-    for this in module.generate_routes_to_other_vpcs.call_routes :
-    merge(this, { tgw_id = local.tgw_id })
+  value = [for rtb_id_route, this in aws_route.this : {
+    rtb_id = this.route_table_id
+    route  = this.destination_cidr_block
+    tgw_id = this.transit_gateway_id
+    }
   ]
 }
