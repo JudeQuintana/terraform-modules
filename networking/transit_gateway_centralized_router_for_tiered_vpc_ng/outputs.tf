@@ -6,13 +6,8 @@ output "region" {
   value = local.region_name
 }
 
-locals {
-  tgw_id = aws_ec2_transit_gateway.this.id
-}
-
 output "id" {
-  value = local.tgw_id
-  #value = aws_ec2_transit_gateway.this.id
+  value = aws_ec2_transit_gateway.this.id
 }
 
 output "route_table_id" {
@@ -25,10 +20,6 @@ output "vpcs" {
 
 output "networks" {
   value = [for vpc_name, this in var.vpcs : this.network]
-}
-
-output "vpc_attachments" {
-  value = [for vpc_id, this in aws_ec2_transit_gateway_vpc_attachment.this : this]
 }
 
 #output "routes" {
