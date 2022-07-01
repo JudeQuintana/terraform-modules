@@ -12,8 +12,8 @@ resource "aws_ec2_transit_gateway_route_table" "local_this" {
 
 locals {
   local_tgws = [for this in var.local_centralized_routers : merge(
-    this, { peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id }
-  )]
+    this, { peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, this.id).id })
+  ]
 
   #output "local_tgws_per_vpc_network" {
   #value = local.local_vpc_network_to_local_tgw
@@ -70,7 +70,7 @@ locals {
   # keep track of current rtb-id to tgw-id
   local_tgw_rtb_id_to_local_tgw_id = zipmap(local.local_tgw_all_vpc_routes[*].rtb_id, local.local_tgw_all_vpc_routes[*].tgw_id)
 
-  # build new routes
+  # build new vpc routes
   local_vpc_routes_to_other_tgws = [
     for rtb_id_and_peer_tgw_networks in setproduct(local.local_tgw_all_vpc_routes[*].rtb_id, local.peer_tgws_all_vpc_networks) : {
       rtb_id = rtb_id_and_peer_tgw_networks[0]
@@ -83,11 +83,6 @@ locals {
     merge(this, { tgw_id = lookup(local.local_tgw_rtb_id_to_local_tgw_id, this.rtb_id) })
   ]
 }
-
-
-#output "local_vpc_routes_to_other_tgws" {
-#value = local.local_tgw_all_new_vpc_routes
-#}
 
 resource "aws_route" "local_vpc_routes" {
   provider = aws.local
@@ -102,13 +97,51 @@ resource "aws_route" "local_vpc_routes" {
 }
 
 locals {
+  local_tgw_route_table_id_to_tgw_id = zipmap(local.local_tgws[*].route_table_id, local.local_tgws[*].id)
+
+  # build new tgw routes
+  local_tgw_routes_to_other_tgws = [
+    for rtb_id_and_peer_tgw_networks in setproduct(local.local_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
+      rtb_id = rtb_id_and_peer_tgw_networks[0]
+      route  = rtb_id_and_peer_tgw_networks[1]
+  }]
+
+  # add the tgw-id back in for each new route
+  local_tgw_all_new_tgw_routes = [
+    for this in local.local_tgw_routes_to_other_tgws :
+    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.local_locals, lookup(local.local_tgw_route_table_id_to_tgw_id, this.rtb_id)).id })
+  ]
+}
+
+resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other_tgws" {
+  provider = aws.local
+
+  for_each = {
+    for this in local.local_tgw_all_new_tgw_routes :
+    format("%s|%s", this.rtb_id, this.route) => this
+  }
+
+  destination_cidr_block = each.value.route
+  #transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.value.tgw_id).id #????
+  transit_gateway_attachment_id  = each.value.transit_gateway_attachment_id
+  transit_gateway_route_table_id = each.value.rtb_id
+
+  # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
+}
+
+########################################################################################
+# Begin Peer
+########################################################################################
+
+locals {
   peer_tgws = [for this in var.peer_centralized_routers :
     merge(this, { peering_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, this.id).id }
   )]
-
-  #output "peer_tgws_per_vpc_network" {
-  #value = local.peer_tgws_per_vpc_network
-  #}
 
   peer_vpc_network_to_peer_tgw = merge(
     [for this in local.peer_tgws :
@@ -152,15 +185,15 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
 
 locals {
   # generate routes for vpcs in other local tgws
-  peer_tgw_all_vpc_routes    = flatten(local.peer_tgws[*].routes)
-  local_tgw_all_vpc_networks = flatten(local.local_tgws[*].networks)
+  peer_tgw_all_vpc_routes     = flatten(local.peer_tgws[*].routes)
+  local_tgws_all_vpc_networks = flatten(local.local_tgws[*].networks)
 
   # keep track of current rtb-id to tgw-id
   peer_tgw_rtb_id_to_peer_tgw_id = zipmap(local.peer_tgw_all_vpc_routes[*].rtb_id, local.peer_tgw_all_vpc_routes[*].tgw_id)
 
   # build new routes
   peer_vpc_routes_to_other_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgw_all_vpc_routes[*].rtb_id, local.local_tgw_all_vpc_networks) : {
+    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgw_all_vpc_routes[*].rtb_id, local.local_tgws_all_vpc_networks) : {
       rtb_id = rtb_id_and_peer_tgw_networks[0]
       route  = rtb_id_and_peer_tgw_networks[1]
   }]
@@ -186,4 +219,42 @@ resource "aws_route" "peer_vpc_routes" {
   destination_cidr_block = each.value.route
   route_table_id         = each.value.rtb_id
   transit_gateway_id     = each.value.tgw_id
+}
+
+locals {
+  peer_tgw_route_table_id_to_tgw_id = zipmap(local.peer_tgws[*].route_table_id, local.peer_tgws[*].id)
+
+  # build new tgw routes
+  peer_tgw_routes_to_other_tgws = [
+    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
+      rtb_id = rtb_id_and_peer_tgw_networks[0]
+      route  = rtb_id_and_peer_tgw_networks[1]
+  }]
+
+  # add the tgw-id back in for each new route
+  peer_tgw_all_new_tgw_routes = [
+    for this in local.peer_tgw_routes_to_other_tgws :
+    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals, lookup(local.peer_tgw_route_table_id_to_tgw_id, this.rtb_id)).id })
+  ]
+}
+
+resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_tgws" {
+  provider = aws.peer
+
+  for_each = {
+    for this in local.peer_tgw_all_new_tgw_routes :
+    format("%s|%s", this.rtb_id, this.route) => this
+  }
+
+  destination_cidr_block = each.value.route
+  #transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.local_peers, each.value.tgw_id).id #????
+  transit_gateway_attachment_id  = each.value.transit_gateway_attachment_id
+  transit_gateway_route_table_id = each.value.rtb_id
+
+  # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
 }

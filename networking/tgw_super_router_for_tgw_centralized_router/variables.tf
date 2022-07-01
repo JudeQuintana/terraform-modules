@@ -26,6 +26,12 @@ variable "local_centralized_routers" {
     region         = string
     account_id     = string
     networks       = list(string)
+    #vpc_attachments = list(object({
+    #id                 = string
+    #subnet_ids         = list(string)
+    #transit_gateway_id = string
+    #vpc_id             = string
+    #}))
     routes = list(object({
       rtb_id = string
       route  = string

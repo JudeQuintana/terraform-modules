@@ -27,6 +27,10 @@ output "networks" {
   value = [for vpc_name, this in var.vpcs : this.network]
 }
 
+output "vpc_attachments" {
+  value = [for vpc_id, this in aws_ec2_transit_gateway_vpc_attachment.this : this]
+}
+
 #output "routes" {
 #value = module.generate_routes_to_other_vpcs.call_routes
 #}
