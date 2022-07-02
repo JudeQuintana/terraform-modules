@@ -54,6 +54,23 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
   #ignore_changes = [transit_gateway_attachment_id] ??
   #}
 }
+
+# associate local tgw route table to attachment accepter too
+resource "aws_ec2_transit_gateway_route_table_association" "local_local" {
+  provider = aws.local
+
+  for_each = { for this in local.local_tgws : this.id => this }
+
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.local_locals, each.key).id
+  transit_gateway_route_table_id = each.value.route_table_id
+
+  # make sure the peer links are up before adding the route table association.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
+}
 #
 # You cannot propagate a tgw peering attachment to a Transit Gateway Route Table
 # resource "aws_ec2_transit_gateway_route_table_propagation" "local_this" {}
@@ -168,6 +185,24 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.local_this.id
+
+  # make sure the peer links are up before adding the route table association.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
+
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id] ??
+  #}
+}
+
+
+# associate peer tgw route table to attachment accepter
+resource "aws_ec2_transit_gateway_route_table_association" "peer_local" {
+  provider = aws.peer
+
+  for_each = { for this in local.peer_tgws : this.id => this }
+
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals, each.key).id
+  transit_gateway_route_table_id = each.value.route_table_id
 
   # make sure the peer links are up before adding the route table association.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
