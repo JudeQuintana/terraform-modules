@@ -26,18 +26,10 @@ data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" 
 
   for_each = local.local_centralized_routers
 
-  # use dynamic block
   filter {
     name   = "transit-gateway-id"
     values = [each.key]
   }
-
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.local_peers]
 }
 
 # accept it in the same region.
