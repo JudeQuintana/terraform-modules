@@ -30,6 +30,13 @@ data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" 
     name   = "transit-gateway-id"
     values = [each.key]
   }
+
+  filter {
+    name   = "state"
+    values = ["available", "pendingAcceptance"]
+  }
+
+  depends_on = [aws_ec2_transit_gateway_peering_attachment.local_peers]
 }
 
 # accept it in the same region.

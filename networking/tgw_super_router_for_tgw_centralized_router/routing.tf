@@ -34,9 +34,9 @@ resource "aws_ec2_transit_gateway_route" "local_this" {
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
@@ -50,9 +50,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_this" {
   # make sure the peer links are up before adding the route table association.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 # associate local tgw route table to attachment accepter too
@@ -67,9 +67,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "local_local" {
   # make sure the peer links are up before adding the route table association.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 #
 # You cannot propagate a tgw peering attachment to a Transit Gateway Route Table
@@ -141,9 +141,9 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.local_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 ########################################################################################
@@ -173,9 +173,10 @@ resource "aws_ec2_transit_gateway_route" "peer_this" {
 
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
@@ -189,9 +190,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_this" {
   # make sure the peer links are up before adding the route table association.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 
@@ -207,9 +208,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "peer_local" {
   # make sure the peer links are up before adding the route table association.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
 
 locals {
@@ -278,7 +279,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.peer_locals]
 
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id] ??
-  #}
+  lifecycle {
+    ignore_changes = [transit_gateway_attachment_id]
+  }
 }
