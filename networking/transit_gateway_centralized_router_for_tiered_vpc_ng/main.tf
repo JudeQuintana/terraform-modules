@@ -47,14 +47,12 @@ locals {
   }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  #vpc_id_to_names = {}
   vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => format("%s-%s", vpc_name, lookup(var.region_az_labels, this.region)) }
 }
 
 # attach vpcs to tgw
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
-  #for_each = {}
 
   subnet_ids                                      = each.value
   transit_gateway_id                              = aws_ec2_transit_gateway.this.id
@@ -81,7 +79,6 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 ## associate attachments to route table
 resource "aws_ec2_transit_gateway_route_table_association" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
-  #for_each = {}
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
@@ -103,8 +100,6 @@ module "generate_routes_to_other_vpcs" {
 }
 
 resource "aws_route" "this" {
-  #for_each = {}
-
   for_each = {
     for this in module.generate_routes_to_other_vpcs.call_routes :
     format("%s|%s", this.rtb_id, this.route) => this
