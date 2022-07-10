@@ -120,7 +120,6 @@ locals {
       rtb_id = rtb_id_and_local_tgw_networks[0]
       route  = rtb_id_and_local_tgw_networks[1]
     }
-    #if length(local.local_tgws) > 1 ??
   ]
 
   local_current_vpc_routes = flatten(
@@ -346,7 +345,6 @@ locals {
       rtb_id = rtb_id_and_peer_tgw_networks[0]
       route  = rtb_id_and_peer_tgw_networks[1]
     }
-    #if length(local.local_tgws) > 1 ??
   ]
 
   peer_current_vpc_routes = flatten(
