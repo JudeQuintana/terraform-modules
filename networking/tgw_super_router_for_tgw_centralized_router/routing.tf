@@ -340,7 +340,7 @@ resource "aws_route" "peer_vpc_routes" {
 }
 
 locals {
-  # build new vpc routes to other local vpcs
+  # build new vpc routes to other peer vpcs
   peer_vpc_routes_to_other_peer_tgws = [
     for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws_all_vpc_routes[*].rtb_id, local.peer_tgws_all_vpc_networks) : {
       rtb_id = rtb_id_and_peer_tgw_networks[0]
