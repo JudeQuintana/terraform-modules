@@ -54,10 +54,6 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
   lifecycle {
     ignore_changes = [transit_gateway_attachment_id]
   }
-  # might need ignore lifecycle on transit_gateway_id_attachment
-  # (???) because if a non-force-destroy attribute is changed (???)
-  # the data source wants to re-read settings and wants to force destroy
-  # this resource. need to get more familiar with the data source behavior.
 }
 
 ########################################################################
@@ -94,7 +90,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "peer_locals" {
     Side = "Acceptor"
   }
 
-  lifecycle {
-    ignore_changes = [transit_gateway_attachment_id]
-  }
+  #lifecycle {
+  #ignore_changes = [transit_gateway_attachment_id]
+  #}
 }
