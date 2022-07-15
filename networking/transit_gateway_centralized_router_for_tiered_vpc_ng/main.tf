@@ -102,10 +102,10 @@ module "generate_routes_to_other_vpcs" {
 resource "aws_route" "this" {
   for_each = {
     for this in module.generate_routes_to_other_vpcs.call_routes :
-    format("%s|%s", this.rtb_id, this.route) => this
+    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
   }
 
-  destination_cidr_block = each.value.route
-  route_table_id         = each.value.rtb_id
+  destination_cidr_block = each.value.destination_cidr_block
+  route_table_id         = each.value.route_table_id
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }

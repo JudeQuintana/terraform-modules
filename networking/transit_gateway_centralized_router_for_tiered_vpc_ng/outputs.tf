@@ -22,16 +22,6 @@ output "networks" {
   value = [for vpc_name, this in var.vpcs : this.network]
 }
 
-#output "routes" {
-#value = module.generate_routes_to_other_vpcs.call_routes
-#}
-
-# vpc routes, rename later
-output "routes" {
-  value = [for rtb_id_route, this in aws_route.this : {
-    rtb_id = this.route_table_id
-    route  = this.destination_cidr_block
-    tgw_id = this.transit_gateway_id
-    }
-  ]
+output "vpc_routes" {
+  value = [for route_key, this in aws_route.this : this]
 }
