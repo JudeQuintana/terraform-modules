@@ -24,7 +24,7 @@ locals {
   routes = flatten(
     [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
       [for rtb_id_and_route in setproduct([r.rtb_id], r.other_networks) : {
-        rtb_id = rtb_id_and_route[0]
-        route  = rtb_id_and_route[1]
+        route_table_id         = rtb_id_and_route[0]
+        destination_cidr_block = rtb_id_and_route[1]
   }]])
 }
