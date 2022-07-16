@@ -104,6 +104,7 @@ locals {
 
 resource "aws_route" "this_local_vpc_routes" {
   provider = aws.local
+
   for_each = {
     for this in local.local_tgw_all_new_vpc_routes :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
@@ -306,6 +307,7 @@ locals {
 
 resource "aws_route" "this_peer_vpc_routes" {
   provider = aws.peer
+
   for_each = {
     for this in local.peer_tgw_all_new_vpc_routes :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
@@ -344,6 +346,7 @@ locals {
 
 resource "aws_route" "this_peer_vpcs_routes_to_other_peer_vpcs" {
   provider = aws.peer
+
   for_each = {
     for this in local.peer_tgw_all_new_vpc_routes_to_other_peer_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
