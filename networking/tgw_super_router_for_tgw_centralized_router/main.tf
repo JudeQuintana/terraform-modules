@@ -1,15 +1,15 @@
 # Pull region data and account id from provider
-data "aws_region" "local" {
+data "aws_region" "this_local" {
   provider = aws.local
 }
 
-data "aws_caller_identity" "local" {
+data "aws_caller_identity" "this_local" {
   provider = aws.local
 }
 
 locals {
-  local_account_id   = data.aws_caller_identity.local.account_id
-  local_region_name  = data.aws_region.local.name
+  local_account_id   = data.aws_caller_identity.this_local.account_id
+  local_region_name  = data.aws_region.this_local.name
   local_region_label = lookup(var.region_az_labels, local.local_region_name)
   upper_env_prefix   = upper(var.env_prefix)
   default_tags = merge({
@@ -22,8 +22,12 @@ resource "random_pet" "this" {
   length = 1
 }
 
+locals {
+  super_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
+}
+
 # one tgw that will route between all centralized routers.
-resource "aws_ec2_transit_gateway" "local_this" {
+resource "aws_ec2_transit_gateway" "this_local" {
   provider = aws.local
 
   amazon_side_asn                 = var.local_amazon_side_asn
@@ -32,12 +36,6 @@ resource "aws_ec2_transit_gateway" "local_this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
+      Name = local.super_router_name
   })
 }
-
-#TODO
-# figure out routing between tgws
-# add routes to each vpc, use generate_routes_to_other_vpcs module??
-# figure out tgw route overrides
-# whatever else comes up

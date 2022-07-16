@@ -1,30 +1,31 @@
 # Create the Peering attachment in same region/acct for the local provider
 # iteration of over centralized router in same region
 locals {
-  local_centralized_routers = { for this in var.local_centralized_routers : this.id => this }
+  local_tgws          = var.local_centralized_routers
+  local_tgw_id_to_tgw = { for this in local.local_tgws : this.id => this }
 }
 
-resource "aws_ec2_transit_gateway_peering_attachment" "local_peers" {
+resource "aws_ec2_transit_gateway_peering_attachment" "this_local_peers" {
   provider = aws.local
 
-  for_each = local.local_centralized_routers
+  for_each = local.local_tgw_id_to_tgw
 
   peer_account_id         = each.value.account_id
   peer_region             = each.value.region
   peer_transit_gateway_id = each.key
-  transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
+  transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = "same region tgw peer"
+    Name = format("%s <-> %s", each.value.name, local.super_router_name)
     Side = "Creator"
   }
 }
 
 # data source needed for intra-region peering.
 # ref: https://github.com/hashicorp/terraform-provider-aws/issues/23828
-data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" {
+data "aws_ec2_transit_gateway_peering_attachment" "this_local_accepter_peering_data" {
   provider = aws.local
 
-  for_each = local.local_centralized_routers
+  for_each = local.local_tgw_id_to_tgw
 
   filter {
     name   = "transit-gateway-id"
@@ -36,19 +37,19 @@ data "aws_ec2_transit_gateway_peering_attachment" "local_acceptor_peering_data" 
     values = ["available", "pendingAcceptance"]
   }
 
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.local_peers]
+  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_peers]
 }
 
 # accept it in the same region.
-resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
+resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_locals" {
   provider = aws.local
 
-  for_each = local.local_centralized_routers
+  for_each = local.local_tgw_id_to_tgw
 
-  transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.local_acceptor_peering_data, each.key).id
+  transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_accepter_peering_data, each.key).id
   tags = {
-    Name = "same region tgw local"
-    Side = "Acceptor"
+    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Side = "Accepter"
   }
 
   lifecycle {
@@ -60,37 +61,34 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "local_locals" {
 
 # Create the Peering attachment in cross region to super router (same acct) for the peer provider
 locals {
-  peer_centralized_routers = { for this in var.peer_centralized_routers : this.id => this }
+  peer_tgws          = var.peer_centralized_routers
+  peer_tgw_id_to_tgw = { for this in local.peer_tgws : this.id => this }
 }
 
-resource "aws_ec2_transit_gateway_peering_attachment" "peer_peers" {
+resource "aws_ec2_transit_gateway_peering_attachment" "this_peer_to_peers" {
   provider = aws.local
 
-  for_each = local.peer_centralized_routers
+  for_each = local.peer_tgw_id_to_tgw
 
   peer_account_id         = each.value.account_id
   peer_region             = each.value.region
   peer_transit_gateway_id = each.key
-  transit_gateway_id      = aws_ec2_transit_gateway.local_this.id
+  transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = "cross region tgw peer"
+    Name = format("%s <-> %s", each.value.name, local.super_router_name)
     Side = "Creator"
   }
 }
 
 # accept it in cross region.
-resource "aws_ec2_transit_gateway_peering_attachment_accepter" "peer_locals" {
+resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_peer_to_locals" {
   provider = aws.peer
 
-  for_each = local.peer_centralized_routers
+  for_each = local.peer_tgw_id_to_tgw
 
-  transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.peer_peers, each.key).id
+  transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.this_peer_to_peers, each.key).id
   tags = {
-    Name = "cross region tgw peer"
-    Side = "Acceptor"
+    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Side = "Accepter"
   }
-
-  #lifecycle {
-  #ignore_changes = [transit_gateway_attachment_id]
-  #}
 }

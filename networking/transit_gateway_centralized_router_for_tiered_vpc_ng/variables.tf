@@ -1,5 +1,6 @@
 variable "amazon_side_asn" {
-  type = number
+  description = "required local amazon side asn"
+  type        = number
 }
 
 variable "env_prefix" {

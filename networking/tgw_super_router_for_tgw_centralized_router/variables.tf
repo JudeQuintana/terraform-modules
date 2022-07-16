@@ -15,13 +15,15 @@ variable "tags" {
 }
 
 variable "local_amazon_side_asn" {
-  type = number
+  description = "required local amazon side asn"
+  type        = number
 }
 
 variable "local_centralized_routers" {
   description = "list of centralized router objects for local provider"
   type = list(object({
     id             = string
+    name           = string
     route_table_id = string
     region         = string
     account_id     = string
@@ -41,21 +43,11 @@ variable "local_centralized_routers" {
   # validation
 }
 
-variable "local_tgw_routes" {
-  description = "additional blackhole and override routes?"
-  type = list(object({
-    destination_network           = string
-    blackhole                     = bool   #optional
-    transit_gateway_attachment_id = string #optional?
-  }))
-  default = []
-  #validation
-}
-
 variable "peer_centralized_routers" {
   description = "list of centralized router objects for remote provider"
   type = list(object({
     id             = string
+    name           = string
     route_table_id = string
     region         = string
     account_id     = string

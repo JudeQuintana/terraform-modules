@@ -20,6 +20,10 @@ resource "random_pet" "this" {
   length = 1
 }
 
+locals {
+  centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
+}
+
 # one tgw that will route between all tiered vpcs.
 resource "aws_ec2_transit_gateway" "this" {
   amazon_side_asn                 = var.amazon_side_asn
@@ -28,7 +32,7 @@ resource "aws_ec2_transit_gateway" "this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
+      Name = local.centralized_router_name
   })
 }
 
@@ -72,7 +76,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
   tags = merge(
     local.default_tags,
     {
-      Name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
+      Name = local.centralized_router_name
   })
 }
 
