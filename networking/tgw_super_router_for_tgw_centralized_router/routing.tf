@@ -1,4 +1,6 @@
 locals {
+  route_format = "%s|%s"
+
   local_tgws_all_vpc_networks = flatten(local.local_tgws[*].networks)
   local_tgws_all_vpc_routes   = flatten(local.local_tgws[*].vpc_routes)
 
@@ -104,7 +106,7 @@ resource "aws_route" "this_local_vpc_routes" {
   provider = aws.local
   for_each = {
     for this in local.local_tgw_all_new_vpc_routes :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block = each.value.destination_cidr_block
@@ -142,7 +144,7 @@ resource "aws_route" "this_local_vpcs_routes_to_other_local_vpcs" {
 
   for_each = {
     for this in local.local_tgw_all_new_vpc_routes_to_other_local_vpcs :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block = each.value.destination_cidr_block
@@ -172,7 +174,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other
 
   for_each = {
     for this in local.local_tgw_all_new_tgw_routes :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block         = each.value.destination_cidr_block
@@ -218,7 +220,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_other_local_t
 
   for_each = {
     for this in local.local_tgw_all_new_tgw_routes_to_other_local_tgws :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block         = each.value.destination_cidr_block
@@ -306,7 +308,7 @@ resource "aws_route" "this_peer_vpc_routes" {
   provider = aws.peer
   for_each = {
     for this in local.peer_tgw_all_new_vpc_routes :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block = each.value.destination_cidr_block
@@ -345,7 +347,7 @@ resource "aws_route" "this_peer_vpcs_routes_to_other_peer_vpcs" {
   provider = aws.peer
   for_each = {
     for this in local.peer_tgw_all_new_vpc_routes_to_other_peer_vpcs :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block = each.value.destination_cidr_block
@@ -375,7 +377,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_
 
   for_each = {
     for this in local.peer_tgw_all_new_tgw_routes :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block         = each.value.destination_cidr_block
@@ -417,7 +419,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_other_peer_tgw
 
   for_each = {
     for this in local.peer_tgw_all_new_tgw_routes_to_other_peer_tgws :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block         = each.value.destination_cidr_block

@@ -9,6 +9,7 @@ locals {
   region_name      = data.aws_region.current.name
   region_label     = lookup(var.region_az_labels, local.region_name)
   upper_env_prefix = upper(var.env_prefix)
+  route_format     = "%s|%s"
 
   default_tags = merge({
     Environment = var.env_prefix
@@ -31,9 +32,8 @@ resource "aws_ec2_transit_gateway" "this" {
   default_route_table_propagation = "disable"
   tags = merge(
     local.default_tags,
-    {
-      Name = local.centralized_router_name
-  })
+    { Name = local.centralized_router_name }
+  )
 }
 
 locals {
@@ -65,9 +65,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   vpc_id                                          = each.key
   tags = merge(
     local.default_tags,
-    {
-      Name = lookup(local.vpc_id_to_names, each.key)
-  })
+    { Name = lookup(local.vpc_id_to_names, each.key) }
+  )
 }
 
 ## one route table for all vpc networks
@@ -75,9 +74,8 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(
     local.default_tags,
-    {
-      Name = local.centralized_router_name
-  })
+    { Name = local.centralized_router_name }
+  )
 }
 
 ## associate attachments to route table
@@ -106,7 +104,7 @@ module "generate_routes_to_other_vpcs" {
 resource "aws_route" "this" {
   for_each = {
     for this in module.generate_routes_to_other_vpcs.call_routes :
-    format("%s|%s", this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 
   destination_cidr_block = each.value.destination_cidr_block

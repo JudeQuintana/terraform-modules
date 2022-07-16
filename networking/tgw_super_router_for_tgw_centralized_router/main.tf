@@ -35,7 +35,6 @@ resource "aws_ec2_transit_gateway" "this_local" {
   default_route_table_propagation = "disable"
   tags = merge(
     local.default_tags,
-    {
-      Name = local.super_router_name
-  })
+    { Name = local.super_router_name }
+  )
 }

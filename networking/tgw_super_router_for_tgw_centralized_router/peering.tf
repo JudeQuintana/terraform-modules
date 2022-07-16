@@ -1,6 +1,8 @@
 # Create the Peering attachment in same region/acct for the local provider
 # iteration of over centralized router in same region
 locals {
+  peering_name_format = "%s <-> %s"
+
   local_tgws          = var.local_centralized_routers
   local_tgw_id_to_tgw = { for this in local.local_tgws : this.id => this }
 }
@@ -15,7 +17,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_peers" {
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
     Side = "Creator"
   }
 }
@@ -48,7 +50,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_lo
 
   transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_accepter_peering_data, each.key).id
   tags = {
-    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
     Side = "Accepter"
   }
 
@@ -75,7 +77,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_peer_to_peers" {
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
     Side = "Creator"
   }
 }
@@ -88,7 +90,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_peer_to_loc
 
   transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.this_peer_to_peers, each.key).id
   tags = {
-    Name = format("%s <-> %s", each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
     Side = "Accepter"
   }
 }
