@@ -212,7 +212,7 @@ locals {
   # add the tgw-attachment-id back in for each new tgw route
   local_tgw_all_new_tgw_routes_to_other_local_tgws = [
     for this in setsubtract(local.local_tgws_routes_to_other_local_tgws, local.local_current_tgw_routes) :
-    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_tgw_id, this.route_table_id)).id })
+    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, this.route_table_id)).id })
   ]
 }
 
@@ -412,7 +412,7 @@ locals {
   # add the tgw-attachment-id back in for each new tgw route
   peer_tgw_all_new_tgw_routes_to_other_peer_tgws = [
     for this in setsubtract(local.peer_tgws_routes_to_other_peer_tgws, local.peer_current_tgw_routes) :
-    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_locals, lookup(local.peer_tgw_route_table_id_to_tgw_id, this.route_table_id)).id })
+    merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_locals, lookup(local.peer_tgw_route_table_id_to_peer_tgw_id, this.route_table_id)).id })
   ]
 }
 
