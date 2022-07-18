@@ -176,8 +176,7 @@ locals {
     for rtb_id_and_network in setproduct(local.local_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
       destination_cidr_block = rtb_id_and_network[1]
       route_table_id         = rtb_id_and_network[0]
-    }
-  ]
+  }]
 
   # generate current existing local tgw routes for its local vpcs
   local_current_tgw_routes = flatten(
@@ -291,8 +290,7 @@ locals {
     for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
       route_table_id         = rtb_id_and_peer_tgw_networks[0]
-    }
-  ]
+  }]
 
   # generate current existing peer vpc routes
   peer_current_vpc_routes = flatten(
@@ -355,8 +353,7 @@ locals {
     for rtb_id_and_network in setproduct(local.peer_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       destination_cidr_block = rtb_id_and_network[1]
       route_table_id         = rtb_id_and_network[0]
-    }
-  ]
+  }]
 
   # generate current existing peer tgw routes for its peer vpcs
   peer_current_tgw_routes = flatten(
