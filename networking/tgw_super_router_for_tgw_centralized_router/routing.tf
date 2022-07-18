@@ -82,9 +82,9 @@ locals {
 
   # build new local vpc routes to other peer tgws
   local_vpc_routes_to_other_peer_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
-      route_table_id         = rtb_id_and_peer_tgw_networks[0]
+    for rtb_id_and_peer_tgw_network in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
+      route_table_id         = rtb_id_and_peer_tgw_network[0]
   }]
 
   local_tgw_all_new_vpc_routes_to_peer_tgws = {
@@ -106,9 +106,9 @@ resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
 locals {
   # build new local vpc routes to other local vpcs
   local_vpc_routes_to_other_local_tgws = [
-    for rtb_id_and_local_tgw_networks in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_local_tgw_networks[1]
-      route_table_id         = rtb_id_and_local_tgw_networks[0]
+    for rtb_id_and_local_tgw_network in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
+      destination_cidr_block = rtb_id_and_local_tgw_network[1]
+      route_table_id         = rtb_id_and_local_tgw_network[0]
   }]
 
   # generate current existing local vpc routes
@@ -142,9 +142,9 @@ locals {
 
   # build new local tgw routes to other peer tgws
   local_tgw_routes_to_other_peer_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.local_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
-      route_table_id         = rtb_id_and_peer_tgw_networks[0]
+    for rtb_id_and_peer_tgw_network in setproduct(local.local_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
+      route_table_id         = rtb_id_and_peer_tgw_network[0]
   }]
 
   local_tgw_all_new_tgw_routes_to_vpc_in_other_tgws = {
@@ -263,9 +263,9 @@ locals {
 
   # build new vpc peer routes routes to other local tgws
   peer_vpc_routes_to_other_local_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
-      route_table_id         = rtb_id_and_peer_tgw_networks[0]
+    for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
+      route_table_id         = rtb_id_and_peer_tgw_network[0]
   }]
 
   peer_tgw_all_new_vpc_routes_to_local_tgws = {
@@ -287,9 +287,9 @@ resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
 locals {
   # build new peer vpc routes to other peer vpcs
   peer_vpc_routes_to_other_peer_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
-      route_table_id         = rtb_id_and_peer_tgw_networks[0]
+    for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
+      route_table_id         = rtb_id_and_peer_tgw_network[0]
   }]
 
   # generate current existing peer vpc routes
@@ -323,9 +323,9 @@ locals {
 
   # build new peer tgw routes to other local tgws
   peer_tgw_routes_to_other_tgws = [
-    for rtb_id_and_peer_tgw_networks in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
-      route_table_id         = rtb_id_and_peer_tgw_networks[0]
-      destination_cidr_block = rtb_id_and_peer_tgw_networks[1]
+    for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
+      route_table_id         = rtb_id_and_peer_tgw_network[0]
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
   peer_tgw_all_new_tgw_routes_to_vpcs_in_other_tgws = {
