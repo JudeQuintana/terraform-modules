@@ -50,7 +50,7 @@ locals {
   }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => format("%s-%s", vpc_name, lookup(var.region_az_labels, this.region)) }
+  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => this.full_name }
 }
 
 # attach vpcs to tgw

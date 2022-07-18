@@ -10,7 +10,7 @@ output "id" {
   value = aws_vpc.this.id
 }
 
-output "name" {
+output "full_name" {
   value = local.vpc_name
 }
 

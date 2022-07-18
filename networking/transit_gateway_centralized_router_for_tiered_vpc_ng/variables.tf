@@ -25,6 +25,7 @@ variable "vpcs" {
     account_id                   = string
     region                       = string
     id                           = string
+    full_name                    = string
     network                      = string
     az_to_private_route_table_id = map(string)
     az_to_private_subnet_ids     = map(list(string))
