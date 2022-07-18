@@ -148,11 +148,6 @@ locals {
       route_table_id         = rtb_id_and_peer_tgw_networks[0]
   }]
 
-  # add the tgw-attachment-id back in for each new route
-  #local_tgw_all_new_tgw_routes = [
-  #for this in local.local_tgw_routes_to_other_peer_tgws :
-  #merge(this, { transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, this.route_table_id)).id })
-  #]
   local_tgw_all_new_tgw_routes_to_vpc_in_other_tgws = {
     for this in local.local_tgw_routes_to_other_peer_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
