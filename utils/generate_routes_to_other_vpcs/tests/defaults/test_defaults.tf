@@ -63,14 +63,79 @@ locals {
     "rtb-0f8deb7a6682793e2|10.0.0.0/20"    = "10.0.0.0/20"
     "rtb-0f8deb7a6682793e2|192.168.0.0/20" = "192.168.0.0/20"
   }
+
+  routes_to_other_vpcs = toset([
+    {
+      "destination_cidr_block" = "10.0.0.0/20"
+      "route_table_id"         = "rtb-01e5ec4882154a9a1"
+    },
+    {
+      "destination_cidr_block" = "10.0.0.0/20"
+      "route_table_id"         = "rtb-09a4481eb3684abba"
+    },
+    {
+      "destination_cidr_block" = "10.0.0.0/20"
+      "route_table_id"         = "rtb-0ad6cde89a9e386fd"
+    },
+    {
+      "destination_cidr_block" = "10.0.0.0/20"
+      "route_table_id"         = "rtb-0f8deb7a6682793e2"
+    },
+    {
+      "destination_cidr_block" = "172.31.0.0/20"
+      "route_table_id"         = "rtb-01e5ec4882154a9a1"
+    },
+    {
+      "destination_cidr_block" = "172.31.0.0/20"
+      "route_table_id"         = "rtb-02ad79df1a7c192e7"
+    },
+    {
+      "destination_cidr_block" = "172.31.0.0/20"
+      "route_table_id"         = "rtb-0468efad92cd62ab8"
+    },
+    {
+      "destination_cidr_block" = "172.31.0.0/20"
+      "route_table_id"         = "rtb-06b216fb818494594"
+    },
+    {
+      "destination_cidr_block" = "172.31.0.0/20"
+      "route_table_id"         = "rtb-0ad6cde89a9e386fd"
+    },
+    {
+      "destination_cidr_block" = "192.168.0.0/20"
+      "route_table_id"         = "rtb-02ad79df1a7c192e7"
+    },
+    {
+      "destination_cidr_block" = "192.168.0.0/20"
+      "route_table_id"         = "rtb-0468efad92cd62ab8"
+    },
+    {
+      "destination_cidr_block" = "192.168.0.0/20"
+      "route_table_id"         = "rtb-06b216fb818494594"
+    },
+    {
+      "destination_cidr_block" = "192.168.0.0/20"
+      "route_table_id"         = "rtb-09a4481eb3684abba"
+    },
+    {
+      "destination_cidr_block" = "192.168.0.0/20"
+      "route_table_id"         = "rtb-0f8deb7a6682793e2"
+    },
+  ])
 }
 
 resource "test_assertions" "generate_routes_to_other_vpcs" {
   component = "generate_routes_to_other_vpcs"
 
-  equal "map_of_unique_routes_to_other_vpcs" {
+  equal "map_of_routes_to_other_vpcs" {
+    description = "generated routes"
+    got         = module.main.call_legacy
+    want        = local.private_and_public_routes_to_other_vpcs
+  }
+
+  equal "list_of_route_objects" {
     description = "generated routes"
     got         = module.main.call
-    want        = local.private_and_public_routes_to_other_vpcs
+    want        = local.routes_to_other_vpcs
   }
 }
