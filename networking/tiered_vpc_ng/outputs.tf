@@ -10,6 +10,10 @@ output "id" {
   value = aws_vpc.this.id
 }
 
+output "name" {
+  value = local.vpc_name
+}
+
 output "network" {
   # pass thru what is known pre-apply
   value = var.tier.network

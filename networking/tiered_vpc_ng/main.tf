@@ -16,9 +16,7 @@ locals {
     Environment = lower(var.env_prefix)
   }, var.tags)
 
-  vpc_igw_name_tag = {
-    Name = format("%s-%s-%s", upper(var.env_prefix), local.region_label, var.tier.name)
-  }
+  vpc_name = format("%s-%s-%s", upper(var.env_prefix), local.region_label, var.tier.name)
 }
 
 ######################################################
@@ -36,7 +34,7 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = true
   tags = merge(
     local.default_tags,
-    local.vpc_igw_name_tag
+    { Name = local.vpc_name }
   )
 
   lifecycle {
@@ -48,6 +46,6 @@ resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
-    local.vpc_igw_name_tag
+    { Name = local.vpc_name }
   )
 }
