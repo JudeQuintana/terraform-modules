@@ -133,7 +133,7 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
     want        = local.private_and_public_routes_to_other_vpcs
   }
 
-  equal "list_of_route_objects" {
+  equal "list_of_route_objects_to_other_vpcs" {
     description = "generated routes"
     got         = module.main.call
     want        = local.routes_to_other_vpcs
