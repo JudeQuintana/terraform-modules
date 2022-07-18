@@ -5,11 +5,12 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  account_id       = data.aws_caller_identity.current.account_id
-  region_name      = data.aws_region.current.name
-  region_label     = lookup(var.region_az_labels, local.region_name)
-  upper_env_prefix = upper(var.env_prefix)
-  route_format     = "%s|%s"
+  account_id            = data.aws_caller_identity.current.account_id
+  region_name           = data.aws_region.current.name
+  region_label          = lookup(var.region_az_labels, local.region_name)
+  upper_env_prefix      = upper(var.env_prefix)
+  route_format          = "%s|%s"
+  vpc_attachment_format = "%s <-> %s"
 
   default_tags = merge({
     Environment = var.env_prefix
@@ -64,7 +65,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   vpc_id                                          = each.key
   tags = merge(
     local.default_tags,
-    { Name = lookup(local.vpc_id_to_names, each.key) }
+    { Name = format(local.vpc_attachment_format, lookup(local.vpc_id_to_names, each.key), local.centralized_router_name) }
   )
 }
 
