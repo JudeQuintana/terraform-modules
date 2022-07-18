@@ -24,7 +24,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_peers" {
 
 # data source needed for intra-region peering.
 # ref: https://github.com/hashicorp/terraform-provider-aws/issues/23828
-data "aws_ec2_transit_gateway_peering_attachment" "this_local_accepter_peering_data" {
+data "aws_ec2_transit_gateway_peering_attachment" "this_local_accepter_peering" {
   provider = aws.local
 
   for_each = local.local_tgw_id_to_tgw
@@ -48,7 +48,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_lo
 
   for_each = local.local_tgw_id_to_tgw
 
-  transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_accepter_peering_data, each.key).id
+  transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_accepter_peering, each.key).id
   tags = {
     Name = format(local.peering_name_format, each.value.name, local.super_router_name)
     Side = "Accepter"
