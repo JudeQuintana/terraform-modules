@@ -29,8 +29,8 @@ variable "local_centralized_routers" {
     account_id     = string
     networks       = list(string)
     vpc_routes = list(object({
-      route_table_id         = string
       destination_cidr_block = string
+      route_table_id         = string
       transit_gateway_id     = string
     }))
     vpcs = map(object({
@@ -63,8 +63,8 @@ variable "peer_centralized_routers" {
     account_id     = string
     networks       = list(string)
     vpc_routes = list(object({
-      route_table_id         = string
       destination_cidr_block = string
+      route_table_id         = string
       transit_gateway_id     = string
     }))
     vpcs = map(object({
@@ -73,6 +73,7 @@ variable "peer_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
+
 
   validation {
     condition     = length(distinct(var.peer_centralized_routers[*].region)) < 2
