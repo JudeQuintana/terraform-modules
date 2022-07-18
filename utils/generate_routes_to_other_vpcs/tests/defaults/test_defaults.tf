@@ -47,7 +47,7 @@ module "main" {
 }
 
 locals {
-  private_and_public_routes_to_other_vpcs = {
+  map_of_routes_to_other_vpcs = {
     "rtb-01e5ec4882154a9a1|10.0.0.0/20"    = "10.0.0.0/20"
     "rtb-01e5ec4882154a9a1|172.31.0.0/20"  = "172.31.0.0/20"
     "rtb-02ad79df1a7c192e7|172.31.0.0/20"  = "172.31.0.0/20"
@@ -130,7 +130,7 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
   equal "map_of_routes_to_other_vpcs" {
     description = "generated routes"
     got         = module.main.call_legacy
-    want        = local.private_and_public_routes_to_other_vpcs
+    want        = local.map_of_routes_to_other_vpcs
   }
 
   equal "list_of_route_objects_to_other_vpcs" {
