@@ -66,60 +66,60 @@ locals {
 
   routes_to_other_vpcs = toset([
     {
-      "destination_cidr_block" = "10.0.0.0/20"
-      "route_table_id"         = "rtb-01e5ec4882154a9a1"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-01e5ec4882154a9a1"
     },
     {
-      "destination_cidr_block" = "10.0.0.0/20"
-      "route_table_id"         = "rtb-09a4481eb3684abba"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-09a4481eb3684abba"
     },
     {
-      "destination_cidr_block" = "10.0.0.0/20"
-      "route_table_id"         = "rtb-0ad6cde89a9e386fd"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0ad6cde89a9e386fd"
     },
     {
-      "destination_cidr_block" = "10.0.0.0/20"
-      "route_table_id"         = "rtb-0f8deb7a6682793e2"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0f8deb7a6682793e2"
     },
     {
-      "destination_cidr_block" = "172.31.0.0/20"
-      "route_table_id"         = "rtb-01e5ec4882154a9a1"
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-01e5ec4882154a9a1"
     },
     {
-      "destination_cidr_block" = "172.31.0.0/20"
-      "route_table_id"         = "rtb-02ad79df1a7c192e7"
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-02ad79df1a7c192e7"
     },
     {
-      "destination_cidr_block" = "172.31.0.0/20"
-      "route_table_id"         = "rtb-0468efad92cd62ab8"
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-0468efad92cd62ab8"
     },
     {
-      "destination_cidr_block" = "172.31.0.0/20"
-      "route_table_id"         = "rtb-06b216fb818494594"
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-06b216fb818494594"
     },
     {
-      "destination_cidr_block" = "172.31.0.0/20"
-      "route_table_id"         = "rtb-0ad6cde89a9e386fd"
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-0ad6cde89a9e386fd"
     },
     {
-      "destination_cidr_block" = "192.168.0.0/20"
-      "route_table_id"         = "rtb-02ad79df1a7c192e7"
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-02ad79df1a7c192e7"
     },
     {
-      "destination_cidr_block" = "192.168.0.0/20"
-      "route_table_id"         = "rtb-0468efad92cd62ab8"
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0468efad92cd62ab8"
     },
     {
-      "destination_cidr_block" = "192.168.0.0/20"
-      "route_table_id"         = "rtb-06b216fb818494594"
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-06b216fb818494594"
     },
     {
-      "destination_cidr_block" = "192.168.0.0/20"
-      "route_table_id"         = "rtb-09a4481eb3684abba"
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-09a4481eb3684abba"
     },
     {
-      "destination_cidr_block" = "192.168.0.0/20"
-      "route_table_id"         = "rtb-0f8deb7a6682793e2"
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0f8deb7a6682793e2"
     },
   ])
 }
