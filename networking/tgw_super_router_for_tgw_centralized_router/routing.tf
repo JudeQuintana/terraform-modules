@@ -77,7 +77,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals
 # resource "aws_ec2_transit_gateway_route_table_propagation" "this_local" {}
 
 locals {
-  # generate routes for local vpcs in other peer tgws
   # keep track of current rtb-id to tgw-id
   local_tgw_rtb_id_to_local_tgw_id = zipmap(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_routes[*].transit_gateway_id)
 
@@ -260,7 +259,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_locals"
 }
 
 locals {
-  # generate routes for peer vpcs in other local tgws
   # keep track of current rtb-id to tgw-id
   peer_tgw_rtb_id_to_peer_tgw_id = zipmap(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_routes[*].transit_gateway_id)
 
@@ -271,7 +269,6 @@ locals {
       route_table_id         = rtb_id_and_peer_tgw_networks[0]
   }]
 
-  # add the tgw-id back in for each new route
   peer_tgw_all_new_vpc_routes_to_local_tgws = {
     for this in local.peer_vpc_routes_to_other_local_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
