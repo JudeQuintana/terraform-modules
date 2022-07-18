@@ -39,8 +39,9 @@ variable "local_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
-  # include region and caller_identity.account_id?
-  # validation
+
+  default = []
+
 }
 
 variable "peer_centralized_routers" {
@@ -63,5 +64,7 @@ variable "peer_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
+
+  default = []
   # validation
 }
