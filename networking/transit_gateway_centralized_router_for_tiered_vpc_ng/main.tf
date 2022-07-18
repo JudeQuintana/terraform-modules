@@ -77,7 +77,7 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
   )
 }
 
-## associate attachments to route table
+# associate attachments to route table
 resource "aws_ec2_transit_gateway_route_table_association" "this" {
   for_each = local.vpc_id_to_single_public_subnet_ids_per_az
 
