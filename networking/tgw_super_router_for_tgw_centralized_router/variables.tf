@@ -40,8 +40,17 @@ variable "local_centralized_routers" {
     }))
   }))
 
-  default = []
+  validation {
+    condition     = length(distinct(var.local_centralized_routers[*].region)) < 2
+    error_message = "All local centralized routers must have the same region as each other."
+  }
 
+  validation {
+    condition     = length(distinct(var.local_centralized_routers[*].account_id)) < 2
+    error_message = "All local centralized routers must have the same account id as each other."
+  }
+
+  default = []
 }
 
 variable "peer_centralized_routers" {
@@ -65,6 +74,15 @@ variable "peer_centralized_routers" {
     }))
   }))
 
+  validation {
+    condition     = length(distinct(var.peer_centralized_routers[*].region)) < 2
+    error_message = "All peer centralized routers must have the same region as each other."
+  }
+
+  validation {
+    condition     = length(distinct(var.peer_centralized_routers[*].account_id)) < 2
+    error_message = "All peer centralized couters must have the same account id as each other."
+  }
+
   default = []
-  # validation
 }

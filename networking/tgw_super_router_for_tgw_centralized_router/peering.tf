@@ -1,12 +1,15 @@
-# Create the Peering attachment in same region/acct for the local provider
-# iteration of over centralized router in same region
 locals {
   peering_name_format = "%s <-> %s"
 
   local_tgws          = var.local_centralized_routers
   local_tgw_id_to_tgw = { for this in local.local_tgws : this.id => this }
 }
+########################################################################################
+# Begin Local Side
+########################################################################################
 
+# Create the Peering attachment in same region/acct for the local provider
+# iteration of over centralized router in same region
 resource "aws_ec2_transit_gateway_peering_attachment" "this_local_peers" {
   provider = aws.local
 
@@ -59,7 +62,9 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_lo
   }
 }
 
-########################################################################
+########################################################################################
+# Begin Peer Side
+########################################################################################
 
 # Create the Peering attachment in cross region to super router (same acct) for the peer provider
 locals {
