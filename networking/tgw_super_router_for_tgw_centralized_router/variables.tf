@@ -23,7 +23,7 @@ variable "local_centralized_routers" {
   description = "list of centralized router objects for local provider"
   type = list(object({
     id             = string
-    name           = string
+    full_name      = string
     route_table_id = string
     region         = string
     account_id     = string
@@ -57,7 +57,7 @@ variable "peer_centralized_routers" {
   description = "list of centralized router objects for remote provider"
   type = list(object({
     id             = string
-    name           = string
+    full_name      = string
     route_table_id = string
     region         = string
     account_id     = string

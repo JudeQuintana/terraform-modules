@@ -2,7 +2,7 @@ output "id" {
   value = aws_ec2_transit_gateway.this_local.id
 }
 
-output "name" {
+output "full_name" {
   value = local.super_router_name
 }
 

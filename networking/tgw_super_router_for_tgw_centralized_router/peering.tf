@@ -22,7 +22,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_to_locals" {
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.full_name, local.super_router_name)
     Side = "Creator"
   }
 }
@@ -55,7 +55,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_lo
 
   transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_to_locals, each.key).id
   tags = {
-    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.full_name, local.super_router_name)
     Side = "Accepter"
   }
 
@@ -79,7 +79,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_to_peers" {
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
   tags = {
-    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.full_name, local.super_router_name)
     Side = "Creator"
   }
 }
@@ -92,7 +92,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_peer_to_loc
 
   transit_gateway_attachment_id = lookup(aws_ec2_transit_gateway_peering_attachment.this_local_to_peers, each.key).id
   tags = {
-    Name = format(local.peering_name_format, each.value.name, local.super_router_name)
+    Name = format(local.peering_name_format, each.value.full_name, local.super_router_name)
     Side = "Accepter"
   }
 }
