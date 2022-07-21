@@ -65,9 +65,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals
   transit_gateway_route_table_id = each.value.route_table_id
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, each.key).id
 
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_locals]
-
   lifecycle {
     ignore_changes = [transit_gateway_attachment_id]
   }
@@ -162,9 +159,6 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, each.value.route_table_id)).id
 
-  # make sure the peer links are up before adding the route.????
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_locals]
-
   lifecycle {
     ignore_changes = [transit_gateway_attachment_id]
   }
@@ -202,9 +196,6 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_other_local_t
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, each.value.route_table_id)).id
-
-  # make sure the peer links are up before adding the route.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_locals]
 }
 
 ########################################################################################
@@ -252,9 +243,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_locals"
 
   transit_gateway_route_table_id = each.value.route_table_id
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_locals, each.key).id
-
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_peers]
 }
 
 locals {
@@ -324,27 +312,24 @@ locals {
   # build new peer tgw routes to other local tgws
   peer_tgw_routes_to_other_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
-      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
       route_table_id         = rtb_id_and_peer_tgw_network[0]
+      destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
-  peer_tgw_all_new_tgw_routes_to_vpcs_in_other_tgws = {
+  peer_tgw_all_new_tgw_routes_to_vpcs_in_other_local_tgws = {
     for this in local.peer_tgw_routes_to_other_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_tgws" {
+resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_local_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_tgw_routes_to_vpcs_in_other_tgws
+  for_each = local.peer_tgw_all_new_tgw_routes_to_vpcs_in_other_local_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_locals, lookup(local.peer_tgw_route_table_id_to_peer_tgw_id, each.value.route_table_id)).id
-
-  # make sure the peer links are up before adding the route.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_peers]
 }
 
 locals {
@@ -379,7 +364,4 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_other_peer_tgw
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_locals, lookup(local.peer_tgw_route_table_id_to_peer_tgw_id, each.value.route_table_id)).id
-
-  # make sure the peer links are up before adding the route.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment.this_local_to_peers]
 }
