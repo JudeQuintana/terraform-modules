@@ -7,7 +7,7 @@ It will create a map of routes to other VPC networks (execept itself) which will
 
 The `call` output is `toset([{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }, ...])`.
 
-```
+```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
@@ -18,7 +18,7 @@ module "generate_routes_to_other_vpcs" {
 locals {
   vpc_routes_to_other_vpcs = {
     for this in module.generate_routes_to_other_vpcs.call :
-    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+    format("|", this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
@@ -29,7 +29,6 @@ resource "aws_route" "this" {
   route_table_id         = each.value.route_table_id
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
-
 ```
 
 Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
@@ -38,7 +37,7 @@ The `call_legacy` output is `{ "rtb-id|route" => "route", ... }`. It has
 been deprecated in favor of `call` that outputs a list of route objects.
 It makes it easier to handle when passing to other route resource types (ie vpc, tgw).
 
-```
+```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
