@@ -64,7 +64,7 @@ locals {
     "rtb-0f8deb7a6682793e2|192.168.0.0/20" = "192.168.0.0/20"
   }
 
-  routes_to_other_vpcs = toset([
+  set_of_route_objects_to_other_vpcs = toset([
     {
       destination_cidr_block = "10.0.0.0/20"
       route_table_id         = "rtb-01e5ec4882154a9a1"
@@ -136,6 +136,6 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
   equal "list_of_route_objects_to_other_vpcs" {
     description = "generated list of route objects"
     got         = module.main.call
-    want        = local.routes_to_other_vpcs
+    want        = local.set_of_route_objects_to_other_vpcs
   }
 }
