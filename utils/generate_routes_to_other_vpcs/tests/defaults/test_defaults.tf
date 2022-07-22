@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  tiered_vpcs_test_input = {
+  tiered_vpcs = {
     app = {
       az_to_private_route_table_id = {
         a = "rtb-0468efad92cd62ab8"
@@ -43,7 +43,7 @@ locals {
 module "main" {
   source = "../.."
 
-  vpcs = local.tiered_vpcs_test_input
+  vpcs = local.tiered_vpcs
 }
 
 locals {
@@ -133,8 +133,8 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
     want        = local.map_of_routes_to_other_vpcs
   }
 
-  equal "list_of_route_objects_to_other_vpcs" {
-    description = "generated list of route objects"
+  equal "set_of_route_objects_to_other_vpcs" {
+    description = "generated set of route objects"
     got         = module.main.call
     want        = local.set_of_route_objects_to_other_vpcs
   }
