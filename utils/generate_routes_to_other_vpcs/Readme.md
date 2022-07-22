@@ -5,23 +5,49 @@ This is a function type module (no resources) that will take a map of `tiered_vp
 
 It will create a map of routes to other VPC networks (execept itself) which will then be consumed by route resources.
 
-The `call` output is `{ "rtb-id|route" => "route", ... }`.
+The `call` output is `{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" } `.
 
-Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to vaidate the test suite.
-
-The test suite will help when refactoring is needed.
-
-Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
 ```
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
+
+  vpcs = var.vpcs
+}
+
+locals {
+  vpc_routes_to_other_vpcs = {
+    for this in module.generate_routes_to_other_vpcs.call :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this" {
+  for_each = local.vpc_routes_to_other_vpcs
+
+  destination_cidr_block = each.value.destination_cidr_block
+  route_table_id         = each.value.route_table_id
+  transit_gateway_id     = aws_ec2_transit_gateway.this.id
+}
+
+```
+
+Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
+
+
+The `call_legacy` output is `{ "rtb-id|route" => "route", ... }` and has
+been deprecated in favor of `call` that outputs a list of route objects.
+
+```
+# snippet
+module "generate_routes_to_other_vpcs" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
 
   vpcs = var.vpcs
 }
 
 resource "aws_route" "this" {
-  for_each = module.generate_routes_to_other_vpcs.call
+  for_each = module.generate_routes_to_other_vpcs.call_legacy
 
   destination_cidr_block = each.value
   route_table_id         = split("|", each.key)[0]
@@ -29,11 +55,15 @@ resource "aws_route" "this" {
 }
 ```
 
+Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to vaidate the test suite.
+
+The test suite will help when refactoring is needed.
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0.4 |
+| terraform | >= 1.2 |
 
 ## Providers
 
@@ -51,3 +81,4 @@ resource "aws_route" "this" {
 | Name | Description |
 |------|-------------|
 | call | n/a |
+| call_legacy | n/a |

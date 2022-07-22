@@ -14,15 +14,17 @@ locals {
         other_networks = [for n in keys(local.vpc_network_to_private_and_public_route_table_ids) : n if n != network]
   }]])
 
-  # legacy
+  # deprecated loco legacy style
   # { rtb-id|route => route, ... }
-  private_and_public_routes_to_other_networks = merge(
+  routes_legacy = merge(
     [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
       { for route_table_id_and_network in setproduct([r.route_table_id], r.other_networks) :
         format("%s|%s", route_table_id_and_network[0], route_table_id_and_network[1]) => route_table_id_and_network[1] # each key must be unique, dont group by key
   }]...)
 
-  # { route_table_id = "rtb-1234", destinantion_cidr_block = "x.x.x.x/x" }
+  # the better way to serve routes like hotcakes
+  # { route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }
+  # need extra toset because there will be dupes per AZ after the flatten call
   routes = toset(flatten(
     [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
       [for route_table_id_and_network in setproduct([r.route_table_id], r.other_networks) : {
