@@ -128,13 +128,13 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
   component = "generate_routes_to_other_vpcs"
 
   equal "map_of_routes_to_other_vpcs" {
-    description = "generated routes"
+    description = "generated map of routes"
     got         = module.main.call_legacy
     want        = local.map_of_routes_to_other_vpcs
   }
 
   equal "list_of_route_objects_to_other_vpcs" {
-    description = "generated routes"
+    description = "generated list of route objects"
     got         = module.main.call
     want        = local.routes_to_other_vpcs
   }
