@@ -7,6 +7,8 @@ It will create a map of routes to other VPC networks (execept itself) which will
 
 The `call` output is `toset([{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }, ...])`.
 
+A list of route objects makes it easier to handle when passing to other route resource types (ie vpc, tgw) than a map of routes.
+
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
@@ -33,9 +35,11 @@ resource "aws_route" "this" {
 
 Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
 
-The `call_legacy` output is `{ "rtb-id|route" => "route", ... }`. It has
-been deprecated in favor of `call` that outputs a list of route objects.
-It makes it easier to handle when passing to other route resource types (ie vpc, tgw).
+You can still get the legacy map of routes with the call_legacy output.
+
+But I don’t think generating a map of routes with unique keys for the caller is not a shortcut worth taking becuase of it’s inflexibility when needing different transforms.
+
+The `call_legacy` output is `{ "rtb-id|route" => "route", ... }`. It has been deprecated in favor of `call`
 
 ```hcl
 # snippet
