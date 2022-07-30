@@ -1,11 +1,12 @@
+# deprecated
 # { "rtb-id|route" => "route", ... }
-output "call" {
-  # deprecate soon, probably need distinct(keys(local.private_and_public_routes_to_other_networks)) # ugly but allows for multi az
-  value = local.private_and_public_routes_to_other_networks
-}
-# output routes as set of objects instead of a map
-# { rtb_id = "rtb-1234", route = "x.x.x.x/x" }
-output "call_routes" {
-  value = toset(local.routes)
+output "call_legacy" {
+  value = local.routes_legacy
 }
 
+# output routes as set of objects instead of a map
+# it makes it easier to handle when passing to other route resource types (vpc, tgw)
+# toset([{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }, ...])
+output "call" {
+  value = local.routes
+}
