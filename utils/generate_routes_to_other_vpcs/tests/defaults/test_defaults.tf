@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  tiered_vpcs_test_input = {
+  tiered_vpcs = {
     app = {
       az_to_private_route_table_id = {
         a = "rtb-0468efad92cd62ab8"
@@ -43,11 +43,11 @@ locals {
 module "main" {
   source = "../.."
 
-  vpcs = local.tiered_vpcs_test_input
+  vpcs = local.tiered_vpcs
 }
 
 locals {
-  private_and_public_routes_to_other_vpcs = {
+  map_of_routes_to_other_vpcs = {
     "rtb-01e5ec4882154a9a1|10.0.0.0/20"    = "10.0.0.0/20"
     "rtb-01e5ec4882154a9a1|172.31.0.0/20"  = "172.31.0.0/20"
     "rtb-02ad79df1a7c192e7|172.31.0.0/20"  = "172.31.0.0/20"
@@ -63,14 +63,79 @@ locals {
     "rtb-0f8deb7a6682793e2|10.0.0.0/20"    = "10.0.0.0/20"
     "rtb-0f8deb7a6682793e2|192.168.0.0/20" = "192.168.0.0/20"
   }
+
+  set_of_route_objects_to_other_vpcs = toset([
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-01e5ec4882154a9a1"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-09a4481eb3684abba"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0ad6cde89a9e386fd"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0f8deb7a6682793e2"
+    },
+    {
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-01e5ec4882154a9a1"
+    },
+    {
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-02ad79df1a7c192e7"
+    },
+    {
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-0468efad92cd62ab8"
+    },
+    {
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-06b216fb818494594"
+    },
+    {
+      destination_cidr_block = "172.31.0.0/20"
+      route_table_id         = "rtb-0ad6cde89a9e386fd"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-02ad79df1a7c192e7"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0468efad92cd62ab8"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-06b216fb818494594"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-09a4481eb3684abba"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0f8deb7a6682793e2"
+    },
+  ])
 }
 
 resource "test_assertions" "generate_routes_to_other_vpcs" {
   component = "generate_routes_to_other_vpcs"
 
-  equal "map_of_unique_routes_to_other_vpcs" {
-    description = "generated routes"
+  equal "map_of_routes_to_other_vpcs" {
+    description = "generated map of routes"
+    got         = module.main.call_legacy
+    want        = local.map_of_routes_to_other_vpcs
+  }
+
+  equal "set_of_route_objects_to_other_vpcs" {
+    description = "generated set of route objects"
     got         = module.main.call
-    want        = local.private_and_public_routes_to_other_vpcs
+    want        = local.set_of_route_objects_to_other_vpcs
   }
 }
