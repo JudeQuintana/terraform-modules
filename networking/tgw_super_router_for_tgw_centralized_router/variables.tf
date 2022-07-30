@@ -83,7 +83,6 @@ variable "peer_centralized_routers" {
     }))
   }))
 
-
   validation {
     condition = length(
       distinct(var.peer_centralized_routers[*].amazon_side_asn)

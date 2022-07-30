@@ -111,7 +111,7 @@ locals {
 resource "aws_route" "this" {
   for_each = local.vpc_routes_to_other_vpcs
 
-  destination_cidr_block = each.value.destination_cidr_block
   route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
