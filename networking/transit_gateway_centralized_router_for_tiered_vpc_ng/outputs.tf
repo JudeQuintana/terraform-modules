@@ -2,6 +2,10 @@ output "account_id" {
   value = local.account_id
 }
 
+output "amazon_side_asn" {
+  value = var.amazon_side_asn
+}
+
 output "region" {
   value = local.region_name
 }

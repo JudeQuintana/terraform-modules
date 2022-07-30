@@ -22,12 +22,13 @@ variable "local_amazon_side_asn" {
 variable "local_centralized_routers" {
   description = "list of centralized router objects for local provider"
   type = list(object({
-    id             = string
-    full_name      = string
-    route_table_id = string
-    region         = string
-    account_id     = string
-    networks       = list(string)
+    id              = string
+    account_id      = string
+    amazon_side_asn = string
+    full_name       = string
+    route_table_id  = string
+    region          = string
+    networks        = list(string)
     vpc_routes = list(object({
       destination_cidr_block = string
       route_table_id         = string
@@ -39,6 +40,13 @@ variable "local_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
+
+  validation {
+    condition = length(
+      distinct(var.local_centralized_routers[*].amazon_side_asn)
+    ) == length(var.local_centralized_routers[*].amazon_side_asn)
+    error_message = "All local centralized routers must have a unique amazon_side_asn number."
+  }
 
   validation {
     condition     = length(distinct(var.local_centralized_routers[*].region)) < 2
@@ -56,12 +64,13 @@ variable "local_centralized_routers" {
 variable "peer_centralized_routers" {
   description = "list of centralized router objects for remote provider"
   type = list(object({
-    id             = string
-    full_name      = string
-    route_table_id = string
-    region         = string
-    account_id     = string
-    networks       = list(string)
+    id              = string
+    account_id      = string
+    amazon_side_asn = string
+    full_name       = string
+    route_table_id  = string
+    region          = string
+    networks        = list(string)
     vpc_routes = list(object({
       destination_cidr_block = string
       route_table_id         = string
@@ -74,6 +83,13 @@ variable "peer_centralized_routers" {
     }))
   }))
 
+
+  validation {
+    condition = length(
+      distinct(var.peer_centralized_routers[*].amazon_side_asn)
+    ) == length(var.peer_centralized_routers[*].amazon_side_asn)
+    error_message = "All peer centralized routers must have a unique amazon_side_asn number."
+  }
 
   validation {
     condition     = length(distinct(var.peer_centralized_routers[*].region)) < 2
