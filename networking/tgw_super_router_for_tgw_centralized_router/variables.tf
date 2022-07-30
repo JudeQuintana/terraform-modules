@@ -22,16 +22,16 @@ variable "local_amazon_side_asn" {
 variable "local_centralized_routers" {
   description = "list of centralized router objects for local provider"
   type = list(object({
-    id              = string
     account_id      = string
     amazon_side_asn = string
     full_name       = string
-    route_table_id  = string
-    region          = string
+    id              = string
     networks        = list(string)
+    region          = string
+    route_table_id  = string
     vpc_routes = list(object({
-      destination_cidr_block = string
       route_table_id         = string
+      destination_cidr_block = string
       transit_gateway_id     = string
     }))
     vpcs = map(object({
@@ -64,16 +64,16 @@ variable "local_centralized_routers" {
 variable "peer_centralized_routers" {
   description = "list of centralized router objects for remote provider"
   type = list(object({
-    id              = string
     account_id      = string
     amazon_side_asn = string
     full_name       = string
-    route_table_id  = string
-    region          = string
+    id              = string
     networks        = list(string)
+    region          = string
+    route_table_id  = string
     vpc_routes = list(object({
-      destination_cidr_block = string
       route_table_id         = string
+      destination_cidr_block = string
       transit_gateway_id     = string
     }))
     vpcs = map(object({
