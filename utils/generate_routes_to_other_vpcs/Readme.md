@@ -10,7 +10,7 @@ The `call` output is `toset([{ route_table_id = "rtb-12345678", destination_cidr
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.2"
 
   vpcs = var.vpcs
 }
@@ -40,7 +40,7 @@ It makes it easier to handle when passing to other route resource types (ie vpc,
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.2"
 
   vpcs = var.vpcs
 }
