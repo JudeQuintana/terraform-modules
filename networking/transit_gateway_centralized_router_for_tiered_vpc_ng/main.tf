@@ -96,14 +96,14 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 
 # Create routes to other VPC networks in private and public route tables for each VPC
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.2"
 
   vpcs = var.vpcs
 }
 
 locals {
   vpc_routes_to_other_vpcs = {
-    for this in module.generate_routes_to_other_vpcs.call_routes :
+    for this in module.generate_routes_to_other_vpcs.call :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }

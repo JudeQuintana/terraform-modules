@@ -47,7 +47,7 @@ resource "aws_ec2_transit_gateway_route" "this_local" {
 resource "aws_ec2_transit_gateway_route_table_association" "this_local" {
   provider = aws.local
 
-  for_each = toset(local.local_tgws[*].id)
+  for_each = local.local_tgw_id_to_local_tgw
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.this_local_to_locals, each.key).id
@@ -226,7 +226,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_vpc_to_peer_tgws" {
 resource "aws_ec2_transit_gateway_route_table_association" "this_peer" {
   provider = aws.local
 
-  for_each = toset(local.peer_tgws[*].id)
+  for_each = local.peer_tgw_id_to_peer_tgw
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment.this_local_to_peers, each.key).id
