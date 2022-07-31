@@ -6,11 +6,6 @@ variable "vpcs" {
     az_to_public_route_table_id  = map(string)
   }))
 
-  validation {
-    condition     = length(var.vpcs) > 1
-    error_message = "There must be at least 2 VPCs."
-  }
-
   # im using a manual CIDR notation check here because there are no vpc resources in use to validate the CIDR for me.
   validation {
     condition = length([
