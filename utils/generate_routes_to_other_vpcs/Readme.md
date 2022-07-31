@@ -35,7 +35,7 @@ resource "aws_route" "this" {
 
 Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
 
-You can still get the legacy map of routes with the call_legacy output.
+You can still get the legacy map of routes with the `call_legacy` output.
 
 But I don’t think generating a map of routes with unique keys for the caller is not a shortcut worth taking becuase of it’s inflexibility when needing different transforms.
 
