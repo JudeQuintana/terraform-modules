@@ -78,14 +78,14 @@ locals {
   local_tgw_rtb_id_to_local_tgw_id = zipmap(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_routes[*].transit_gateway_id)
 
   # build new local vpc routes to other peer tgws
-  local_vpc_routes_to_other_peer_tgws = [
+  local_vpc_routes_to_peer_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_peer_tgw_network[0]
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
   local_tgw_all_new_vpc_routes_to_peer_tgws = {
-    for this in local.local_vpc_routes_to_other_peer_tgws :
+    for this in local.local_vpc_routes_to_peer_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
@@ -102,7 +102,7 @@ resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
 
 locals {
   # build new local vpc routes to other local vpcs
-  local_vpc_routes_to_other_local_tgws = [
+  local_vpc_routes_to_local_tgws = [
     for rtb_id_and_local_tgw_network in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_local_tgw_network[0]
       destination_cidr_block = rtb_id_and_local_tgw_network[1]
@@ -118,16 +118,16 @@ locals {
   }]]])
 
   # subtract current existing local vpc routes from all local vpc routes
-  local_tgw_all_new_vpc_routes_to_other_local_vpcs = {
-    for this in setsubtract(local.local_vpc_routes_to_other_local_tgws, local.local_current_vpc_routes) :
+  local_tgw_all_new_vpc_routes_to_local_vpcs = {
+    for this in setsubtract(local.local_vpc_routes_to_local_tgws, local.local_current_vpc_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_local_vpcs_routes_to_other_local_vpcs" {
+resource "aws_route" "this_local_vpcs_routes_to_local_vpcs" {
   provider = aws.local
 
-  for_each = local.local_tgw_all_new_vpc_routes_to_other_local_vpcs
+  for_each = local.local_tgw_all_new_vpc_routes_to_local_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -138,22 +138,22 @@ locals {
   local_tgw_route_table_id_to_local_tgw_id = zipmap(local.local_tgws[*].route_table_id, local.local_tgws[*].id)
 
   # build new local tgw routes to other peer tgws
-  local_tgw_routes_to_other_peer_tgws = [
+  local_tgw_routes_to_peer_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.local_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_peer_tgw_network[0]
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
-  local_tgw_all_new_tgw_routes_to_vpc_in_other_tgws = {
-    for this in local.local_tgw_routes_to_other_peer_tgws :
+  local_tgw_all_new_tgw_routes_to_vpc_in_peer_tgws = {
+    for this in local.local_tgw_routes_to_peer_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other_tgws" {
+resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_peer_tgws" {
   provider = aws.local
 
-  for_each = local.local_tgw_all_new_tgw_routes_to_vpc_in_other_tgws
+  for_each = local.local_tgw_all_new_tgw_routes_to_vpc_in_peer_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
@@ -166,7 +166,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_other
 
 locals {
   # build new local tgw routes to other local tgws
-  local_tgws_routes_to_other_local_tgws = [
+  local_tgws_routes_to_local_tgws = [
     for rtb_id_and_network in setproduct(local.local_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_network[0]
       destination_cidr_block = rtb_id_and_network[1]
@@ -182,16 +182,16 @@ locals {
   }]]])
 
   # subtract current existing local tgw routes from all local tgw routes
-  local_tgw_all_new_tgw_routes_to_other_local_tgws = {
-    for this in setsubtract(local.local_tgws_routes_to_other_local_tgws, local.local_current_tgw_routes) :
+  local_tgw_all_new_tgw_routes_to_local_tgws = {
+    for this in setsubtract(local.local_tgws_routes_to_local_tgws, local.local_current_tgw_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_other_local_tgws" {
+resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_local_tgws" {
   provider = aws.local
 
-  for_each = local.local_tgw_all_new_tgw_routes_to_other_local_tgws
+  for_each = local.local_tgw_all_new_tgw_routes_to_local_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
@@ -250,14 +250,14 @@ locals {
   peer_tgw_rtb_id_to_peer_tgw_id = zipmap(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_routes[*].transit_gateway_id)
 
   # build new vpc peer routes routes to other local tgws
-  peer_vpc_routes_to_other_local_tgws = [
+  peer_vpc_routes_to_local_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_peer_tgw_network[0]
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
   peer_tgw_all_new_vpc_routes_to_local_tgws = {
-    for this in local.peer_vpc_routes_to_other_local_tgws :
+    for this in local.peer_vpc_routes_to_local_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
@@ -274,7 +274,7 @@ resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
 
 locals {
   # build new peer vpc routes to other peer vpcs
-  peer_vpc_routes_to_other_peer_tgws = [
+  peer_vpc_routes_to_peer_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_peer_tgw_network[0]
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
@@ -290,8 +290,8 @@ locals {
   }]]])
 
   # subtract current existing peer vpc routes from all peer vpc routes
-  peer_tgw_all_new_vpc_routes_to_other_peer_vpcs = {
-    for this in setsubtract(local.peer_vpc_routes_to_other_peer_tgws, local.peer_current_vpc_routes) :
+  peer_tgw_all_new_vpc_routes_to_peer_vpcs = {
+    for this in setsubtract(local.peer_vpc_routes_to_peer_tgws, local.peer_current_vpc_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
@@ -299,7 +299,7 @@ locals {
 resource "aws_route" "this_peer_vpcs_routes_to_other_peer_vpcs" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_vpc_routes_to_other_peer_vpcs
+  for_each = local.peer_tgw_all_new_vpc_routes_to_peer_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -310,22 +310,22 @@ locals {
   peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws[*].route_table_id, local.peer_tgws[*].id)
 
   # build new peer tgw routes to other local tgws
-  peer_tgw_routes_to_other_tgws = [
+  peer_tgw_routes_to_local_tgws = [
     for rtb_id_and_peer_tgw_network in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_peer_tgw_network[0]
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
-  peer_tgw_all_new_tgw_routes_to_vpcs_in_other_local_tgws = {
-    for this in local.peer_tgw_routes_to_other_tgws :
+  peer_tgw_all_new_tgw_routes_to_vpcs_in_local_tgws = {
+    for this in local.peer_tgw_routes_to_local_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_local_tgws" {
+resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_local_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_tgw_routes_to_vpcs_in_other_local_tgws
+  for_each = local.peer_tgw_all_new_tgw_routes_to_vpcs_in_local_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
@@ -334,7 +334,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_other_
 
 locals {
   # build new peer tgw routes to other peer tgws
-  peer_tgws_routes_to_other_peer_tgws = [
+  peer_tgws_routes_to_peer_tgws = [
     for rtb_id_and_network in setproduct(local.peer_tgws[*].route_table_id, local.peer_tgws_all_vpc_networks) : {
       route_table_id         = rtb_id_and_network[0]
       destination_cidr_block = rtb_id_and_network[1]
@@ -350,16 +350,16 @@ locals {
   }]]])
 
   # subtract current existing peer tgw routes from all peer tgw routes
-  peer_tgw_all_new_tgw_routes_to_other_peer_tgws = {
-    for this in setsubtract(local.peer_tgws_routes_to_other_peer_tgws, local.peer_current_tgw_routes) :
+  peer_tgw_all_new_tgw_routes_to_peer_tgws = {
+    for this in setsubtract(local.peer_tgws_routes_to_peer_tgws, local.peer_current_tgw_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_other_peer_tgws" {
+resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_peer_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_tgw_routes_to_other_peer_tgws
+  for_each = local.peer_tgw_all_new_tgw_routes_to_peer_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
