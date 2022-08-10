@@ -25,7 +25,7 @@ the TGW.
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~>4.20 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~>3.1.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~>3.3 |
 
 ## Modules
 
