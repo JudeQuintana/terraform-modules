@@ -32,5 +32,11 @@ variable "vpcs" {
     az_to_public_route_table_id  = map(string)
     az_to_public_subnet_ids      = map(list(string))
   }))
+
   default = {}
+
+  validation {
+    condition     = length(distinct([for this in var.vpcs : this.network])) == length([for this in var.vpcs : this.network])
+    error_message = "All VPCs must have unique network CIDRs."
+  }
 }
