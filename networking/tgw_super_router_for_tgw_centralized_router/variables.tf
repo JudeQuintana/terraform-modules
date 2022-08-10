@@ -40,6 +40,7 @@ variable "local_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
+  default = []
 
   validation {
     condition = length(
@@ -57,8 +58,6 @@ variable "local_centralized_routers" {
     condition     = length(distinct(var.local_centralized_routers[*].account_id)) < 2
     error_message = "All local centralized routers must have the same account id as each other and the aws.local provider alias."
   }
-
-  default = []
 }
 
 variable "peer_centralized_routers" {
@@ -82,6 +81,7 @@ variable "peer_centralized_routers" {
       az_to_private_route_table_id = map(string)
     }))
   }))
+  default = []
 
   validation {
     condition = length(
@@ -99,6 +99,4 @@ variable "peer_centralized_routers" {
     condition     = length(distinct(var.peer_centralized_routers[*].account_id)) < 2
     error_message = "All peer centralized couters must have the same account id as each other and the aws.peer provider alias."
   }
-
-  default = []
 }
