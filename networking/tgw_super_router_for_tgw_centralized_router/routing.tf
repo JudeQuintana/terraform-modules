@@ -296,7 +296,7 @@ locals {
   }
 }
 
-resource "aws_route" "this_peer_vpcs_routes_to_other_peer_vpcs" {
+resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
   provider = aws.peer
 
   for_each = local.peer_tgw_all_new_vpc_routes_to_peer_vpcs
