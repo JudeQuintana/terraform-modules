@@ -13,8 +13,7 @@
 # - private_az_to_subnets is map of azs to private subnets list (cidrs)
 # - private_subnet_to_az is a map of private subnets to az used for subnet name tagging
 # - private_subnets is a set of all private subnets
-# - natgw_private_az_to_bool is a map of AZs to boolean that have a NAT Gateway configured and have
-#   private subnets configured
+# - natgw_private_az_to_bool is a map of AZs to boolean that have a NAT Gateway enabled
 ############################################################################################################
 
 locals {
@@ -22,7 +21,7 @@ locals {
   private_az_to_subnets    = { for az, acls in local.tier.azs : az => acls.private }
   private_subnet_to_az     = { for subnet, azs in transpose(local.private_az_to_subnets) : subnet => element(azs, 0) }
   private_subnets          = toset(keys(local.private_subnet_to_az))
-  natgw_private_az_to_bool = { for az, acls in local.tier.azs : az => acls.enable_natgw if acls.enable_natgw && length(local.private_subnets) > 0 }
+  natgw_private_az_to_bool = { for az, acls in local.tier.azs : az => acls.enable_natgw if acls.enable_natgw }
 }
 
 # generate single word random pet name for each privae subnet's name tag
