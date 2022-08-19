@@ -39,6 +39,57 @@ What’s new in NG?
  - NAT Gateways are created with an EIP per AZ when enabled.
    - This is why we need at least one public subnet per AZ to create them in.
 
+
+Example:
+```
+locals {
+  vpc_tiers_usw2 = [
+    {
+      azs = {
+        a = {
+          # Enable a NAT Gateway for all private subnets in the AZ with:
+          # enable_natgw = true
+          private = ["10.0.16.0/24", "10.0.17.0/24", "10.0.18.0/24"]
+          public  = ["10.0.19.0/24", "10.0.20.0/24", "10.0.21.0/24"]
+        }
+        b = {
+          # Enable a NAT Gateway for all private subnets in the AZ with:
+          # enable_natgw = true
+          private = ["10.0.26.0/24"]
+          public  = ["10.0.27.0/24"]
+        }
+      }
+      name    = "app"
+      network = "10.0.16.0/20"
+    },
+    {
+      azs = {
+        c = {
+          private = ["192.168.16.0/24", "192.168.17.0/24", "192.168.18.0/24"]
+          public  = ["192.168.19.0/28"]
+        }
+      }
+      name    = "general"
+      network = "192.168.16.0/20"
+    }
+  ]
+}
+
+module "vpcs_usw2" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng"
+
+  providers = {
+    aws = aws.usw2
+  }
+
+  for_each = { for t in local.vpc_tiers_usw2 : t.name => t }
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  tier             = each.value
+}
+```
+
 ## Requirements
 
 | Name | Version |

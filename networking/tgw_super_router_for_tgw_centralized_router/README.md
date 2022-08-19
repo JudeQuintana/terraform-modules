@@ -1,3 +1,26 @@
+# Super Router Description
+
+Super Router provides both intra-region and cross-region peering and routing for Centralized Routers.
+
+Example:
+
+```
+module "tgw_super_router_usw2_to_use1" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router"
+
+  providers = {
+    aws.local = aws.usw2 # super router will be built in the aws.local provider region
+    aws.peer  = aws.use1
+  }
+
+  env_prefix                = var.env_prefix
+  region_az_labels          = var.region_az_labels
+  local_amazon_side_asn     = 64521
+  local_centralized_routers = [module.tgw_centralized_router_usw2, module.tgw_centralized_router_usw2_another] # local list must be all same region as each other in aws.local provider.
+  peer_centralized_routers  = [module.tgw_centralized_router_use1, module.tgw_centralized_router_use1_another] # peer list must all be same region as each other in aws.peer provider.
+}
+```
+
 ## Requirements
 
 | Name | Version |

@@ -6,6 +6,26 @@ Main:
 - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
   - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
+Example:
+```
+# This TGW Centralized router module will attach all vpcs (attachment for each AZ) to one TGW
+# associate and propagate to a single route table
+# generate and add routes in each VPC to all other networks.
+module "tgw_centralized_router_usw2" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng"
+
+  providers = {
+    aws = aws.usw2
+  }
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  amazon_side_asn  = 64520
+  vpcs             = module.vpcs_usw2
+}
+
+```
+
 # Transit Gateway Centralized Router Description
 This Transit Gateway Centralized Router module will attach all AZs in each Tiered VPC to the TGW.
 All attachments will be associated and routes propagated to one TGW Route Table.
