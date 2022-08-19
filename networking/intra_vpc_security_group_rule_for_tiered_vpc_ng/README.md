@@ -13,14 +13,14 @@ This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC all
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~>1.2 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~>4.20 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.2 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.20 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~>4.20 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.20 |
 
 ## Modules
 
