@@ -27,7 +27,7 @@ module "tgw_super_router_usw2_to_use1" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.2 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.3 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >=3.3 |
 
 ## Providers
 
@@ -35,7 +35,7 @@ module "tgw_super_router_usw2_to_use1" {
 |------|---------|
 | <a name="provider_aws.local"></a> [aws.local](#provider\_aws.local) | >=4.20 |
 | <a name="provider_aws.peer"></a> [aws.peer](#provider\_aws.peer) | >=4.20 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 3.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | >=3.3 |
 
 ## Modules
 
