@@ -2,7 +2,7 @@
 
 [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
 
-Super Router provides both intra-region and cross-region peering and routing for Centralized Routers (same AWS account only, no cross account).
+Super Router provides both intra-region and cross-region peering and routing for Centralized Routers and Tiered VPCs (same AWS account only, no cross account).
 
 - The caveat is the peer TGWs will have to go through the super-router local provider region to get to other peer TGWs. Architecture diagrams, lol:
   - public subnet usw2a in app vpc <-> usw2 centralized router 1 <-> usw2 super router <-> use1 centralized router 1 <-> private subnet use1c in general vpc
