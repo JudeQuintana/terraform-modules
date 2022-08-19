@@ -1,5 +1,7 @@
 # Super Router Description
 
+Super Powered, Super Sharp, Super Router!
+
 [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
 
 Super Router provides both intra-region and cross-region peering and routing for Centralized Routers and Tiered VPCs (same AWS account only, no cross account).
