@@ -1,5 +1,7 @@
 # Super Router Description
 
+[Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
+
 Super Router provides both intra-region and cross-region peering and routing for Centralized Routers.
 
 - The caveat is the peer TGWs will have to go through the super-router local provider region to get to other peer TGWs. Architecture diagrams, lol:
