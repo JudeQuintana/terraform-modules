@@ -1,18 +1,5 @@
-output "id" {
-  value = aws_vpc.this.id
-}
-
-output "network" {
-  # pass thru what is known pre-apply
-  value = var.tier.network
-}
-
-output "default_security_group_id" {
-  value = aws_vpc.this.default_security_group_id
-}
-
-output "intra_vpc_security_group_id" {
-  value = aws_security_group.intra_vpc.id
+output "account_id" {
+  value = local.account_id
 }
 
 locals {
@@ -37,4 +24,29 @@ output "az_to_public_subnet_ids" {
 
 output "az_to_public_route_table_id" {
   value = local.az_to_public_route_table_id
+}
+
+output "default_security_group_id" {
+  value = aws_vpc.this.default_security_group_id
+}
+
+output "full_name" {
+  value = local.vpc_name
+}
+
+output "id" {
+  value = aws_vpc.this.id
+}
+
+output "intra_vpc_security_group_id" {
+  value = aws_security_group.intra_vpc.id
+}
+
+output "network" {
+  # pass thru what is known pre-apply
+  value = var.tier.network
+}
+
+output "region" {
+  value = local.region_name
 }

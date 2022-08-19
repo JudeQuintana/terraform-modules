@@ -1,6 +1,6 @@
 variable "amazon_side_asn" {
-  type    = number
-  default = null
+  description = "required local amazon side asn"
+  type        = number
 }
 
 variable "env_prefix" {
@@ -22,16 +22,20 @@ variable "tags" {
 variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
+    account_id                   = string
+    region                       = string
     id                           = string
+    full_name                    = string
     network                      = string
     az_to_private_route_table_id = map(string)
     az_to_private_subnet_ids     = map(list(string))
     az_to_public_route_table_id  = map(string)
     az_to_public_subnet_ids      = map(list(string))
   }))
+  default = {}
 
   validation {
-    condition     = length(var.vpcs) > 1
-    error_message = "There must be at least 2 VPCs."
+    condition     = length(distinct([for this in var.vpcs : this.network])) == length([for this in var.vpcs : this.network])
+    error_message = "All VPCs must have unique network CIDRs."
   }
 }

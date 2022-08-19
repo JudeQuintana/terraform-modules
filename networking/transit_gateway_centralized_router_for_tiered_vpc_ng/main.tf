@@ -1,14 +1,29 @@
+# Pull caller identity data from provider
+data "aws_caller_identity" "current" {}
+
 # Pull region data from provider
 data "aws_region" "current" {}
 
 locals {
-  region_name      = data.aws_region.current.name
-  region_label     = lookup(var.region_az_labels, local.region_name)
-  upper_env_prefix = upper(var.env_prefix)
+  account_id            = data.aws_caller_identity.current.account_id
+  region_name           = data.aws_region.current.name
+  region_label          = lookup(var.region_az_labels, local.region_name)
+  upper_env_prefix      = upper(var.env_prefix)
+  route_format          = "%s|%s"
+  vpc_attachment_format = "%s <-> %s"
 
   default_tags = merge({
     Environment = var.env_prefix
   }, var.tags)
+}
+
+# generate single word random pet name for tgw
+resource "random_pet" "this" {
+  length = 1
+}
+
+locals {
+  centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
 }
 
 # one tgw that will route between all tiered vpcs.
@@ -18,9 +33,8 @@ resource "aws_ec2_transit_gateway" "this" {
   default_route_table_propagation = "disable"
   tags = merge(
     local.default_tags,
-    {
-      Name = format("%s-%s", local.upper_env_prefix, local.region_label)
-  })
+    { Name = local.centralized_router_name }
+  )
 }
 
 locals {
@@ -37,7 +51,7 @@ locals {
   }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => vpc_name }
+  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => this.full_name }
 }
 
 # attach vpcs to tgw
@@ -51,19 +65,17 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   vpc_id                                          = each.key
   tags = merge(
     local.default_tags,
-    {
-      Name = lookup(local.vpc_id_to_names, each.key)
-  })
+    { Name = format(local.vpc_attachment_format, lookup(local.vpc_id_to_names, each.key), local.centralized_router_name) }
+  )
 }
 
-# one route table for all vpc networks
+## one route table for all vpc networks
 resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(
     local.default_tags,
-    {
-      Name = format("%s-%s", local.upper_env_prefix, local.region_label)
-  })
+    { Name = local.centralized_router_name }
+  )
 }
 
 # associate attachments to route table
@@ -83,33 +95,23 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
 }
 
 # Create routes to other VPC networks in private and public route tables for each VPC
+module "generate_routes_to_other_vpcs" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.3.3"
+
+  vpcs = var.vpcs
+}
+
 locals {
-  # { vpc-1-network => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
-  vpc_network_to_private_and_public_route_table_ids = {
-    for vpc_name, this in var.vpcs :
-    this.network => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
+  vpc_routes_to_other_vpcs = {
+    for this in module.generate_routes_to_other_vpcs.call :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
-
-  # [ { rtb_id = "vpc-1-rtb-id-123", other_networks = [ "other-vpc-2-network", "other-vpc3-network", ... ] }, ...]
-  associate_private_and_public_route_table_ids_with_other_networks = flatten(
-    [for network, rtb_ids in local.vpc_network_to_private_and_public_route_table_ids :
-      [for rtb_id in rtb_ids : {
-        rtb_id         = rtb_id
-        other_networks = [for n in keys(local.vpc_network_to_private_and_public_route_table_ids) : n if n != network]
-  }]])
-
-  # { rtb-id|route => route, ... }
-  private_and_public_routes_to_other_networks = merge(
-    [for r in local.associate_private_and_public_route_table_ids_with_other_networks :
-      { for rtb_id_and_route in setproduct([r.rtb_id], r.other_networks) :
-        format("%s|%s", rtb_id_and_route[0], rtb_id_and_route[1]) => rtb_id_and_route[1] # each key must be unique, dont group by key
-  }]...)
 }
 
 resource "aws_route" "this" {
-  for_each = local.private_and_public_routes_to_other_networks
+  for_each = local.vpc_routes_to_other_vpcs
 
-  destination_cidr_block = each.value
-  route_table_id         = split("|", each.key)[0]
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
