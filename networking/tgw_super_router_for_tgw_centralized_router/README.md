@@ -1,6 +1,7 @@
 # Super Router Description
+This is a follow up to the [generating routes post](https://jq1.io/posts/generating_routes/).
 
-Super Powered, Super Sharp, Super Router!
+New Blog Post: [Super Powered, Super Sharp, Super Router!](https://jq1.io/posts/super_router/)
 
 [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
 
