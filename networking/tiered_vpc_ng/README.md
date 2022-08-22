@@ -43,7 +43,7 @@ What’s new in NG?
 Example:
 ```
 locals {
-  vpc_tiers_usw2 = [
+  vpc_tiers = [
     {
       azs = {
         a = {
@@ -75,14 +75,10 @@ locals {
   ]
 }
 
-module "vpcs_usw2" {
+module "vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.4.0"
 
-  providers = {
-    aws = aws.usw2
-  }
-
-  for_each = { for t in local.vpc_tiers_usw2 : t.name => t }
+  for_each = { for t in local.vpc_tiers : t.name => t }
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
