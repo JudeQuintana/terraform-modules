@@ -74,12 +74,14 @@ resource "aws_route_table" "private" {
 }
 
 # one private route out through natgw per az
+# uses a map from public.tf but the route is a
+# private conext
 resource "aws_route" "private_route_out" {
-  for_each = local.natgw_private_az_to_bool
+  for_each = local.natgw_public_az_to_bool
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.private, each.key).id
-  nat_gateway_id         = lookup(aws_nat_gateway.private, each.key).id
+  nat_gateway_id         = lookup(aws_nat_gateway.public, each.key).id
 
   lifecycle {
     ignore_changes = [route_table_id, nat_gateway_id]
