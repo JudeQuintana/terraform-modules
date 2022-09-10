@@ -1,10 +1,10 @@
-# Blog Post
+## This module is deprecated
+Please use [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng) instead!
+
+## Blog Post
 Please see the [Tiered VPC in Terraform
 0.13](https://jq1.io/posts/tiered_vpc) blog post for more
 details.
-
-## This module is deprecated
-Please use [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng) instead!
 
 ## Description
 Create VPC tiers.
