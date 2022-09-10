@@ -46,7 +46,7 @@ the TGW.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_generate_routes_to_other_vpcs"></a> [generate\_routes\_to\_other\_vpcs](#module\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.3.3 |
+| <a name="module_generate_routes_to_other_vpcs"></a> [generate\_routes\_to\_other\_vpcs](#module\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.0 |
 
 ## Resources
 
