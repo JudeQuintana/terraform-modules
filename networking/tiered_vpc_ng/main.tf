@@ -5,18 +5,19 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  account_id     = data.aws_caller_identity.current.account_id
-  region_name    = data.aws_region.current.name
-  region_label   = lookup(var.region_az_labels, local.region_name)
-  route_any_cidr = "0.0.0.0/0"
+  account_id       = data.aws_caller_identity.current.account_id
+  region_name      = data.aws_region.current.name
+  region_label     = lookup(var.region_az_labels, local.region_name)
+  route_any_cidr   = "0.0.0.0/0"
+  upper_env_prefix = upper(var.env_prefix)
 
   # Set Environment tag since we have have var.env_prefix
   # add or override with var.tags
   default_tags = merge({
-    Environment = lower(var.env_prefix)
+    Environment = var.env_prefix
   }, var.tags)
 
-  vpc_name = format("%s-%s-%s", upper(var.env_prefix), local.region_label, var.tier.name)
+  vpc_name = format("%s-%s-%s", local.upper_env_prefix, local.region_label, var.tier.name)
 }
 
 ######################################################
