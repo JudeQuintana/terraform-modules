@@ -70,7 +70,7 @@ the TGW.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    account_id                   = string<br>    region                       = string<br>    id                           = string<br>    full_name                    = string<br>    network                      = string<br>    az_to_private_route_table_id = map(string)<br>    az_to_private_subnet_ids     = map(list(string))<br>    az_to_public_route_table_id  = map(string)<br>    az_to_public_subnet_ids      = map(list(string))<br>  }))</pre> | `{}` | no |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    account_id                   = string<br>    az_to_private_route_table_id = map(string)<br>    az_to_private_subnet_ids     = map(list(string))<br>    az_to_public_route_table_id  = map(string)<br>    az_to_public_subnet_ids      = map(list(string))<br>    region                       = string<br>    id                           = string<br>    full_name                    = string<br>    network                      = string<br>  }))</pre> | `{}` | no |
 
 ## Outputs
 
