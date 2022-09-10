@@ -13,15 +13,13 @@
 # - private_az_to_subnets is map of azs to private subnets list (cidrs)
 # - private_subnet_to_az is a map of private subnets to az used for subnet name tagging
 # - private_subnets is a set of all private subnets
-# - natgw_private_az_to_bool is a map of AZs to boolean that have a NAT Gateway enabled
 ############################################################################################################
 
 locals {
-  private_label            = "private"
-  private_az_to_subnets    = { for az, acls in local.tier.azs : az => acls.private }
-  private_subnet_to_az     = { for subnet, azs in transpose(local.private_az_to_subnets) : subnet => element(azs, 0) }
-  private_subnets          = toset(keys(local.private_subnet_to_az))
-  natgw_private_az_to_bool = { for az, acls in local.tier.azs : az => acls.enable_natgw if acls.enable_natgw }
+  private_label         = "private"
+  private_az_to_subnets = { for az, acls in local.tier.azs : az => acls.private }
+  private_subnet_to_az  = { for subnet, azs in transpose(local.private_az_to_subnets) : subnet => element(azs, 0) }
+  private_subnets       = toset(keys(local.private_subnet_to_az))
 }
 
 # generate single word random pet name for each privae subnet's name tag
@@ -76,12 +74,14 @@ resource "aws_route_table" "private" {
 }
 
 # one private route out through natgw per az
+# uses a map from public.tf but the route is a
+# private conext
 resource "aws_route" "private_route_out" {
-  for_each = local.natgw_private_az_to_bool
+  for_each = local.natgw_public_az_to_bool
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.private, each.key).id
-  nat_gateway_id         = lookup(aws_nat_gateway.private, each.key).id
+  nat_gateway_id         = lookup(aws_nat_gateway.public, each.key).id
 
   lifecycle {
     ignore_changes = [route_table_id, nat_gateway_id]
@@ -97,72 +97,5 @@ resource "aws_route_table_association" "private" {
 
   lifecycle {
     ignore_changes = [subnet_id, route_table_id]
-  }
-}
-
-#######################################################
-##
-## EIPs:
-## - Used for NAT Gateway's Public IP
-##
-#######################################################
-
-# one eip per natgw (one per az)
-resource "aws_eip" "private" {
-  for_each = local.natgw_private_az_to_bool
-
-  vpc = true
-  tags = merge(
-    local.default_tags,
-    {
-      Name = format(
-        "%s-%s-%s-%s",
-        upper(var.env_prefix),
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        local.tier.name,
-        local.private_label
-      )
-  })
-}
-
-#######################################################
-##
-## NAT Gatways:
-## - For routing the respective private AZ traffic and
-##   is built in a public subnet
-## - depends_on is required because NAT GW needs an IGW
-##   to route through but there is not an implicit
-##   dependency via it's attributes so we must be
-##   explicit.
-##
-#######################################################
-
-locals {
-  # grab the first public subnet in the list per az to put a nat gateway
-  public_az_to_single_subnet = { for az, subnets in local.public_az_to_subnets : az => element(subnets, 0) }
-}
-
-# one natgw per az, put natgw in a single public subnet in relative az if the natgw is enabled for a private subnet
-resource "aws_nat_gateway" "private" {
-  for_each = local.natgw_private_az_to_bool
-
-  allocation_id = lookup(aws_eip.private, each.key).id
-  subnet_id     = lookup(aws_subnet.public, lookup(local.public_az_to_single_subnet, each.key)).id
-  tags = merge(
-    local.default_tags,
-    {
-      Name = format(
-        "%s-%s-%s-%s",
-        upper(var.env_prefix),
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        local.tier.name,
-        local.private_label
-      )
-  })
-
-  depends_on = [aws_internet_gateway.this]
-
-  lifecycle {
-    ignore_changes = [allocation_id, subnet_id]
   }
 }
