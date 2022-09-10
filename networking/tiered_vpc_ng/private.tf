@@ -41,7 +41,7 @@ resource "aws_subnet" "private" {
     {
       Name = format(
         "%s-%s-%s-%s-%s",
-        upper(var.env_prefix),
+        local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_az, each.value))),
         local.tier.name,
         local.private_label,
@@ -65,7 +65,7 @@ resource "aws_route_table" "private" {
     {
       Name = format(
         "%s-%s-%s-%s",
-        upper(var.env_prefix),
+        local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
         local.tier.name,
         local.private_label
