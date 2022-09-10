@@ -150,7 +150,7 @@ resource "aws_nat_gateway" "public" {
     {
       Name = format(
         "%s-%s-%s-%s",
-        local.local.upper_env_prefix,
+        local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
         local.tier.name,
         local.public_label
