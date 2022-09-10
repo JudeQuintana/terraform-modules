@@ -302,7 +302,7 @@ resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.peer_tgw_route_table_id_id_to_peer_tgw_id, each.value.route_table_id)
+  transit_gateway_id     = lookup(local.peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id, each.value.route_table_id)
 }
 
 locals {
