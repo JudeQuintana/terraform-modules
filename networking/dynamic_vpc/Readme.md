@@ -1,3 +1,6 @@
+# This module is deprecated
+Please use [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng) instead!
+
 # Overview
 
 This is a Dynamic VPC Module that builds a redundant network
