@@ -8,12 +8,6 @@ variable "region_az_labels" {
   type        = map(string)
 }
 
-variable "tenancy" {
-  description = "Set VPC Tenancy"
-  type        = string
-  default     = "default"
-}
-
 variable "tags" {
   description = "Additional Tags"
   type        = map(string)
@@ -22,13 +16,14 @@ variable "tags" {
 
 variable "tier" {
   type = object({
+    azs = map(object({
+      enable_natgw = optional(bool, false)
+      private      = list(string)
+      public       = list(string)
+    }))
     name    = string
     network = string
-    azs = map(object({
-      enable_natgw = optional(bool)
-      public       = list(string)
-      private      = list(string)
-    }))
+    tenancy = optional(string, "default")
   })
 
   # Requiring at least one public subnet allows for
@@ -55,13 +50,4 @@ variable "tier" {
     condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tier.network))
     error_message = "Tier network must be in valid cidr notation ie 10.46.0.0/20, x.x.x.x/xx ."
   }
-}
-
-locals {
-  tier = defaults(var.tier, {
-    # natgw disabled by default
-    azs = {
-      enable_natgw = false
-    }
-  })
 }
