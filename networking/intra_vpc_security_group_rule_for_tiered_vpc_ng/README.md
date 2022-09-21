@@ -29,7 +29,7 @@ locals {
 }
 
 module "intra_vpc_security_group_rules" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.4.2"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.4.4"
 
   for_each = { for r in local.intra_vpcs_security_group_rules : r.label => r }
 
@@ -43,14 +43,14 @@ module "intra_vpc_security_group_rules" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.2 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.20 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.20 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >=4.20 |
 
 ## Modules
 

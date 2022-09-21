@@ -16,7 +16,7 @@ Example:
 
 ```
 module "tgw_super_router_usw2_to_use1" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router?ref=v1.4.2"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router?ref=v1.4.4"
 
   providers = {
     aws.local = aws.usw2 # super router will be built in the aws.local provider region
@@ -35,7 +35,7 @@ module "tgw_super_router_usw2_to_use1" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >=3.3 |
 

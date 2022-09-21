@@ -90,7 +90,7 @@ module "vpcs" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.20 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.3 |
 
@@ -134,8 +134,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tenancy"></a> [tenancy](#input\_tenancy) | Set VPC Tenancy | `string` | `"default"` | no |
-| <a name="input_tier"></a> [tier](#input\_tier) | n/a | <pre>object({<br>    name    = string<br>    network = string<br>    azs = map(object({<br>      enable_natgw = optional(bool)<br>      public       = list(string)<br>      private      = list(string)<br>    }))<br>  })</pre> | n/a | yes |
+| <a name="input_tier"></a> [tier](#input\_tier) | n/a | <pre>object({<br>    azs = map(object({<br>      enable_natgw = optional(bool, false)<br>      private      = list(string)<br>      public       = list(string)<br>    }))<br>    name    = string<br>    network = string<br>    tenancy = optional(string, "default")<br>  })</pre> | n/a | yes |
 
 ## Outputs
 
