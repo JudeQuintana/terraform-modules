@@ -17,7 +17,7 @@
 
 locals {
   private_label         = "private"
-  private_az_to_subnets = { for az, acls in local.tier.azs : az => acls.private }
+  private_az_to_subnets = { for az, acls in var.tier.azs : az => acls.private }
   private_subnet_to_az  = { for subnet, azs in transpose(local.private_az_to_subnets) : subnet => element(azs, 0) }
   private_subnets       = toset(keys(local.private_subnet_to_az))
 }
@@ -43,7 +43,7 @@ resource "aws_subnet" "private" {
         "%s-%s-%s-%s-%s",
         local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_az, each.value))),
-        local.tier.name,
+        var.tier.name,
         local.private_label,
         lookup(random_pet.private, each.value).id
       )
@@ -67,7 +67,7 @@ resource "aws_route_table" "private" {
         "%s-%s-%s-%s",
         local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        local.tier.name,
+        var.tier.name,
         local.private_label
       )
   })

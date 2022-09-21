@@ -19,10 +19,10 @@
 
 locals {
   public_label            = "public"
-  public_az_to_subnets    = { for az, acls in local.tier.azs : az => acls.public }
+  public_az_to_subnets    = { for az, acls in var.tier.azs : az => acls.public }
   public_subnet_to_az     = { for subnet, azs in transpose(local.public_az_to_subnets) : subnet => element(azs, 0) }
   public_subnets          = toset(keys(local.public_subnet_to_az))
-  natgw_public_az_to_bool = { for az, acls in local.tier.azs : az => acls.enable_natgw if acls.enable_natgw }
+  natgw_public_az_to_bool = { for az, acls in var.tier.azs : az => acls.enable_natgw if acls.enable_natgw }
 }
 
 # generate single word random pet name for each public subnet's name tag
@@ -46,7 +46,7 @@ resource "aws_subnet" "public" {
         "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_az, each.value))),
-        local.tier.name,
+        var.tier.name,
         local.public_label,
         lookup(random_pet.public, each.value).id
       )
@@ -68,7 +68,7 @@ resource "aws_route_table" "public" {
         "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
         local.region_label,
-        local.tier.name,
+        var.tier.name,
         local.public_label,
         "all"
       )
@@ -116,7 +116,7 @@ resource "aws_eip" "public" {
         "%s-%s-%s-%s",
         local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        local.tier.name,
+        var.tier.name,
         local.public_label
       )
   })
@@ -152,7 +152,7 @@ resource "aws_nat_gateway" "public" {
         "%s-%s-%s-%s",
         local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        local.tier.name,
+        var.tier.name,
         local.public_label
       )
   })

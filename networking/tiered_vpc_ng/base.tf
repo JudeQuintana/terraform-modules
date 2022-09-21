@@ -30,7 +30,7 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tier.network
-  instance_tenancy     = var.tenancy
+  instance_tenancy     = var.tier.tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = merge(
