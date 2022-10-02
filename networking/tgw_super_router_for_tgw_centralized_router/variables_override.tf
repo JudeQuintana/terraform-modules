@@ -14,17 +14,13 @@ variable "tags" {
   default     = {}
 }
 
-#variable "local_amazon_side_asn" {
-#description = "required local amazon side asn"
-#type        = number
-#}
 variable "amazon_side_asns" {
   description = "required local amazon side asn"
   type        = list(strings)
 
   validation {
     condition     = length(var.amazon_side_asns) == 3
-    error_message = "Super Router requires 3 unique ASNs"
+    error_message = "Super Router requires 3 unique ASNs."
   }
 }
 
