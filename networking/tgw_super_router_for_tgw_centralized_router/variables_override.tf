@@ -14,14 +14,14 @@ variable "tags" {
   default     = {}
 }
 
-variable "amazon_side_asns" {
-  description = "required local amazon side asn"
-  type        = list(string)
+variable "local_amazon_side_asn" {
+  description = "local amazon side asns"
+  type        = string
+}
 
-  validation {
-    condition     = length(var.amazon_side_asns) == 3
-    error_message = "Super Router requires 3 unique ASNs."
-  }
+variable "peer_amazon_side_asn" {
+  description = "peer amazon side asns"
+  type        = string
 }
 
 variable "local_centralized_routers" {
