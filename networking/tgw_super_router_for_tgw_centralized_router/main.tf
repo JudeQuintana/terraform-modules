@@ -7,6 +7,14 @@ data "aws_caller_identity" "this_local_current" {
   provider = aws.local
 }
 
+data "aws_region" "this_peer_current" {
+  provider = aws.peer
+}
+
+data "aws_caller_identity" "this_peer_current" {
+  provider = aws.peer
+}
+
 locals {
   local_account_id   = data.aws_caller_identity.this_local_current.account_id
   local_region_name  = data.aws_region.this_local_current.name
@@ -17,16 +25,19 @@ locals {
   }, var.tags)
 }
 
-# generate single word random pet name for tgw
+# generate single word random pet name for each super router tgw
 resource "random_pet" "this" {
+  for_each = toset([var.local_amazon_side_asn, var.peer_amazon_side_asn])
+
   length = 1
 }
 
 locals {
-  super_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "super-router", random_pet.this.id, local.local_region_label)
+  base_super_router_name  = format("%s-%s-%s", local.upper_env_prefix, "super-router", local.local_region_label)
+  local_super_router_name = format("%s-%s", local.base_super_router_name, lookup(random_pet.this, var.local_amazon_side_asn).id)
+  peer_super_router_name  = format("%s-%s", local.base_super_router_name, lookup(random_pet.this, var.peer_amazon_side_asn).id)
 }
 
-# one tgw that will route between all centralized routers.
 resource "aws_ec2_transit_gateway" "this_local" {
   provider = aws.local
 
@@ -35,6 +46,18 @@ resource "aws_ec2_transit_gateway" "this_local" {
   default_route_table_propagation = "disable"
   tags = merge(
     local.default_tags,
-    { Name = local.super_router_name }
+    { Name = local.local_super_router_name }
+  )
+}
+
+resource "aws_ec2_transit_gateway" "this_peer" {
+  provider = aws.peer
+
+  amazon_side_asn                 = var.peer_amazon_side_asn
+  default_route_table_association = "disable"
+  default_route_table_propagation = "disable"
+  tags = merge(
+    local.default_tags,
+    { Name = local.peer_super_router_name }
   )
 }

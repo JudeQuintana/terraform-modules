@@ -15,8 +15,13 @@ variable "tags" {
 }
 
 variable "local_amazon_side_asn" {
-  description = "required local amazon side asn"
-  type        = number
+  description = "local amazon side asns"
+  type        = string
+}
+
+variable "peer_amazon_side_asn" {
+  description = "peer amazon side asns"
+  type        = string
 }
 
 variable "local_centralized_routers" {
