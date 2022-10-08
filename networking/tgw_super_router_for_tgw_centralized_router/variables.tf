@@ -15,12 +15,12 @@ variable "tags" {
 }
 
 variable "local_amazon_side_asn" {
-  description = "local amazon side asns"
+  description = "local amazon side asn"
   type        = string
 }
 
 variable "peer_amazon_side_asn" {
-  description = "peer amazon side asns"
+  description = "peer amazon side asn"
   type        = string
 }
 
