@@ -144,7 +144,7 @@ locals {
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
-  local_tgw_all_new_tgw_routes_to_vpc_in_peer_tgws = {
+  local_tgw_all_new_tgw_routes_to_vpcs_in_peer_tgws = {
     for this in local.local_tgw_routes_to_peer_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
@@ -153,7 +153,7 @@ locals {
 resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_peer_tgws" {
   provider = aws.local
 
-  for_each = local.local_tgw_all_new_tgw_routes_to_vpc_in_peer_tgws
+  for_each = local.local_tgw_all_new_tgw_routes_to_vpcs_in_peer_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
@@ -336,7 +336,7 @@ locals {
       destination_cidr_block = rtb_id_and_peer_tgw_network[1]
   }]
 
-  peer_tgw_all_new_tgw_routes_to_vpc_in_local_tgws = {
+  peer_tgw_all_new_tgw_routes_to_vpcs_in_local_tgws = {
     for this in local.peer_tgw_routes_to_local_tgws :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
@@ -345,7 +345,7 @@ locals {
 resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_peer_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_tgw_routes_to_vpc_in_local_tgws
+  for_each = local.peer_tgw_all_new_tgw_routes_to_vpcs_in_local_tgws
 
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
