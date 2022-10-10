@@ -19,18 +19,23 @@ locals {
   local_account_id   = data.aws_caller_identity.this_local_current.account_id
   local_region_name  = data.aws_region.this_local_current.name
   local_region_label = lookup(var.region_az_labels, local.local_region_name)
-  peer_account_id    = data.aws_caller_identity.this_peer_current.account_id
-  peer_region_name   = data.aws_region.this_peer_current.name
-  peer_region_label  = lookup(var.region_az_labels, local.peer_region_name)
-  upper_env_prefix   = upper(var.env_prefix)
+
+  peer_account_id   = data.aws_caller_identity.this_peer_current.account_id
+  peer_region_name  = data.aws_region.this_peer_current.name
+  peer_region_label = lookup(var.region_az_labels, local.peer_region_name)
+
+  upper_env_prefix = upper(var.env_prefix)
   default_tags = merge({
     Environment = var.env_prefix
   }, var.tags)
+
+
+  random_super_router_names = toset([var.local_amazon_side_asn, var.peer_amazon_side_asn])
 }
 
 # generate single word random pet name for each super router tgw
 resource "random_pet" "this" {
-  for_each = toset([var.local_amazon_side_asn, var.peer_amazon_side_asn])
+  for_each = local.random_super_router_names
 
   length = 1
 }

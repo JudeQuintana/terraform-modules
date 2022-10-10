@@ -56,7 +56,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals]
 }
 
-# associate local tgw route table to accociated local attachment accepters
+# associate local tgw route table to associated local attachment accepters
 resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals" {
   provider = aws.local
 
@@ -248,7 +248,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-# associate peer tgw route table to accociated peer attachment accepters
+# associate peer tgw route table to associated peer attachment accepters
 resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_peers" {
   provider = aws.peer
 
@@ -388,4 +388,57 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_peer_tgws" {
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers, lookup(local.peer_tgw_route_table_id_to_peer_tgw_id, each.value.route_table_id)).id
+}
+
+
+########################################################################################
+# Begin Local Super Router Router Side
+#########################################################################################
+
+# add all peer tgw routes to local tgw super router
+resource "aws_ec2_transit_gateway_route" "this_local_to_peer_tgws" {
+  provider = aws.local
+
+  for_each = local.peer_vpc_network_to_peer_tgw
+
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
+  destination_cidr_block         = each.key
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
+
+  # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_this_peer]
+}
+#
+# associate local tgw route table to super router peering attachment
+resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_this_peer" {
+  provider = aws.local
+
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
+}
+
+########################################################################################
+# Begin Local Super Router Router Side
+#########################################################################################
+
+# add all local tgw routes to peer tgw super router
+resource "aws_ec2_transit_gateway_route" "this_peer_to_local_tgws" {
+  provider = aws.peer
+
+  for_each = local.local_vpc_network_to_local_tgw
+
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_peer.id
+  destination_cidr_block         = each.key
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
+
+  # make sure the peer links are up before adding the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_this_peer]
+}
+
+# associate peer tgw route table to super router peering attachment
+resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_this_local" {
+  provider = aws.peer
+
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_peer.id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
 }
