@@ -414,6 +414,9 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_this_p
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
+
+  # make sure the peer links are up before associating the route the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_this_peer]
 }
 
 ########################################################################################
@@ -440,4 +443,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_this_lo
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_peer.id
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
+
+  # make sure the peer links are up before associating the route the route.
+  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_this_peer]
 }
