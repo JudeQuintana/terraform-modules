@@ -29,7 +29,6 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-
   random_super_router_names = toset([var.local_amazon_side_asn, var.peer_amazon_side_asn])
 }
 
