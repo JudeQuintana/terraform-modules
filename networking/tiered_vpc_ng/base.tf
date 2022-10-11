@@ -17,7 +17,7 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-  vpc_name = format("%s-%s-%s", local.upper_env_prefix, local.region_label, var.tier.name)
+  vpc_name = format("%s-tiered-vpc-%s-%s", local.upper_env_prefix, local.region_label, var.tier.name)
 }
 
 ######################################################
