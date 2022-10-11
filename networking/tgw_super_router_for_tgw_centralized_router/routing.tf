@@ -43,7 +43,7 @@ resource "aws_ec2_transit_gateway_route" "this_local" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals]
 }
 
-# associate all local tgw routes table associations to local tgw super router
+# associate all local tgw routes table to local tgw super router route tables
 resource "aws_ec2_transit_gateway_route_table_association" "this_local" {
   provider = aws.local
 
@@ -56,7 +56,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals]
 }
 
-# associate local tgw route table to associated local attachment accepters
+# associate local tgw route table to local attachment accepters
 resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals" {
   provider = aws.local
 
@@ -235,7 +235,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-# associate all peer tgw routes table associations to peer tgw super router
+# associate all peer tgw routes table to peer tgw super router route table
 resource "aws_ec2_transit_gateway_route_table_association" "this_peer" {
   provider = aws.peer
 
@@ -248,7 +248,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-# associate peer tgw route table to associated peer attachment accepters
+# associate peer tgw route table to peer attachment accepters
 resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_peers" {
   provider = aws.peer
 
@@ -407,7 +407,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_to_peer_tgws" {
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_this_peer]
 }
-#
+
 # associate local tgw route table to super router peering attachment
 resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_this_peer" {
   provider = aws.local
