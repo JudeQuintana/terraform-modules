@@ -80,7 +80,7 @@ the TGW.
 | <a name="output_amazon_side_asn"></a> [amazon\_side\_asn](#output\_amazon\_side\_asn) | n/a |
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
-| <a name="output_networks"></a> [networks](#output\_networks) | n/a |
+| <a name="output_vpc_networks"></a> [networks](#output\_vpc\_networks) | n/a |
 | <a name="output_region"></a> [region](#output\_region) | n/a |
 | <a name="output_route_table_id"></a> [route\_table\_id](#output\_route\_table\_id) | n/a |
 | <a name="output_vpc_routes"></a> [vpc\_routes](#output\_vpc\_routes) | n/a |

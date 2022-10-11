@@ -1,7 +1,7 @@
 locals {
-  local_tgws_all_vpc_networks = flatten(local.local_tgws[*].networks)
+  local_tgws_all_vpc_networks = flatten(local.local_tgws[*].vpc_networks)
   local_tgws_all_vpc_routes   = flatten(local.local_tgws[*].vpc_routes)
-  peer_tgws_all_vpc_networks  = flatten(local.peer_tgws[*].networks)
+  peer_tgws_all_vpc_networks  = flatten(local.peer_tgws[*].vpc_networks)
   peer_tgws_all_vpc_routes    = flatten(local.peer_tgws[*].vpc_routes)
   route_format                = "%s|%s"
 }

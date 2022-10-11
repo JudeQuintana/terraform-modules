@@ -2,10 +2,12 @@ locals {
   peering_name_format       = "%s <-> %s"
   peering_super_router_name = format(local.peering_name_format, local.local_super_router_name, local.peer_super_router_name)
 
+  # renaming var to shorter name
   local_tgws                = var.local_centralized_routers
   local_tgw_id_to_local_tgw = { for this in local.local_tgws : this.id => this }
-  peer_tgws                 = var.peer_centralized_routers
-  peer_tgw_id_to_peer_tgw   = { for this in local.peer_tgws : this.id => this }
+  # renaming var to shorter name
+  peer_tgws               = var.peer_centralized_routers
+  peer_tgw_id_to_peer_tgw = { for this in local.peer_tgws : this.id => this }
 }
 
 ########################################################################################
