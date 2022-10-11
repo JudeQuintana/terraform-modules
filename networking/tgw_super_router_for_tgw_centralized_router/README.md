@@ -5,6 +5,8 @@ Original Blog Post: [Super Powered, Super Sharp, Super Router!](https://jq1.io/p
 
 [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
 
+Super Router provides both intra-region and cross-region peering and routing for Centralized Routers and Tiered VPCs (same AWS account only, no cross account).
+
 Super Router is now two TGWs instead of one TGW (one for each region).
 
 In the old version `v1.4.4` TGWs in us-east-1 (peer region) had to route through the Super Router TGW in us-west-2 (local region) to get to other TGWs in us-east-1 (peer region).
@@ -14,8 +16,6 @@ This caveat is now eliminated with version `v1.4.5`.
 Each region's Centralized Router TGW and it's attached VPCs will now route through it's relative Super Router TGW region to get to other TGWs in the same region for both local and peer providers.
 
 See the new [$init super refactor](https://jq1.io/posts/init_super_refactor/) blog post for moar deets!
-
-Super Router provides both intra-region and cross-region peering and routing for Centralized Routers and Tiered VPCs (same AWS account only, no cross account).
 
 - Architecture diagrams, lol:
   - intra-region:
