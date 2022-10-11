@@ -36,3 +36,13 @@ resource "aws_ec2_transit_gateway" "this" {
     { Name = local.centralized_router_name }
   )
 }
+
+# one route table for all vpc networks
+resource "aws_ec2_transit_gateway_route_table" "this" {
+  transit_gateway_id = aws_ec2_transit_gateway.this.id
+  tags = merge(
+    local.default_tags,
+    { Name = local.centralized_router_name }
+  )
+}
+
