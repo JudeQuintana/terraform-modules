@@ -17,7 +17,9 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-  vpc_name = format("%s-%s-%s", local.upper_env_prefix, local.region_label, var.tier.name)
+  # the tiered-vpc name is redundant when viewing in vpc aws console
+  # but is most useful when viewing a TGW's VPC attachment.
+  vpc_name = format("%s-tiered-vpc-%s-%s", local.upper_env_prefix, local.region_label, var.tier.name)
 }
 
 ######################################################

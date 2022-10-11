@@ -15,8 +15,13 @@ variable "tags" {
 }
 
 variable "local_amazon_side_asn" {
-  description = "required local amazon side asn"
-  type        = number
+  description = "local amazon side asn"
+  type        = string
+}
+
+variable "peer_amazon_side_asn" {
+  description = "peer amazon side asn"
+  type        = string
 }
 
 variable "local_centralized_routers" {
@@ -26,9 +31,9 @@ variable "local_centralized_routers" {
     amazon_side_asn = string
     full_name       = string
     id              = string
-    networks        = list(string)
     region          = string
     route_table_id  = string
+    vpc_networks    = list(string)
     vpc_routes = list(object({
       route_table_id         = string
       destination_cidr_block = string
@@ -67,9 +72,9 @@ variable "peer_centralized_routers" {
     amazon_side_asn = string
     full_name       = string
     id              = string
-    networks        = list(string)
     region          = string
     route_table_id  = string
+    vpc_networks    = list(string)
     vpc_routes = list(object({
       route_table_id         = string
       destination_cidr_block = string
