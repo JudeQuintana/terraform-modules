@@ -76,7 +76,7 @@ locals {
 }
 
 module "vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.4.2"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.4.5"
 
   for_each = { for t in local.vpc_tiers : t.name => t }
 

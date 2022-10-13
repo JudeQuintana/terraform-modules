@@ -29,7 +29,7 @@ locals {
 }
 
 module "intra_vpc_security_group_rules" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.4.4"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.4.5"
 
   for_each = { for r in local.intra_vpcs_security_group_rules : r.label => r }
 
