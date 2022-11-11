@@ -1,8 +1,7 @@
 ############################################################################################################
 #
-# Private Subnets with NAT Gateway:
-# - Route Tables with Associtated Routes
-# - Route out respective AZ NAT Gateway if enabled.
+# If NATGWs are enabled for an AZ:
+# - Private Route Tables are updated to route out the NATGW to the internet
 #
 # Note:
 #   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_azs, each.value)))

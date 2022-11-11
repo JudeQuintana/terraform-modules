@@ -5,6 +5,10 @@
 # - Public Route Table and Route for all subnets
 # - Route out IGW
 #
+# If NATGWs are enabled for an AZ:
+# - NATGW is created in the first public subnet in the AZ
+# - EIP is created and associated to the NATGW
+#
 # Note:
 #   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_azs, each.value)))
 #   is building the public AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
