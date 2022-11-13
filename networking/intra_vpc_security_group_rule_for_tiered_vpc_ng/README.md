@@ -9,7 +9,7 @@ Main:
 # Intra VPC Security Group Rule Description
 This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
 
-Example:
+Allowing SSH and ping communication across all VPCs example:
 ```
 locals {
   intra_vpcs_security_group_rules = [
