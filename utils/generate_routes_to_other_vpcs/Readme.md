@@ -58,7 +58,7 @@ resource "aws_route" "this" {
 }
 ```
 
-Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to vaidate the test suite.
+Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to run the test suite.
 
 The test suite will help when refactoring is needed.
 

@@ -2,7 +2,7 @@
 
 See the [blog post](https://jq1.io/posts/opinion_23) for more details.
 
-Use `terraform refresh` in each directory to show the same collection types output below for `list_of_objects` and `map_of_maps`.
+Use `terraform apply -refresh-only` in each directory to show the same collection types output below for `list_of_objects` and `map_of_maps`.
 
 ```
 map_of_attribute1_value_to_name = {
