@@ -6,6 +6,7 @@ terraform {
   }
 }
 
+# Multiple routes for a map with more than one tiered vpc
 locals {
   tiered_vpcs = {
     app = {
@@ -124,11 +125,11 @@ locals {
   ])
 }
 
-resource "test_assertions" "generate_routes_to_other_vpcs" {
+resource "test_assertions" "generate_routes_to_other_vpcs_call_with_n_greater_than_1" {
   component = "generate_routes_to_other_vpcs"
 
   equal "map_of_routes_to_other_vpcs" {
-    description = "generated map of routes"
+    description = "generated map of generically defined routes"
     got         = module.main.call_legacy
     want        = local.map_of_routes_to_other_vpcs
   }
@@ -139,3 +140,58 @@ resource "test_assertions" "generate_routes_to_other_vpcs" {
     want        = local.set_of_route_objects_to_other_vpcs
   }
 }
+
+# Empty set for map with one tiered vpc
+locals {
+  one_tiered_vpc = {
+    app = {
+      az_to_private_route_table_id = {
+        a = "rtb-0468efad92cd62ab8"
+        b = "rtb-02ad79df1a7c192e7"
+      }
+      az_to_public_route_table_id = {
+        a = "rtb-06b216fb818494594"
+        b = "rtb-06b216fb818494594"
+      }
+      network = "10.0.0.0/20"
+    }
+  }
+}
+
+module "main_with_n_equal_to_1" {
+  source = "../.."
+
+  vpcs = local.one_tiered_vpc
+}
+
+resource "test_assertions" "generate_routes_to_other_vpcs_with_n_equal_to_1" {
+  component = "generate_routes_to_other_vpcs_with_n_equal_to_1"
+
+  equal "empty_set" {
+    description = "empty set of routes objects"
+    got         = module.main_with_n_equal_to_1.call
+    want        = toset([])
+  }
+}
+
+# Empty set for empty map
+locals {
+  zero_tiered_vpc = {}
+}
+
+module "main_with_n_equal_to_0" {
+  source = "../.."
+
+  vpcs = local.zero_tiered_vpc
+}
+
+resource "test_assertions" "generate_routes_to_other_vpcs_with_n_equal_to_0" {
+  component = "generate_routes_to_other_vpcs_with_n_equal_to_0"
+
+  equal "empty_set" {
+    description = "empty set of routes objects"
+    got         = module.main_with_n_equal_to_0.call
+    want        = toset([])
+  }
+}
+
