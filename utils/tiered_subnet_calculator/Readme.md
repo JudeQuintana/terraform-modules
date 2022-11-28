@@ -41,9 +41,9 @@ az_newbits = {
 ```
 
 
-`terraform refresh`
+`terraform apply -refresh-only`
 ```
-$ terraform refresh
+$ terraform apply -refresh-only
 
 Empty or non-existent state file.
 
