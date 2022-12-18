@@ -1,3 +1,12 @@
+# Update Dec 17th 2022
+
+Things have changed since TF v0.13 like the resulting order for a list of objects with `for`.
+
+So the [Tiered Subnet
+Calculator](https://jq1.io/posts/tiered_subnet_calculator/) article is outdated if you're using a more recent version of Terraform.
+
+I'll try to update article when I can.
+
 # Overview
 
 Used to generate tiered subnets for a VPC. Please see my [Tiered Subnet
