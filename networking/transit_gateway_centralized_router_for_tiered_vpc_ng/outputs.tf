@@ -3,7 +3,7 @@ output "account_id" {
 }
 
 output "amazon_side_asn" {
-  value = var.amazon_side_asn
+  value = var.centralized_router.amazon_side_asn
 }
 
 output "full_name" {
@@ -23,14 +23,13 @@ output "route_table_id" {
 }
 
 output "vpc_networks" {
-  value = [for vpc_name, this in var.vpcs : this.network]
+  value = [for this in var.centralized_router.vpcs : this.network]
 }
 
 output "vpc_routes" {
-  value = [for route_key, this in aws_route.this : this]
+  value = [for this in aws_route.this : this]
 }
 
 output "vpcs" {
-  value = var.vpcs
+  value = var.centralized_router.vpcs
 }
-

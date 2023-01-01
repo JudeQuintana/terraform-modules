@@ -2,7 +2,7 @@
 module "generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.1"
 
-  vpcs = var.vpcs
+  vpcs = var.centralized_router.vpcs
 }
 
 locals {

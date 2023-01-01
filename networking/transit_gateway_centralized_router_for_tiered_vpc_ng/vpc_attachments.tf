@@ -7,12 +7,12 @@ locals {
   #
   # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
   vpc_id_to_single_public_subnet_ids_per_az = {
-    for vpc_name, this in var.vpcs :
+    for vpc_name, this in var.centralized_router.vpcs :
     this.id => [for az, public_subnet_ids in this.az_to_public_subnet_ids : element(public_subnet_ids, 0)]
   }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_names = { for vpc_name, this in var.vpcs : this.id => this.full_name }
+  vpc_id_to_names = { for vpc_name, this in var.centralized_router.vpcs : this.id => this.full_name }
 }
 
 # attach vpcs to tgw
