@@ -6,9 +6,5 @@ terraform {
       version               = ">=4.20"
       configuration_aliases = [aws.local, aws.peer]
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">=3.3"
-    }
   }
 }

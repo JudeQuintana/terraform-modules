@@ -17,13 +17,8 @@ locals {
   }, var.tags)
 }
 
-# generate single word random pet name for tgw
-resource "random_pet" "this" {
-  length = 1
-}
-
 locals {
-  centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", random_pet.this.id, local.region_label)
+  centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", var.name, local.region_label)
 }
 
 # one tgw that will route between all tiered vpcs.

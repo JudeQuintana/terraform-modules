@@ -3,6 +3,11 @@ variable "amazon_side_asn" {
   type        = number
 }
 
+variable "name" {
+  description = "centralized router name"
+  type        = string
+}
+
 variable "env_prefix" {
   description = "prod, stage, test"
   type        = string
