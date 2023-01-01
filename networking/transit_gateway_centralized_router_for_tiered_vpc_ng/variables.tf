@@ -3,6 +3,12 @@ variable "amazon_side_asn" {
   type        = number
 }
 
+variable "blackhole_subnets" {
+  description = "subnets to blackhole."
+  type        = list(string)
+  default     = []
+}
+
 variable "name" {
   description = "centralized router name"
   type        = string
