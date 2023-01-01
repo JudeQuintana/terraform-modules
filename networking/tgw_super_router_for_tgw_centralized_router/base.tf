@@ -78,5 +78,10 @@ resource "aws_ec2_transit_gateway" "this_peer" {
       condition     = local.cross_region_asn_check.condition
       error_message = local.cross_region_asn_check.error_message
     }
+
+    precondition {
+      condition     = local.cross_region_vpc_networks_check.condition
+      error_message = local.cross_region_vpc_networks_check.error_message
+    }
   }
 }

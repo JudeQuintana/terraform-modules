@@ -18,7 +18,6 @@ variable "tags" {
 #variable "local" {
 #type = object({
 #amazon_side_asn = number
-#name            = optional(string)
 #centralized_routers = optional(list(object({
 #account_id      = string
 #amazon_side_asn = string
@@ -112,7 +111,6 @@ variable "local_centralized_routers" {
 #variable "peer" {
 #type = object({
 #amazon_side_asn = number
-#name            = string
 #centralized_routers = optional(list(object({
 #account_id      = string
 #amazon_side_asn = string
