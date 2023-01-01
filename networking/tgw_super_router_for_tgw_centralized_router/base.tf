@@ -50,6 +50,7 @@ resource "aws_ec2_transit_gateway" "this_local" {
 
   lifecycle {
     # cant use dynamic block for lifecycle blocks
+    # preconditions are evaluated only on apply
     precondition {
       condition     = local.cross_region_asn_check.condition
       error_message = local.cross_region_asn_check.error_message
@@ -58,6 +59,16 @@ resource "aws_ec2_transit_gateway" "this_local" {
     precondition {
       condition     = local.cross_region_vpc_networks_check.condition
       error_message = local.cross_region_vpc_networks_check.error_message
+    }
+
+    precondition {
+      condition     = local.local_provider_to_local_tgws_region_check.condition
+      error_message = local.local_provider_to_local_tgws_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_tgws_region_check.condition
+      error_message = local.peer_provider_to_peer_tgws_region_check.error_message
     }
   }
 }
@@ -74,6 +85,8 @@ resource "aws_ec2_transit_gateway" "this_peer" {
   )
 
   lifecycle {
+    # cant use dynamic block for lifecycle blocks
+    # preconditions are evaluated only on apply
     precondition {
       condition     = local.cross_region_asn_check.condition
       error_message = local.cross_region_asn_check.error_message
@@ -82,6 +95,16 @@ resource "aws_ec2_transit_gateway" "this_peer" {
     precondition {
       condition     = local.cross_region_vpc_networks_check.condition
       error_message = local.cross_region_vpc_networks_check.error_message
+    }
+
+    precondition {
+      condition     = local.local_provider_to_local_tgws_region_check.condition
+      error_message = local.local_provider_to_local_tgws_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_tgws_region_check.condition
+      error_message = local.peer_provider_to_peer_tgws_region_check.error_message
     }
   }
 }
