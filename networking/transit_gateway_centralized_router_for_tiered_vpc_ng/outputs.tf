@@ -6,6 +6,10 @@ output "amazon_side_asn" {
   value = var.centralized_router.amazon_side_asn
 }
 
+output "name" {
+  value = var.centralized_router.name
+}
+
 output "full_name" {
   value = local.centralized_router_name
 }
