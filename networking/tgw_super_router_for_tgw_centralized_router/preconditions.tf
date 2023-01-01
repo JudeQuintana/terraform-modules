@@ -13,17 +13,17 @@ locals {
 
   cross_region_asn_check = {
     condition     = length(distinct(local.all_amazon_side_asns)) == length(local.all_amazon_side_asns)
-    error_message = "All Amazon side ASNs must be unique across regions."
+    error_message = "All Amazon side ASNs must be unique across providers/regions."
   }
 
   # guarantee the centralized routers match their relative provider's region.
   local_provider_to_local_tgws_region_check = {
     condition     = contains(local.local_tgws[*].region, local.local_region_name)
-    error_message = "All local Centralized Router regions must match the aws.local provider region."
+    error_message = "All local Centralized Router regions must match the aws.local provider alias region."
   }
 
   peer_provider_to_peer_tgws_region_check = {
     condition     = contains(local.peer_tgws[*].region, local.peer_region_name)
-    error_message = "All peer Centralized Router regions must match the aws.peer provider region."
+    error_message = "All peer Centralized Router regions must match the aws.peer provider alias region."
   }
 }
