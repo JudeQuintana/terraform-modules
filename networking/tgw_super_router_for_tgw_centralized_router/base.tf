@@ -29,20 +29,12 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-  random_super_router_names = toset([var.local_amazon_side_asn, var.peer_amazon_side_asn])
-}
-
-# generate single word random pet name for each super router tgw
-resource "random_pet" "this" {
-  for_each = local.random_super_router_names
-
-  length = 1
 }
 
 locals {
   base_super_router_name  = format("%s-%s", local.upper_env_prefix, "super-router")
-  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, lookup(random_pet.this, var.local_amazon_side_asn).id)
-  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, lookup(random_pet.this, var.peer_amazon_side_asn).id)
+  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, var.name)
+  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, var.name)
 }
 
 resource "aws_ec2_transit_gateway" "this_local" {
@@ -55,6 +47,19 @@ resource "aws_ec2_transit_gateway" "this_local" {
     local.default_tags,
     { Name = local.local_super_router_name }
   )
+
+  lifecycle {
+    # cant use dynamic block for lifecycle blocks
+    precondition {
+      condition     = local.cross_region_asn_check.condition
+      error_message = local.cross_region_asn_check.error_message
+    }
+
+    precondition {
+      condition     = local.cross_region_vpc_networks_check.condition
+      error_message = local.cross_region_vpc_networks_check.error_message
+    }
+  }
 }
 
 resource "aws_ec2_transit_gateway" "this_peer" {
@@ -67,4 +72,11 @@ resource "aws_ec2_transit_gateway" "this_peer" {
     local.default_tags,
     { Name = local.peer_super_router_name }
   )
+
+  lifecycle {
+    precondition {
+      condition     = local.cross_region_asn_check.condition
+      error_message = local.cross_region_asn_check.error_message
+    }
+  }
 }
