@@ -33,14 +33,14 @@ locals {
 
 locals {
   base_super_router_name  = format("%s-%s", local.upper_env_prefix, "super-router")
-  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, var.name)
-  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, var.name)
+  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, var.super_router.name)
+  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, var.super_router.name)
 }
 
 resource "aws_ec2_transit_gateway" "this_local" {
   provider = aws.local
 
-  amazon_side_asn                 = var.local_amazon_side_asn
+  amazon_side_asn                 = var.super_router.local.amazon_side_asn
   default_route_table_association = "disable"
   default_route_table_propagation = "disable"
   tags = merge(
@@ -76,7 +76,7 @@ resource "aws_ec2_transit_gateway" "this_local" {
 resource "aws_ec2_transit_gateway" "this_peer" {
   provider = aws.peer
 
-  amazon_side_asn                 = var.peer_amazon_side_asn
+  amazon_side_asn                 = var.super_router.peer.amazon_side_asn
   default_route_table_association = "disable"
   default_route_table_propagation = "disable"
   tags = merge(

@@ -1,4 +1,4 @@
-resource "aws_ec2_transit_gateway_route" "blackhole" {
+resource "aws_ec2_transit_gateway_route" "this_blackhole" {
   for_each = toset(var.centralized_router.blackhole_subnets)
 
   destination_cidr_block         = each.value
