@@ -8,32 +8,21 @@
 #   is building the private AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
 #   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
 #
-# - private_label for tags that are related to the private subnets
-# - private_az_to_subnets is map of azs to private subnets list (cidrs)
-# - private_subnet_to_az is a map of private subnets to az used for subnet name tagging
-# - private_subnets is a set of all private subnets
 ############################################################################################################
 
 locals {
-  private_label         = "private"
-  private_az_to_subnets = { for az, acls in var.tier.azs : az => acls.private }
-  private_subnet_to_az  = { for subnet, azs in transpose(local.private_az_to_subnets) : subnet => element(azs, 0) }
-  private_subnets       = toset(keys(local.private_subnet_to_az))
-}
-
-# generate single word random pet name for each privae subnet's name tag
-resource "random_pet" "private" {
-  for_each = local.private_subnets
-
-  length = 1
+  private_label                      = "private"
+  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
+  private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
+  private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
 }
 
 resource "aws_subnet" "private" {
-  for_each = local.private_subnets
+  for_each = local.private_subnet_cidr_to_subnet_name
 
   vpc_id                  = aws_vpc.this.id
-  availability_zone       = format("%s%s", local.region_name, lookup(local.private_subnet_to_az, each.value))
-  cidr_block              = each.value
+  availability_zone       = format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key))
+  cidr_block              = each.key
   map_public_ip_on_launch = false
   tags = merge(
     local.default_tags,
@@ -41,22 +30,17 @@ resource "aws_subnet" "private" {
       Name = format(
         "%s-%s-%s-%s-%s",
         local.upper_env_prefix,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_az, each.value))),
-        var.tier.name,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key))),
+        var.tiered_vpc.name,
         local.private_label,
-        lookup(random_pet.private, each.value).id
+        each.value
       )
   })
-
-  lifecycle {
-    # ignore tags because a lookup on random_pet.private is used
-    ignore_changes = [tags]
-  }
 }
 
 # one private route table per az
 resource "aws_route_table" "private" {
-  for_each = local.private_az_to_subnets
+  for_each = local.private_az_to_subnet_cidrs
 
   vpc_id = aws_vpc.this.id
   tags = merge(
@@ -66,7 +50,7 @@ resource "aws_route_table" "private" {
         "%s-%s-%s-%s",
         local.upper_env_prefix,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
-        var.tier.name,
+        var.tiered_vpc.name,
         local.private_label
       )
   })
@@ -76,7 +60,7 @@ resource "aws_route_table" "private" {
 # uses a map from public.tf but the route is a
 # private conext
 resource "aws_route" "private_route_out" {
-  for_each = local.natgw_public_az_to_bool
+  for_each = local.public_az_to_natgw_subnet_cidr
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.private, each.key).id
@@ -89,10 +73,10 @@ resource "aws_route" "private_route_out" {
 
 # associate each private subnet to its respective AZ's route table
 resource "aws_route_table_association" "private" {
-  for_each = local.private_subnets
+  for_each = local.private_subnet_cidr_to_subnet_name
 
   subnet_id      = lookup(aws_subnet.private, each.key).id
-  route_table_id = lookup(aws_route_table.private, lookup(local.private_subnet_to_az, each.value)).id
+  route_table_id = lookup(aws_route_table.private, lookup(local.private_subnet_cidr_to_az, each.key)).id
 
   lifecycle {
     ignore_changes = [subnet_id, route_table_id]

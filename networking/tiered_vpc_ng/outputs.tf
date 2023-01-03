@@ -2,20 +2,17 @@ output "account_id" {
   value = local.account_id
 }
 
-locals {
-  az_to_private_subnet_ids     = { for subnet, this in aws_subnet.private : lookup(local.private_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_private_route_table_id = { for az, route_table in aws_route_table.private : az => route_table.id }
-
-  az_to_public_subnet_ids     = { for subnet, this in aws_subnet.public : lookup(local.public_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.public.id }            # Each public subnet shares the same route table
-}
-
 output "az_to_private_subnet_ids" {
-  value = local.az_to_private_subnet_ids
+  value = { for subnet, this in aws_subnet.private : lookup(local.private_subnet_cidr_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
 }
 
 output "az_to_private_route_table_id" {
-  value = local.az_to_private_route_table_id
+  value = { for az, route_table in aws_route_table.private : az => route_table.id }
+}
+
+locals {
+  az_to_public_subnet_ids     = { for subnet, this in aws_subnet.public : lookup(local.public_subnet_cidr_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
+  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.public.id }                 # Each public subnet shares the same route table
 }
 
 output "az_to_public_subnet_ids" {
@@ -44,7 +41,11 @@ output "intra_vpc_security_group_id" {
 
 output "network" {
   # pass thru what is known pre-apply
-  value = var.tier.network
+  value = var.tiered_vpc.network_cidr
+}
+
+output "name" {
+  value = var.tiered_vpc.name
 }
 
 output "region" {
