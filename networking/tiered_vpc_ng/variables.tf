@@ -10,9 +10,9 @@ variable "region_az_labels" {
 
 variable "tiered_vpc" {
   type = object({
-    name         = string
-    network_cidr = string
-    tenancy      = optional(string, "default")
+    name    = string
+    network = string
+    tenancy = optional(string, "default")
     azs = map(object({
       private_subnets = optional(list(object({
         name = string
@@ -31,8 +31,8 @@ variable "tiered_vpc" {
   # the aws provider will error on validate cidr subnets too.
   # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
   validation {
-    condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tiered_vpc.network_cidr))
-    error_message = "Tier network must be in valid cidr notation (ie 10.46.0.0/20 -> x.x.x.x/xx)."
+    condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tiered_vpc.network))
+    error_message = "Tiered VPC network must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
   }
 
   validation {
@@ -54,7 +54,7 @@ variable "tiered_vpc" {
     condition = length(distinct(flatten([
       for this in var.tiered_vpc.azs : this.private_subnets[*].cidr
     ]))) == length(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
-    error_message = "Each private subnet cidr must be unique in the private subnet list."
+    error_message = "Each private subnet CDIR must be unique in the private subnet list."
   }
 
   validation {
@@ -68,7 +68,7 @@ variable "tiered_vpc" {
     condition = length(distinct(flatten([
       for this in var.tiered_vpc.azs : this.public_subnets[*].cidr
     ]))) == length(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
-    error_message = "Each public subnet cidr must be unique in the public subnet list."
+    error_message = "Each public subnet CDIR must be unique in the public subnet list."
   }
 
 }

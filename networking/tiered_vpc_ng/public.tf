@@ -21,11 +21,11 @@ locals {
   public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
   public_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
-  public_natgw_subnet_cidrs         = toset(flatten([for this in var.tiered_vpc.azs : [for subnet in this.public_subnets : subnet.cidr if subnet.name == "natgw"]]))
+  public_natgw_subnet_cidrs         = flatten([for this in var.tiered_vpc.azs : [for subnet in this.public_subnets : subnet.cidr if subnet.name == "natgw"]])
   public_az_to_natgw_subnet_cidr    = { for subnet_cidr in local.public_natgw_subnet_cidrs : lookup(local.public_subnet_cidr_to_az, subnet_cidr) => subnet_cidr }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "this_public" {
   for_each = local.public_subnet_cidr_to_subnet_name
 
   vpc_id                  = aws_vpc.this.id
@@ -47,7 +47,7 @@ resource "aws_subnet" "public" {
 }
 
 # one public route table for all public subnets across azs
-resource "aws_route_table" "public" {
+resource "aws_route_table" "this_public" {
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
@@ -66,16 +66,16 @@ resource "aws_route_table" "public" {
 # one public route out through IGW for all public subnets across azs
 resource "aws_route" "public_route_out" {
   destination_cidr_block = local.route_any_cidr
-  route_table_id         = aws_route_table.public.id
+  route_table_id         = aws_route_table.this_public.id
   gateway_id             = aws_internet_gateway.this.id
 }
 
 # associate each public subnet to the shared route table
-resource "aws_route_table_association" "public" {
+resource "aws_route_table_association" "this_public" {
   for_each = local.public_subnet_cidr_to_subnet_name
 
-  subnet_id      = lookup(aws_subnet.public, each.key).id
-  route_table_id = aws_route_table.public.id
+  subnet_id      = lookup(aws_subnet.this_public, each.key).id
+  route_table_id = aws_route_table.this_public.id
 
   lifecycle {
     # route_table_id is not needed here because the value
@@ -93,7 +93,7 @@ resource "aws_route_table_association" "public" {
 #######################################################
 
 # one eip per natgw (one per az)
-resource "aws_eip" "public" {
+resource "aws_eip" "this_public" {
   for_each = local.public_az_to_natgw_subnet_cidr
 
   vpc = true
@@ -123,12 +123,12 @@ resource "aws_eip" "public" {
 #######################################################
 
 # one natgw per az, put natgw in a single public subnet in relative az if the natgw is enabled for a private subnet
-resource "aws_nat_gateway" "public" {
+resource "aws_nat_gateway" "this_public" {
   for_each = local.public_az_to_natgw_subnet_cidr
 
 
-  allocation_id = lookup(aws_eip.public, each.key).id
-  subnet_id     = lookup(aws_subnet.public, each.value).id
+  allocation_id = lookup(aws_eip.this_public, each.key).id
+  subnet_id     = lookup(aws_subnet.this_public, each.value).id
   tags = merge(
     local.default_tags,
     {

@@ -17,7 +17,7 @@ locals {
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
 }
 
-resource "aws_subnet" "private" {
+resource "aws_subnet" "this_private" {
   for_each = local.private_subnet_cidr_to_subnet_name
 
   vpc_id                  = aws_vpc.this.id
@@ -39,7 +39,7 @@ resource "aws_subnet" "private" {
 }
 
 # one private route table per az
-resource "aws_route_table" "private" {
+resource "aws_route_table" "this_private" {
   for_each = local.private_az_to_subnet_cidrs
 
   vpc_id = aws_vpc.this.id
@@ -59,12 +59,12 @@ resource "aws_route_table" "private" {
 # one private route out through natgw per az
 # uses a map from public.tf but the route is a
 # private conext
-resource "aws_route" "private_route_out" {
+resource "aws_route" "this_private_route_out" {
   for_each = local.public_az_to_natgw_subnet_cidr
 
   destination_cidr_block = local.route_any_cidr
-  route_table_id         = lookup(aws_route_table.private, each.key).id
-  nat_gateway_id         = lookup(aws_nat_gateway.public, each.key).id
+  route_table_id         = lookup(aws_route_table.this_private, each.key).id
+  nat_gateway_id         = lookup(aws_nat_gateway.this_public, each.key).id
 
   lifecycle {
     ignore_changes = [route_table_id, nat_gateway_id]
@@ -72,11 +72,11 @@ resource "aws_route" "private_route_out" {
 }
 
 # associate each private subnet to its respective AZ's route table
-resource "aws_route_table_association" "private" {
+resource "aws_route_table_association" "this_private" {
   for_each = local.private_subnet_cidr_to_subnet_name
 
-  subnet_id      = lookup(aws_subnet.private, each.key).id
-  route_table_id = lookup(aws_route_table.private, lookup(local.private_subnet_cidr_to_az, each.key)).id
+  subnet_id      = lookup(aws_subnet.this_private, each.key).id
+  route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id
 
   lifecycle {
     ignore_changes = [subnet_id, route_table_id]
