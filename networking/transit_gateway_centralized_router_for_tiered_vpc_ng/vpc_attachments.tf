@@ -6,7 +6,7 @@ locals {
   # { vpc-1-id  = [ "first-private-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
   vpc_id_to_single_private_and_public_subnet_ids_per_az = {
     for vpc_name, this in var.centralized_router.vpcs :
-    this.id => [for subnet_ids in concat(values(this.az_to_public_subnet_ids), values(this.az_to_private_subnet_ids)) : element(subnet_ids, 0)]
+    this.id => [for subnet_ids in concat(values(this.az_to_private_subnet_ids), values(this.az_to_public_subnet_ids)) : element(subnet_ids, 0)]
     #this.id => [for subnet_id in concat(values(this.az_to_private_subnet_ids), values(this.az_to_public_subnet_ids)) : subnet_id]
   }
 
