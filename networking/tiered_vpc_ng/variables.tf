@@ -14,6 +14,7 @@ variable "tiered_vpc" {
     network = string
     tenancy = optional(string, "default")
     azs = map(object({
+      enable_natgw = optional(bool, false)
       private_subnets = optional(list(object({
         name = string
         cidr = string
@@ -38,9 +39,9 @@ variable "tiered_vpc" {
   validation {
     condition = length([
       for this in var.tiered_vpc.azs : true
-      if length(this.public_subnets) > 0 || length(this.private_subnets) > 0
+      if length(this.public_subnets) > 0
     ]) == length(var.tiered_vpc.azs)
-    error_message = "There must be at least 1 or more private subnet(s) OR 1 or more public subnet(s) per AZ."
+    error_message = "There must be at least 1 or more public subnets per AZ."
   }
 
   validation {
