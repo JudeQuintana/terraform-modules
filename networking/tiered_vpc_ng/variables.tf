@@ -25,7 +25,7 @@ variable "tiered_vpc" {
       })), [])
     }))
   })
-  #
+
   # This is an example of validating CIDR notation
   # I don't think its really needed because the provider
   # will provide subnet errors if there is invalid cidrs
@@ -33,7 +33,7 @@ variable "tiered_vpc" {
   # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
   validation {
     condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tiered_vpc.network))
-    error_message = "Tiered VPC network must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
+    error_message = "The VPC network must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
   }
 
   validation {
@@ -41,37 +41,24 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs : true
       if length(this.public_subnets) > 0
     ]) == length(var.tiered_vpc.azs)
-    error_message = "There must be at least 1 or more public subnets per AZ."
+    error_message = "There must be at least 1 public subnet per AZ."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for this in var.tiered_vpc.azs : [
+        for private_subnet_name in this.private_subnets[*].name :
+        !contains(this.public_subnets[*].name, private_subnet_name)
+    ]]))
+    error_message = "Each subnet name must be unique across both private and public subnet lists within each AZ for a VPC."
   }
 
   validation {
     condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : this.private_subnets[*].name
-    ]))) == length(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].name]))
-    error_message = "Each private subnet name must be unique in the private subnet list."
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
+    ]))) == length(flatten([for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)]))
+    error_message = "Each subnet CDIR must be unique across all AZs within the VPC network CIDR block."
   }
-
-  validation {
-    condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : this.private_subnets[*].cidr
-    ]))) == length(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
-    error_message = "Each private subnet CDIR must be unique in the private subnet list."
-  }
-
-  validation {
-    condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : this.public_subnets[*].name
-    ]))) == length(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].name]))
-    error_message = "Each public subnet name must be unique in the public subnet list."
-  }
-
-  validation {
-    condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : this.public_subnets[*].cidr
-    ]))) == length(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
-    error_message = "Each public subnet CDIR must be unique in the public subnet list."
-  }
-
 }
 
 variable "tags" {

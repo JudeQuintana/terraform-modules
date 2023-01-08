@@ -3,7 +3,7 @@ output "account_id" {
 }
 
 output "az_to_private_subnet_ids" {
-  value = { for subnet, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
+  value = { for subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_az, subnet_cidr) => this.id... } # group subnet_ids by AZ of subnet
 }
 
 output "az_to_private_route_table_id" {
@@ -11,8 +11,17 @@ output "az_to_private_route_table_id" {
 }
 
 locals {
-  az_to_public_subnet_ids     = { for subnet, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.this_public.id }                 # Each public subnet shares the same route table
+  private_subnet_name_to_subnet_id = { for subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, subnet_cidr) => this.id }
+  public_subnet_name_to_subnet_id  = { for subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, subnet_cidr) => this.id }
+}
+
+output "subnet_name_to_subnet_id" {
+  value = merge(local.private_subnet_name_to_subnet_id, local.public_subnet_name_to_subnet_id)
+}
+
+locals {
+  az_to_public_subnet_ids     = { for subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_az, subnet_cidr) => this.id... } # group subnet_ids by AZ of subnet
+  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.this_public.id }                           # Each public subnet shares the same route table
 }
 
 output "az_to_public_subnet_ids" {
