@@ -35,7 +35,7 @@ output "vpc_networks" {
 }
 
 # route object will only have 3 attributes instead of all attributes from the route
-# makes it easier to see when there are many vpc routes
+# makes it easier to see when troubleshooting many vpc routes
 output "vpc_routes" {
   value = [
     for this in aws_route.this : {
