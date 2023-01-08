@@ -24,8 +24,8 @@ output "az_to_public_route_table_id" {
 }
 
 locals {
-  private_subnet_name_to_subnet_id = { for subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, subnet_cidr) => this.id }
-  public_subnet_name_to_subnet_id  = { for subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, subnet_cidr) => this.id }
+  private_subnet_name_to_subnet_id = { for private_subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, private_subnet_cidr) => this.id }
+  public_subnet_name_to_subnet_id  = { for public_subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, public_subnet_cidr) => this.id }
 }
 
 output "subnet_name_to_subnet_id" {
