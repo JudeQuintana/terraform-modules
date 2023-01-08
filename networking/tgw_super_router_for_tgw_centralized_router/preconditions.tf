@@ -1,9 +1,9 @@
 locals {
-  # check for ASN and VPC network duplicates across regions with precondition
-  # preconditions are evaluated on apply only
+  # check for ASN and VPC network duplicates across regions with precondition.
+  # preconditions are evaluated on apply only.
   # detecting duplicate ASNs and VPC networks across regions can be done in
-  # var.super_router validations but it would be having to duplicate code to do the same validation
-  # so it's easier to do as a precondition instead.
+  # var.super_router validations but it would involve having to duplicate condition code.
+  # kind of making a mess so it's easier to use them as a precondition instead.
   all_vpc_networks = concat(local.local_tgws_all_vpc_networks, local.peer_tgws_all_vpc_networks)
 
   cross_region_vpc_networks_check = {
@@ -20,12 +20,12 @@ locals {
 
   # guarantee the centralized routers match their relative provider's region.
   local_provider_to_local_tgws_region_check = {
-    condition     = contains(local.local_tgws[*].region, local.local_region_name)
+    condition     = alltrue([for region in local.local_tgws[*].region : contains([local.local_region_name], region)])
     error_message = "All local centralized router regions must match the aws.local provider alias region."
   }
 
   peer_provider_to_peer_tgws_region_check = {
-    condition     = contains(local.peer_tgws[*].region, local.peer_region_name)
+    condition     = alltrue([for region in local.peer_tgws[*].region : contains([local.peer_region_name], region)])
     error_message = "All peer centralized router regions must match the aws.peer provider alias region."
   }
 }
