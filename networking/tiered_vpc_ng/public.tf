@@ -93,7 +93,6 @@ resource "aws_route_table_association" "this_public" {
 
 # one eip per natgw (one per az)
 resource "aws_eip" "this_public" {
-  #for_each = local.public_az_to_natgw_subnet_cidr
   for_each = local.natgw_public_az_to_public_subnet_cidr
 
   vpc = true
@@ -124,12 +123,10 @@ resource "aws_eip" "this_public" {
 
 # one natgw per az, put natgw in a single public subnet in relative az if the natgw is enabled for a private subnet
 resource "aws_nat_gateway" "this_public" {
-  #for_each = local.public_az_to_natgw_subnet_cidr
   for_each = local.natgw_public_az_to_public_subnet_cidr
 
   allocation_id = lookup(aws_eip.this_public, each.key).id
   subnet_id     = lookup(aws_subnet.this_public, each.value).id
-  #subnet_id     = lookup(aws_subnet.this_public, lookup(local.public_az_to_single_public_subnet_cidr, each.value)).id
   tags = merge(
     local.default_tags,
     {

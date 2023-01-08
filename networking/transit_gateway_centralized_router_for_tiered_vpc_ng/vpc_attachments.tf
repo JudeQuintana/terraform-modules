@@ -26,7 +26,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   vpc_id                                          = each.key
   tags = merge(
     local.default_tags,
-    { Name = format(local.vpc_attachment_format, lookup(local.vpc_id_to_names, each.key), local.centralized_router_name) }
+    {
+      Name = format(
+        local.vpc_attachment_format,
+        lookup(local.vpc_id_to_names, each.key),
+        local.centralized_router_name
+      )
+    }
   )
 }
 
