@@ -7,9 +7,9 @@ variable "rule" {
   description = "security rule object to allow inbound across vpcs intra-vpc security group"
   type = object({
     label     = string
+    protocol  = string
     from_port = number
     to_port   = number
-    protocol  = string
   })
 }
 
