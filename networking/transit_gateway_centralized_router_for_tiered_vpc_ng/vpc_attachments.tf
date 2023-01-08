@@ -2,7 +2,6 @@ locals {
   # collect the first public subnet for each az per tiered vpc to be used for each vpc attachment.
   # i'm using public subnets because they will always exist for a tiered vpc.
   # this means routing will go through a public subnet to get to a private subnet in the same AZ
-  # private subnets could be used too
   # i'm not sure about security implications of this pattern but i dont think it matters.
   #
   # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
