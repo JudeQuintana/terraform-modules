@@ -6,6 +6,10 @@ output "amazon_side_asn" {
   value = var.centralized_router.amazon_side_asn
 }
 
+output "blackhole_subnets" {
+  value = var.centralized_router.blackhole_subnets
+}
+
 output "name" {
   value = var.centralized_router.name
 }
