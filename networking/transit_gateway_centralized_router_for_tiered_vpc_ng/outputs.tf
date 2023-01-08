@@ -34,8 +34,15 @@ output "vpc_networks" {
   value = [for this in var.centralized_router.vpcs : this.network]
 }
 
+# route object will only have 3 attributes instead of all attributes from the route
+# makes it easier to see when there are many vpc routes
 output "vpc_routes" {
-  value = [for this in aws_route.this : this]
+  value = [
+    for this in aws_route.this : {
+      route_table_id         = this.route_table_id
+      destination_cidr_block = this.destination_cidr_block
+      transit_gateway_id     = this.transit_gateway_id
+  }]
 }
 
 output "vpcs" {
