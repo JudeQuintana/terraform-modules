@@ -28,6 +28,11 @@ variable "centralized_router" {
   })
 
   validation {
+    condition     = length(distinct([for this in var.centralized_router.vpcs : this.name])) == length([for this in var.centralized_router.vpcs : this.name])
+    error_message = "All VPCs must have unique names."
+  }
+
+  validation {
     condition     = length(distinct([for this in var.centralized_router.vpcs : this.network])) == length([for this in var.centralized_router.vpcs : this.network])
     error_message = "All VPCs must have unique network CIDRs."
   }
