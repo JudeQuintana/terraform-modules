@@ -19,10 +19,10 @@ variable "tiered_vpc" {
         name = string
         cidr = string
       })), [])
-      public_subnets = optional(list(object({
+      public_subnets = list(object({
         name = string
         cidr = string
-      })), [])
+      }))
     }))
   })
 
