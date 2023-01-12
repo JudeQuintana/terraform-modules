@@ -20,10 +20,11 @@ variable "centralized_router" {
       az_to_private_subnet_ids     = map(list(string))
       az_to_public_route_table_id  = map(string)
       az_to_public_subnet_ids      = map(list(string))
-      region                       = string
-      id                           = string
       full_name                    = string
+      id                           = string
+      name                         = string
       network                      = string
+      region                       = string
     })), {})
   })
 
