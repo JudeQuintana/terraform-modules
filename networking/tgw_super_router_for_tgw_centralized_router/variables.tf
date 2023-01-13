@@ -11,8 +11,8 @@ variable "region_az_labels" {
 variable "super_router" {
   description = "Super Router config"
   type = object({
-    name                   = string
-    blackhole_subnet_cidrs = optional(list(string), [])
+    name            = string
+    blackhole_cidrs = optional(list(string), [])
     local = object({
       amazon_side_asn = number
       centralized_routers = optional(map(object({

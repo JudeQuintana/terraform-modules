@@ -2,8 +2,8 @@ output "name" {
   value = var.super_router.name
 }
 
-output "blackhole_subnet_cidrs" {
-  value = local.blackhole_subnet_cidrs
+output "blackhole_cidrs" {
+  value = local.blackhole_cidrs
 }
 
 output "local" {
