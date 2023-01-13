@@ -18,7 +18,7 @@ locals {
         a = "rtb-06b216fb818494594"
         b = "rtb-06b216fb818494594"
       }
-      network = "10.0.0.0/20"
+      network_cidr = "10.0.0.0/20"
     }
     cicd = {
       az_to_private_route_table_id = {
@@ -27,7 +27,7 @@ locals {
       az_to_public_route_table_id = {
         a = "rtb-09a4481eb3684abba"
       }
-      network = "172.31.0.0/20"
+      network_cidr = "172.31.0.0/20"
     }
     general = {
       az_to_private_route_table_id = {
@@ -36,7 +36,7 @@ locals {
       az_to_public_route_table_id = {
         c = "rtb-0ad6cde89a9e386fd"
       }
-      network = "192.168.0.0/20"
+      network_cidr = "192.168.0.0/20"
     }
   }
 }
@@ -153,7 +153,7 @@ locals {
         a = "rtb-06b216fb818494594"
         b = "rtb-06b216fb818494594"
       }
-      network = "10.0.0.0/20"
+      network_cidr = "10.0.0.0/20"
     }
   }
 }

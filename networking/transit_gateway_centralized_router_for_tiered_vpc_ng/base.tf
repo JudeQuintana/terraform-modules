@@ -32,7 +32,7 @@ resource "aws_ec2_transit_gateway" "this" {
   )
 }
 
-# one route table for all vpc networks
+# one route table for all vpc network_cidrs
 resource "aws_ec2_transit_gateway_route_table" "this" {
   transit_gateway_id = aws_ec2_transit_gateway.this.id
   tags = merge(

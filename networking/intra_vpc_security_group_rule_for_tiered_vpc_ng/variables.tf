@@ -17,7 +17,7 @@ variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
     id                          = string
-    network                     = string
+    network_cidr                = string
     intra_vpc_security_group_id = string
   }))
 

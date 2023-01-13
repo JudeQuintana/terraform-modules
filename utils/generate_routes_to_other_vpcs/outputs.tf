@@ -1,5 +1,5 @@
 # deprecated
-# { "rtb-id|route" => "route", ... }
+# { "route-table-id|route" => "route", ... }
 output "call_legacy" {
   value = local.routes_legacy
 }

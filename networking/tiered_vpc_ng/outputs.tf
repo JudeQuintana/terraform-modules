@@ -48,9 +48,9 @@ output "intra_vpc_security_group_id" {
   value = aws_security_group.this_intra_vpc.id
 }
 
-output "network" {
+output "network_cidr" {
   # pass thru what is known pre-apply
-  value = var.tiered_vpc.network
+  value = var.tiered_vpc.network_cidr
 }
 
 output "name" {

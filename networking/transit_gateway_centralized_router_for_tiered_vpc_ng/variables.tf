@@ -11,9 +11,9 @@ variable "region_az_labels" {
 variable "centralized_router" {
   description = "centralized router configuration"
   type = object({
-    amazon_side_asn   = number
-    name              = string
-    blackhole_subnets = optional(list(string), [])
+    amazon_side_asn        = number
+    name                   = string
+    blackhole_subnet_cidrs = optional(list(string), [])
     vpcs = optional(map(object({
       account_id                   = string
       az_to_private_route_table_id = map(string)
@@ -23,7 +23,7 @@ variable "centralized_router" {
       full_name                    = string
       id                           = string
       name                         = string
-      network                      = string
+      network_cidr                 = string
       region                       = string
     })), {})
   })
@@ -34,7 +34,7 @@ variable "centralized_router" {
   }
 
   validation {
-    condition     = length(distinct([for this in var.centralized_router.vpcs : this.network])) == length([for this in var.centralized_router.vpcs : this.network])
+    condition     = length(distinct([for this in var.centralized_router.vpcs : this.network_cidr])) == length([for this in var.centralized_router.vpcs : this.network_cidr])
     error_message = "All VPCs must have unique network CIDRs."
   }
 }

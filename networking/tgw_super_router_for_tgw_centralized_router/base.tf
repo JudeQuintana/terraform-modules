@@ -57,8 +57,8 @@ resource "aws_ec2_transit_gateway" "this_local" {
     }
 
     precondition {
-      condition     = local.cross_region_vpc_networks_check.condition
-      error_message = local.cross_region_vpc_networks_check.error_message
+      condition     = local.cross_region_vpc_network_cidrs_check.condition
+      error_message = local.cross_region_vpc_network_cidrs_check.error_message
     }
 
     precondition {
@@ -93,8 +93,8 @@ resource "aws_ec2_transit_gateway" "this_peer" {
     }
 
     precondition {
-      condition     = local.cross_region_vpc_networks_check.condition
-      error_message = local.cross_region_vpc_networks_check.error_message
+      condition     = local.cross_region_vpc_network_cidrs_check.condition
+      error_message = local.cross_region_vpc_network_cidrs_check.error_message
     }
 
     precondition {

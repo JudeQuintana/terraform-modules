@@ -11,25 +11,25 @@ variable "region_az_labels" {
 variable "super_router" {
   description = "Super Router config"
   type = object({
-    name              = string
-    blackhole_subnets = optional(list(string), [])
+    name                   = string
+    blackhole_subnet_cidrs = optional(list(string), [])
     local = object({
       amazon_side_asn = number
       centralized_routers = optional(list(object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        region          = string
-        route_table_id  = string
-        vpc_networks    = list(string)
+        account_id        = string
+        amazon_side_asn   = string
+        full_name         = string
+        id                = string
+        region            = string
+        route_table_id    = string
+        vpc_network_cidrs = list(string)
         vpc_routes = list(object({
           route_table_id         = string
           destination_cidr_block = string
           transit_gateway_id     = string
         }))
         vpcs = map(object({
-          network                      = string
+          network_cidr                 = string
           az_to_public_route_table_id  = map(string)
           az_to_private_route_table_id = map(string)
         }))
@@ -38,20 +38,20 @@ variable "super_router" {
     peer = object({
       amazon_side_asn = number
       centralized_routers = optional(list(object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        region          = string
-        route_table_id  = string
-        vpc_networks    = list(string)
+        account_id        = string
+        amazon_side_asn   = string
+        full_name         = string
+        id                = string
+        region            = string
+        route_table_id    = string
+        vpc_network_cidrs = list(string)
         vpc_routes = list(object({
           route_table_id         = string
           destination_cidr_block = string
           transit_gateway_id     = string
         }))
         vpcs = map(object({
-          network                      = string
+          network_cidr                 = string
           az_to_public_route_table_id  = map(string)
           az_to_private_route_table_id = map(string)
         }))

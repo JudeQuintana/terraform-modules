@@ -11,7 +11,7 @@ locals {
   }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_full_names = { for this in var.centralized_router.vpcs : this.id => this.full_name }
+  vpc_id_to_full_name = { for this in var.centralized_router.vpcs : this.id => this.full_name }
 }
 
 # attach vpcs to tgw
@@ -28,7 +28,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
     {
       Name = format(
         local.vpc_attachment_format,
-        lookup(local.vpc_id_to_full_names, each.key),
+        lookup(local.vpc_id_to_full_name, each.key),
         local.centralized_router_name
       )
     }

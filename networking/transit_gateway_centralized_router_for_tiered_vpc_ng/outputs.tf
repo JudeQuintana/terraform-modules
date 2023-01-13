@@ -6,8 +6,8 @@ output "amazon_side_asn" {
   value = var.centralized_router.amazon_side_asn
 }
 
-output "blackhole_subnets" {
-  value = var.centralized_router.blackhole_subnets
+output "blackhole_subnet_cidrs" {
+  value = var.centralized_router.blackhole_subnet_cidrs
 }
 
 output "name" {
@@ -30,8 +30,8 @@ output "route_table_id" {
   value = aws_ec2_transit_gateway_route_table.this.id
 }
 
-output "vpc_networks" {
-  value = [for this in var.centralized_router.vpcs : this.network]
+output "vpc_network_cidrs" {
+  value = [for this in var.centralized_router.vpcs : this.network_cidr]
 }
 
 # route object will only have 3 attributes instead of all attributes from the route
