@@ -1,6 +1,7 @@
 locals {
   blackhole_subnet_cidrs = toset(var.super_router.blackhole_subnet_cidrs)
 }
+
 resource "aws_ec2_transit_gateway_route" "this_local_blackhole" {
   for_each = local.blackhole_subnet_cidrs
 
