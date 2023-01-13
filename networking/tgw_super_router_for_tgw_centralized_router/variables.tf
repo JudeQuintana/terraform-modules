@@ -15,7 +15,7 @@ variable "super_router" {
     blackhole_subnet_cidrs = optional(list(string), [])
     local = object({
       amazon_side_asn = number
-      centralized_routers = optional(list(object({
+      centralized_routers = optional(map(object({
         account_id        = string
         amazon_side_asn   = string
         full_name         = string
@@ -33,11 +33,11 @@ variable "super_router" {
           az_to_public_route_table_id  = map(string)
           az_to_private_route_table_id = map(string)
         }))
-      })), [])
+      })), {})
     })
     peer = object({
       amazon_side_asn = number
-      centralized_routers = optional(list(object({
+      centralized_routers = optional(map(object({
         account_id        = string
         amazon_side_asn   = string
         full_name         = string
@@ -55,41 +55,41 @@ variable "super_router" {
           az_to_public_route_table_id  = map(string)
           az_to_private_route_table_id = map(string)
         }))
-      })), [])
+      })), {})
     })
   })
 
   validation {
     condition = length(
-      distinct(var.super_router.local.centralized_routers[*].amazon_side_asn)
-    ) == length(var.super_router.local.centralized_routers[*].amazon_side_asn)
+      distinct([for this in var.super_router.local.centralized_routers : this.amazon_side_asn])
+    ) == length([for this in var.super_router.local.centralized_routers : this.amazon_side_asn])
     error_message = "All local centralized routers must have a unique amazon_side_asn number."
   }
 
   validation {
-    condition     = length(distinct(var.super_router.local.centralized_routers[*].region)) < 2
+    condition     = length(distinct([for this in var.super_router.local.centralized_routers : this.region])) < 2
     error_message = "All local centralized routers must have the same region as each other and the aws.local provider alias."
   }
 
   validation {
-    condition     = length(distinct(var.super_router.local.centralized_routers[*].account_id)) < 2
+    condition     = length(distinct([for this in var.super_router.local.centralized_routers : this.account_id])) < 2
     error_message = "All local centralized routers must have the same account id as each other and the aws.local provider alias."
   }
 
   validation {
     condition = length(
-      distinct(var.super_router.peer.centralized_routers[*].amazon_side_asn)
-    ) == length(var.super_router.peer.centralized_routers[*].amazon_side_asn)
+      distinct([for this in var.super_router.peer.centralized_routers : this.amazon_side_asn])
+    ) == length([for this in var.super_router.peer.centralized_routers : this.amazon_side_asn])
     error_message = "All peer centralized routers must have a unique amazon_side_asn number."
   }
 
   validation {
-    condition     = length(distinct(var.super_router.peer.centralized_routers[*].region)) < 2
+    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.region])) < 2
     error_message = "All peer centralized routers must have the same region as each other and the aws.peer provider alias."
   }
 
   validation {
-    condition     = length(distinct(var.super_router.peer.centralized_routers[*].account_id)) < 2
+    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.account_id])) < 2
     error_message = "All peer centralized couters must have the same account id as each other and the aws.peer provider alias."
   }
 }
