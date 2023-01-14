@@ -49,8 +49,8 @@ variable "tiered_vpc" {
   validation {
     condition = length(distinct(flatten([
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
-      ]))) == length(flatten(
-      [for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
+      ]))) == length(flatten([
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
     ]))
     error_message = "Each subnet name must be unique across all AZs in a VPC."
   }
