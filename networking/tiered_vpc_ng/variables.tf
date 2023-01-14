@@ -45,8 +45,7 @@ variable "tiered_vpc" {
 
   validation {
     condition = alltrue([
-      for this in var.tiered_vpc.azs : true
-      if length(this.public_subnets) > 0
+      for this in var.tiered_vpc.azs : length(this.public_subnets) > 0
     ])
     error_message = "There must be at least 1 public subnet per AZ in a VPC."
   }
