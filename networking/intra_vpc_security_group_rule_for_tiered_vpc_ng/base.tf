@@ -12,9 +12,9 @@ locals {
   }
 
   # complete the security group rule object for each vpc
-  vpc_name_to_intra_vpc_security_group_rules = {
+  vpc_id_to_intra_vpc_security_group_rules = {
     for this in var.vpcs :
-    this.name => merge({
+    this.id => merge({
       intra_vpc_security_group_id = this.intra_vpc_security_group_id
       network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
       type                        = "ingress"
@@ -23,7 +23,7 @@ locals {
 }
 
 resource "aws_security_group_rule" "this" {
-  for_each = local.vpc_name_to_intra_vpc_security_group_rules
+  for_each = local.vpc_id_to_intra_vpc_security_group_rules
 
   security_group_id = each.value.intra_vpc_security_group_id
   cidr_blocks       = each.value.network_cidrs
