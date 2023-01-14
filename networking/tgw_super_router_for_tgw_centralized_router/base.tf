@@ -52,16 +52,6 @@ resource "aws_ec2_transit_gateway" "this_local" {
     # cant use dynamic block for lifecycle blocks
     # preconditions are evaluated only on apply
     precondition {
-      condition     = local.cross_region_asn_check.condition
-      error_message = local.cross_region_asn_check.error_message
-    }
-
-    precondition {
-      condition     = local.cross_region_vpc_network_cidrs_check.condition
-      error_message = local.cross_region_vpc_network_cidrs_check.error_message
-    }
-
-    precondition {
       condition     = local.local_provider_to_local_tgws_region_check.condition
       error_message = local.local_provider_to_local_tgws_region_check.error_message
     }
@@ -87,16 +77,6 @@ resource "aws_ec2_transit_gateway" "this_peer" {
   lifecycle {
     # cant use dynamic block for lifecycle blocks
     # preconditions are evaluated only on apply
-    precondition {
-      condition     = local.cross_region_asn_check.condition
-      error_message = local.cross_region_asn_check.error_message
-    }
-
-    precondition {
-      condition     = local.cross_region_vpc_network_cidrs_check.condition
-      error_message = local.cross_region_vpc_network_cidrs_check.error_message
-    }
-
     precondition {
       condition     = local.local_provider_to_local_tgws_region_check.condition
       error_message = local.local_provider_to_local_tgws_region_check.error_message

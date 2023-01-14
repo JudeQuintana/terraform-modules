@@ -92,6 +92,20 @@ variable "super_router" {
     condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.account_id])) < 2
     error_message = "All peer centralized couters must have the same account id as each other and the aws.peer provider alias."
   }
+
+  validation {
+    condition = length(
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
+    error_message = "All VPC network_cidrs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
+    ) == length(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
+    error_message = "All amazon side ASNs must be unique across regions."
+  }
 }
 
 variable "tags" {
