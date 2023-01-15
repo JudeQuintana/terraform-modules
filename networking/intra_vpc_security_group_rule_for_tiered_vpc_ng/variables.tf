@@ -23,15 +23,15 @@ variable "intra_vpc_access" {
 
   validation {
     condition = length(distinct([
-      for this in var.intra_vpc.vpcs : this.network_cidr
+      for this in var.intra_vpc_access.vpcs : this.network_cidr
       ])) == length([
-      for this in var.intra_vpc.vpcs : this.network_cidr
+      for this in var.intra_vpc_access.vpcs : this.network_cidr
     ])
     error_message = "All VPCs must have unique network CIDRs."
   }
 
   validation {
-    condition     = length(var.intra_vpc.vpcs) > 1
+    condition     = length(var.intra_vpc_access.vpcs) > 1
     error_message = "There must be at least 2 VPCs."
   }
 }
