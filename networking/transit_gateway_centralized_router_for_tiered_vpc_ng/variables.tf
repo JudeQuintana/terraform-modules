@@ -9,7 +9,7 @@ variable "region_az_labels" {
 }
 
 variable "centralized_router" {
-  description = "centralized router configuration"
+  description = "Centralized Router configuration"
   type = object({
     amazon_side_asn = number
     name            = string

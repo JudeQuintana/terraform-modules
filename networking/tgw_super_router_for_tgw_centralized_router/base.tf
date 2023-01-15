@@ -51,6 +51,7 @@ resource "aws_ec2_transit_gateway" "this_local" {
   lifecycle {
     # cant use dynamic block for lifecycle blocks
     # preconditions are evaluated only on apply
+    # see preconditions.tf
     precondition {
       condition     = local.local_provider_to_local_tgws_region_check.condition
       error_message = local.local_provider_to_local_tgws_region_check.error_message
@@ -77,6 +78,7 @@ resource "aws_ec2_transit_gateway" "this_peer" {
   lifecycle {
     # cant use dynamic block for lifecycle blocks
     # preconditions are evaluated only on apply
+    # see preconditions.tf
     precondition {
       condition     = local.local_provider_to_local_tgws_region_check.condition
       error_message = local.local_provider_to_local_tgws_region_check.error_message

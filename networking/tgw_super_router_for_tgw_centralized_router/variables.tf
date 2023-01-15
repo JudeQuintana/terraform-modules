@@ -9,7 +9,7 @@ variable "region_az_labels" {
 }
 
 variable "super_router" {
-  description = "Super Router config"
+  description = "Super Router configuration"
   type = object({
     name            = string
     blackhole_cidrs = optional(list(string), [])

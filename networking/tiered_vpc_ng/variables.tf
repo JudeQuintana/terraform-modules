@@ -9,6 +9,7 @@ variable "region_az_labels" {
 }
 
 variable "tiered_vpc" {
+  description = "Tiered VPC configuration"
   type = object({
     name         = string
     network_cidr = string
