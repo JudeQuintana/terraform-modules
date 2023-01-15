@@ -3,6 +3,11 @@ variable "env_prefix" {
   type        = string
 }
 
+variable "region_az_labels" {
+  description = "Region and AZ names mapped to short naming conventions for labeling"
+  type        = map(string)
+}
+
 variable "intra_vpc_access" {
   description = "intra vpc access configuration"
   type = object({
