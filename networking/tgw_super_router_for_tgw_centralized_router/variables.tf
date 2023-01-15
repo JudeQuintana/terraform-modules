@@ -103,6 +103,15 @@ variable "super_router" {
   }
 
   validation {
+    condition = (
+      var.super_router.peer.amazon_side_asn >= 64512 && var.super_router.peer.amazon_side_asn <= 65534
+      ) || (
+      var.super_router.peer.amazon_side_asn >= 4200000000 && var.super_router.peer.amazon_side_asn <= 4294967294
+    )
+    error_message = "The peer super router amazon_side_asn should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+  }
+
+  validation {
     condition = length(
       distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
     ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
@@ -114,15 +123,6 @@ variable "super_router" {
       distinct(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
     ) == length(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
     error_message = "All amazon side ASNs must be unique across regions."
-  }
-
-  validation {
-    condition = (
-      var.super_router.peer.amazon_side_asn >= 64512 && var.super_router.peer.amazon_side_asn <= 65534
-      ) || (
-      var.super_router.peer.amazon_side_asn >= 4200000000 && var.super_router.peer.amazon_side_asn <= 4294967294
-    )
-    error_message = "The peer super router amazon_side_asn should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
   }
 }
 

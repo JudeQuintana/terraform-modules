@@ -10,16 +10,16 @@ output "blackhole_cidrs" {
   value = local.blackhole_cidrs
 }
 
-output "name" {
-  value = var.centralized_router.name
-}
-
 output "full_name" {
   value = local.centralized_router_name
 }
 
 output "id" {
   value = aws_ec2_transit_gateway.this.id
+}
+
+output "name" {
+  value = var.centralized_router.name
 }
 
 output "region" {

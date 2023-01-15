@@ -23,14 +23,6 @@ output "az_to_public_route_table_id" {
   value = local.az_to_public_route_table_id
 }
 
-locals {
-  private_subnet_name_to_subnet_id = { for private_subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, private_subnet_cidr) => this.id }
-  public_subnet_name_to_subnet_id  = { for public_subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, public_subnet_cidr) => this.id }
-}
-
-output "subnet_name_to_subnet_id" {
-  value = merge(local.private_subnet_name_to_subnet_id, local.public_subnet_name_to_subnet_id)
-}
 
 output "default_security_group_id" {
   value = aws_vpc.this.default_security_group_id
@@ -48,15 +40,24 @@ output "intra_vpc_security_group_id" {
   value = aws_security_group.this_intra_vpc.id
 }
 
+output "name" {
+  value = var.tiered_vpc.name
+}
+
 output "network_cidr" {
   # pass thru what is known pre-apply
   value = var.tiered_vpc.network_cidr
 }
 
-output "name" {
-  value = var.tiered_vpc.name
-}
-
 output "region" {
   value = local.region_name
+}
+
+locals {
+  private_subnet_name_to_subnet_id = { for private_subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, private_subnet_cidr) => this.id }
+  public_subnet_name_to_subnet_id  = { for public_subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, public_subnet_cidr) => this.id }
+}
+
+output "subnet_name_to_subnet_id" {
+  value = merge(local.private_subnet_name_to_subnet_id, local.public_subnet_name_to_subnet_id)
 }

@@ -11,8 +11,8 @@ variable "region_az_labels" {
 variable "centralized_router" {
   description = "Centralized Router configuration"
   type = object({
-    amazon_side_asn = number
     name            = string
+    amazon_side_asn = number
     blackhole_cidrs = optional(list(string), [])
     vpcs = optional(map(object({
       account_id                   = string

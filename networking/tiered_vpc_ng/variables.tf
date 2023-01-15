@@ -33,7 +33,10 @@ variable "tiered_vpc" {
   # the aws provider will error on validate cidr subnets too.
   # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
   validation {
-    condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tiered_vpc.network_cidr))
+    condition = can(regex(
+      "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
+      var.tiered_vpc.network_cidr
+    ))
     error_message = "The VPC network_cidr must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
   }
 
