@@ -23,15 +23,6 @@ variable "vpcs" {
 
   validation {
     condition = length(distinct([
-      for this in var.vpcs : this.name
-      ])) == length([
-      for this in var.vpcs : this.name
-    ])
-    error_message = "All VPCs must have unique names."
-  }
-
-  validation {
-    condition = length(distinct([
       for this in var.vpcs : this.network_cidr
       ])) == length([
       for this in var.vpcs : this.network_cidr
