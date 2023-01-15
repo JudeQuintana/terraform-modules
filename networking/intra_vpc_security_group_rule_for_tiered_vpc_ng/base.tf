@@ -2,9 +2,9 @@ locals {
   # Each VPC id should have an inbound rule from all other VPC networks except itself.
 
   # { vpc1-id => "vpc1-network-cidr", vpc2-id => "vpc2-network-cidr", vpc3-id => "vpc3-network-cidr" }
-  vpc_id_to_network_cidr = { for this in var.vpcs : this.id => this.network_cidr }
+  vpc_id_to_network_cidr = { for this in var.intra_vpc.vpcs : this.id => this.network_cidr }
 
-  # { vpc1-id = ["vpc2-network", "vpc3-network", ...], vpc2-id = ["vpc1-network", "vpc3-network", ...], vpc3-id = ["vpc1-network", "vpc2-network", ...] ...  }
+  # { vpc1-id = ["vpc2-network-cidr", "vpc3-network-cidr", ...], vpc2-id = ["vpc1-network-cidr", "vpc3-network-cidr", ...], vpc3-id = ["vpc1-network-cidr", "vpc2-network-cidr", ...] ...  }
   vpc_id_to_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.vpc_id_to_network_cidr), values(local.vpc_id_to_network_cidr)) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
@@ -13,12 +13,12 @@ locals {
 
   # complete the security group rule object for each vpc
   vpc_id_to_intra_vpc_security_group_rules = {
-    for this in var.vpcs :
+    for this in var.intra_vpc.vpcs :
     this.id => merge({
       intra_vpc_security_group_id = this.intra_vpc_security_group_id
       network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
       type                        = "ingress"
-    }, var.rule)
+    }, var.intra_vpc.rule)
   }
 }
 

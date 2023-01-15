@@ -3,35 +3,36 @@ variable "env_prefix" {
   type        = string
 }
 
-variable "rule" {
-  description = "security rule object to allow inbound across vpcs intra-vpc security group"
+variable "intra_vpc_access" {
+  description = "intra vpc access configuration"
   type = object({
-    label     = string
-    protocol  = string
-    from_port = number
-    to_port   = number
+    # security rule object to allow inbound across vpcs intra-vpc security group
+    rule = object({
+      label     = string
+      protocol  = string
+      from_port = number
+      to_port   = number
+    })
+    # map of tiered_vpc_ng objects
+    vpcs = map(object({
+      id                          = string
+      network_cidr                = string
+      intra_vpc_security_group_id = string
+    }))
   })
-}
-
-variable "vpcs" {
-  description = "map of tiered_vpc_ng objects"
-  type = map(object({
-    id                          = string
-    network_cidr                = string
-    intra_vpc_security_group_id = string
-  }))
 
   validation {
     condition = length(distinct([
-      for this in var.vpcs : this.network_cidr
+      for this in var.intra_vpc.vpcs : this.network_cidr
       ])) == length([
-      for this in var.vpcs : this.network_cidr
+      for this in var.intra_vpc.vpcs : this.network_cidr
     ])
     error_message = "All VPCs must have unique network CIDRs."
   }
 
   validation {
-    condition     = length(var.vpcs) > 1
+    condition     = length(var.intra_vpc.vpcs) > 1
     error_message = "There must be at least 2 VPCs."
   }
 }
+
