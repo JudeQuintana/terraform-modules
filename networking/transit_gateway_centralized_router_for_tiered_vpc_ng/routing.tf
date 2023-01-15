@@ -19,4 +19,9 @@ resource "aws_route" "this" {
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
+
+  lifecyle {
+    # make sure the route table exists first
+    depends_on = [aws_ec2_transit_gateway_route_table.this]
+  }
 }
