@@ -30,6 +30,13 @@ resource "aws_ec2_transit_gateway" "this" {
     local.default_tags,
     { Name = local.centralized_router_name }
   )
+
+  lifecycle {
+    precondition {
+      condition     = local.provider_to_vpc_region_check.condition
+      error_message = local.provider_to_vpc_region_check.error_message
+    }
+  }
 }
 
 # one route table for all vpc network_cidrs
