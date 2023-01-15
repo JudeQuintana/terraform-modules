@@ -5,7 +5,7 @@ locals {
   # i'm not sure about security implications of this pattern but i dont think it matters.
   #
   # { vpc-1-id  = [ "first-public-subnet-id-of-az-1-for-vpc-1", "first-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
-  vpc_id_to_single_public_subnet_ids_per_az = {
+  vpc_id_to_single_public_subnet_ids = {
     for this in var.centralized_router.vpcs :
     this.id => [for az, public_subnet_ids in this.az_to_public_subnet_ids : element(public_subnet_ids, 0)]
   }
@@ -16,7 +16,7 @@ locals {
 
 # attach vpcs to tgw
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
-  for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = local.vpc_id_to_single_public_subnet_ids
 
   subnet_ids                                      = each.value
   transit_gateway_id                              = aws_ec2_transit_gateway.this.id
@@ -37,7 +37,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
 
 # associate attachments to route table
 resource "aws_ec2_transit_gateway_route_table_association" "this" {
-  for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = local.vpc_id_to_single_public_subnet_ids
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
@@ -45,7 +45,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this" {
 
 # route table propagation
 resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
-  for_each = local.vpc_id_to_single_public_subnet_ids_per_az
+  for_each = local.vpc_id_to_single_public_subnet_ids
 
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id

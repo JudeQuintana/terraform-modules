@@ -2,7 +2,7 @@ locals {
   blackhole_cidrs = toset(var.super_router.blackhole_cidrs)
 }
 
-resource "aws_ec2_transit_gateway_route" "this_local_blackhole" {
+resource "aws_ec2_transit_gateway_route" "this_local_blackholes" {
   for_each = local.blackhole_cidrs
 
   destination_cidr_block         = each.value
@@ -10,7 +10,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_blackhole" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
 }
 
-resource "aws_ec2_transit_gateway_route" "this_peer_blackhole" {
+resource "aws_ec2_transit_gateway_route" "this_peer_blackholes" {
   for_each = local.blackhole_cidrs
 
   destination_cidr_block         = each.value

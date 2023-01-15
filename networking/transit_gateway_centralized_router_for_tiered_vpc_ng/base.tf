@@ -32,9 +32,10 @@ resource "aws_ec2_transit_gateway" "this" {
   )
 
   lifecycle {
+    # preconditions are evaluated on apply only.
     precondition {
-      condition     = local.provider_to_vpc_region_check.condition
-      error_message = local.provider_to_vpc_region_check.error_message
+      condition     = alltrue([for this in var.centralized_router.vpcs : contains([local.region_name], this.region)])
+      error_message = "All Tiered VPC regions must match the aws provider region for Centralized Router."
     }
   }
 }

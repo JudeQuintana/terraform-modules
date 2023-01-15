@@ -29,13 +29,30 @@ variable "centralized_router" {
   })
 
   validation {
-    condition     = length(distinct([for this in var.centralized_router.vpcs : this.name])) == length([for this in var.centralized_router.vpcs : this.name])
+    condition = length(distinct([
+      for this in var.centralized_router.vpcs : this.name
+      ])) == length([
+      for this in var.centralized_router.vpcs : this.name
+    ])
     error_message = "All VPCs must have unique names."
   }
 
   validation {
-    condition     = length(distinct([for this in var.centralized_router.vpcs : this.network_cidr])) == length([for this in var.centralized_router.vpcs : this.network_cidr])
+    condition = length(distinct([
+      for this in var.centralized_router.vpcs : this.network_cidr
+      ])) == length([
+      for this in var.centralized_router.vpcs : this.network_cidr
+    ])
     error_message = "All VPCs must have unique network CIDRs."
+  }
+
+  validation {
+    condition = (
+      var.centralized_router.amazon_side_asn >= 64512 && var.centralized_router.amazon_side_asn <= 65534
+      ) || (
+      var.centralized_router.amazon_side_asn >= 4200000000 && var.centralized_router.amazon_side_asn <= 4294967294
+    )
+    error_message = "The amazon_side_asn should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
   }
 }
 
@@ -44,4 +61,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
