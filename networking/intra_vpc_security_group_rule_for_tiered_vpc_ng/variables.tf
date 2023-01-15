@@ -21,8 +21,9 @@ variable "intra_vpc_access" {
     # map of tiered_vpc_ng objects
     vpcs = map(object({
       id                          = string
-      network_cidr                = string
       intra_vpc_security_group_id = string
+      network_cidr                = string
+      region                      = string
     }))
   })
 
