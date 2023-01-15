@@ -1,4 +1,14 @@
+# Pull caller identity data from provider
+data "aws_caller_identity" "current" {}
+
+# Pull region data from provider
+data "aws_region" "current" {}
+
 locals {
+  account_id   = data.aws_caller_identity.current.account_id
+  region_name  = data.aws_region.current.name
+  region_label = lookup(var.region_az_labels, local.region_name)
+
   # Each VPC id should have an inbound rule from all other VPC networks except itself.
 
   # { vpc1-id => "vpc1-network-cidr", vpc2-id => "vpc2-network-cidr", vpc3-id => "vpc3-network-cidr" }
@@ -32,8 +42,17 @@ resource "aws_security_group_rule" "this" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s inbound across VPCs",
+    "%s Env: Allow %s-%s inbound across VPCs",
     upper(var.env_prefix),
-    each.value.label
+    each.value.label,
+    local.region_label
   )
+
+  lifecycle {
+    # preconditions are evaluated on apply only.
+    precondition {
+      condition     = alltrue([for this in var.intra_vpc_access.vpcs : contains([local.region_name], this.region)])
+      error_message = "All VPC regions must match the aws provider region for Intra VPC Access."
+    }
+  }
 }
