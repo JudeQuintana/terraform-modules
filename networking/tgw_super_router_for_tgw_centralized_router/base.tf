@@ -1,17 +1,17 @@
 # Pull region data and account id from provider
-data "aws_region" "this_local_current" {
-  provider = aws.local
-}
-
 data "aws_caller_identity" "this_local_current" {
   provider = aws.local
 }
 
-data "aws_region" "this_peer_current" {
-  provider = aws.peer
+data "aws_region" "this_local_current" {
+  provider = aws.local
 }
 
 data "aws_caller_identity" "this_peer_current" {
+  provider = aws.peer
+}
+
+data "aws_region" "this_peer_current" {
   provider = aws.peer
 }
 
@@ -29,9 +29,6 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-}
-
-locals {
   base_super_router_name  = format("%s-%s", local.upper_env_prefix, "super-router")
   local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, var.super_router.name)
   peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, var.super_router.name)
