@@ -10,79 +10,103 @@ Main:
 Baseline Tiered VPC-NG features (same as prototype):
 
 - Create VPC tiers
-  - It’s much easier to think about tiers ephemerally when scaling out VPCs because we can narrow down the context (ie app, db, general) and maximize the use of smaller network size when needed.
+  - Thinking about VPCs as tiers helps narrow down the context (ie app, db, general) and maximize the use of smaller network size when needed.
   - You can still have 3 tiered networking (ie lbs, dbs for an app) internally to the VPC.
 - VPC resources are IPv4 only.
   - No IPv6 configuration for now.
 
 - Creates structured VPC resource naming and tagging.
-  - Ephemeral Naming
-  - `<env_prefix>-<region|az>-<tier_name>-<public|private>-<pet_name|misc_label>`
-
-- Requires a minimum of at least one public subnet per AZ.
-
-- Can add and remove subnets and/or AZs at any time*.
-
-- Internal and external VPC routing is automatic.
-
-What’s new in NG?
+  - `<env_prefix>-<tier_name>-<public|private>-<region|az>`
 
 - An Intra VPC Security Group is created by default.
-
  - This will be for adding security group rules that are inbound only for access across VPCs.
- - No more nulling out private subnets ie `private = null`.
-   - Just populate the list to create them ie `private = []` just like the public subnets.
 
-- NAT Gateways are no longer built by default when private subnets exist in an AZ.
- - This allows for routable private subnets that have no outbound internet traffic unless `enable_natgw = true`, in which case the NAT Gateway will be built and private route tables updated.
- - Now you can just “flip the switch” to give all private subnets in an AZ access to the internet.
- - NAT Gateways are created with an EIP per AZ when enabled.
-   - This is why we need at least one public subnet per AZ to create them in.
+- Can add, remove, name and rename sunbnets*.
 
+- Requires a minimum of at least one public subnet per AZ.
+  - When a NAT Gateway is enabled for an AZ it will be built in the first public subnet in the list for an AZ by default
+    - Set `enable_natgw` in an AZ to give all private subnets in an AZ access to the internet, in which case the NAT Gateway will be built with EIP allocated and private route tables updated.
+  - When a Tiered VPC is passed to a Centralized Router, the VPC attachment will also use the first public subnet in the list for each AZ of that VPC by default.
+  - The trade off is always having to allocate at least one public subnet per AZ, even if the you don't need to use it (ie using private subnets only).
+  - I highly recommend naming and allocating a small subnet like a /28 (ie `public_subnets = [{name = "natwgw", cidr = "10.0.9.64/28"}, {name = "haproxy1", cidr = "10.0.10.0/24"}]` and as the first element in the public\_subnets list.
+  - Once the first public subnet in the list is in use by a natgw or a vpc attachment, it can't be deleted from or moved around (but other subnets can) in the list until they are not in use anymore.
 
 Example:
 ```
 locals {
-  vpc_tiers = [
+  tiered_vpcs = [
     {
+      name         = "app"
+      network_cidr = "10.0.0.0/20"
       azs = {
         a = {
-          # Enable a NAT Gateway for all private subnets in the AZ with:
-          # enable_natgw = true
-          private = ["10.0.16.0/24", "10.0.17.0/24", "10.0.18.0/24"]
-          public  = ["10.0.19.0/24", "10.0.20.0/24", "10.0.21.0/24"]
+          #private = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+          #public  = ["10.0.3.0/24", "10.0.4.0/24"]
+          private_subnets = [
+            { name = "cluster1", cidr = "10.0.0.0/24" },
+          ]
+          public_subnets = [
+            { name = "random1", cidr = "10.0.3.0/28" },
+            { name = "haproxy1", cidr = "10.0.4.64/26" },
+          ]
         }
         b = {
-          # Enable a NAT Gateway for all private subnets in the AZ with:
-          # enable_natgw = true
-          private = ["10.0.26.0/24"]
-          public  = ["10.0.27.0/24"]
+          #private = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+          #public  = ["10.0.3.0/24", "10.0.4.0/24"]
+          private_subnets = [
+            { name = "cluster2", cidr = "10.0.1.0/24" },
+            { name = "random2", cidr = "10.0.5.0/24" },
+          ]
+          public_subnets = [
+            { name = "random3", cidr = "10.0.6.0/24" }
+          ]
         }
       }
-      name    = "app"
-      network = "10.0.16.0/20"
     },
     {
+      name         = "cicd"
+      network_cidr = "172.16.0.0/20"
       azs = {
-        c = {
-          private = ["192.168.16.0/24", "192.168.17.0/24", "192.168.18.0/24"]
-          public  = ["192.168.19.0/28"]
+        b = {
+          enable_natgw = true
+          #private = ["172.16.5.0/24", "172.16.6.0/24", "172.16.7.0/24"]
+          #public  = ["172.16.8.0/28", "172.16.9.0/28"]
+          private_subnets = [
+            { name = "jenkins1", cidr = "172.16.5.0/24" }
+          ]
+          public_subnets = [
+            { name = "natgw", cidr = "172.16.8.0/28" }
+          ]
         }
       }
-      name    = "general"
-      network = "192.168.16.0/20"
+    },
+    {
+      name         = "general"
+      network_cidr = "192.168.0.0/20"
+      azs = {
+        c = {
+          #private = ["192.168.10.0/24", "192.168.11.0/24", "192.168.12.0/24"]
+          #public  = ["192.168.13.0/28"]
+          private_subnets = [
+            { name = "db1", cidr = "192.168.10.0/24" }
+          ]
+          public_subnets = [
+            { name = "random1", cidr = "192.168.13.0/28" },
+          ]
+        }
+      }
     }
   ]
 }
 
 module "vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.4.5"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=moar-better"
 
-  for_each = { for t in local.vpc_tiers : t.name => t }
+  for_each = { for t in local.tiered_vpcs : t.name => t }
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
-  tier             = each.value
+  tiered_vpc       = each.value
 }
 ```
 
@@ -92,14 +116,12 @@ module "vpcs" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.20 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.3 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.20 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 3.3 |
 
 ## Modules
 
@@ -109,21 +131,19 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_eip.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_eip.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
-| [aws_nat_gateway.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
-| [aws_route.private_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_nat_gateway.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
 | [aws_route.public_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
-| [aws_route_table.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
-| [aws_route_table.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
-| [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
-| [aws_route_table_association.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
-| [aws_security_group.intra_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
-| [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_route.this_private_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route_table.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table_association.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_route_table_association.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_security_group.this_intra_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_subnet.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
-| [random_pet.private](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
-| [random_pet.public](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
@@ -134,7 +154,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tier"></a> [tier](#input\_tier) | n/a | <pre>object({<br>    azs = map(object({<br>      enable_natgw = optional(bool, false)<br>      private      = list(string)<br>      public       = list(string)<br>    }))<br>    name    = string<br>    network = string<br>    tenancy = optional(string, "default")<br>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = map(object({<br>      enable_natgw = optional(bool, false)<br>      private_subnets = optional(list(object({<br>        name = string<br>        cidr = string<br>      })), [])<br>      public_subnets = list(object({<br>        name = string<br>        cidr = string<br>      }))<br>    }))<br>  })</pre> | n/a | yes |
 
 ## Outputs
 
@@ -149,5 +169,7 @@ No modules.
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 | <a name="output_intra_vpc_security_group_id"></a> [intra\_vpc\_security\_group\_id](#output\_intra\_vpc\_security\_group\_id) | n/a |
-| <a name="output_network"></a> [network](#output\_network) | n/a |
+| <a name="output_name"></a> [name](#output\_name) | n/a |
+| <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | n/a |
 | <a name="output_region"></a> [region](#output\_region) | n/a |
+| <a name="output_subnet_name_to_subnet_id"></a> [subnet\_name\_to\_subnet\_id](#output\_subnet\_name\_to\_subnet\_id) | n/a |
