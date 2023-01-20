@@ -1,12 +1,12 @@
 ############################################################################################################
 #
 # Public Subnets:
-# - It's required to have at least 1 public subnet in a tiered vpc
+# - It's required to have at least 1 public subnet with specail = true in a tiered vpc
 # - Public Route Table and Route for all subnets
 # - Route out IGW
 #
 # If NATGWs are enabled for an AZ:
-# - NATGW is created in the first public subnet in the AZ
+# - NATGW is created in the public subnet with special = true for each AZ
 # - EIP is created and associated to the NATGW
 #
 # Note:
