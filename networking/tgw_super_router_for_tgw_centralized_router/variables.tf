@@ -50,7 +50,7 @@ variable "super_router" {
           destination_cidr_block = string
           transit_gateway_id     = string
         }))
-        vpcs = list(object({
+        vpcs = map(object({
           network_cidr            = string
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
