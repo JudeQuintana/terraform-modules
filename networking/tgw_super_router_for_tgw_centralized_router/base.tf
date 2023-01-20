@@ -30,8 +30,8 @@ locals {
   }, var.tags)
 
   base_super_router_name  = format("%s-%s", local.upper_env_prefix, "super-router")
-  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, local.local_region_label, var.super_router.name)
-  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, local.peer_region_label, var.super_router.name)
+  local_super_router_name = format("%s-%s-%s", local.base_super_router_name, var.super_router.name, local.local_region_label)
+  peer_super_router_name  = format("%s-%s-%s", local.base_super_router_name, var.super_router.name, local.peer_region_label)
 }
 
 resource "aws_ec2_transit_gateway" "this_local" {
