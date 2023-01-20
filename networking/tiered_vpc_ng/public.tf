@@ -122,7 +122,6 @@ resource "aws_eip" "this_public" {
 ##
 #######################################################
 
-# one natgw per az, put natgw in a single public subnet in relative az if the natgw is enabled for a private subnet
 resource "aws_nat_gateway" "this_public" {
   for_each = local.public_natgw_az_to_special_subnet_cidr
 
