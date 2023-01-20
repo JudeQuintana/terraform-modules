@@ -15,16 +15,15 @@ variable "centralized_router" {
     amazon_side_asn = number
     blackhole_cidrs = optional(list(string), [])
     vpcs = optional(map(object({
-      account_id                   = string
-      az_to_private_route_table_id = map(string)
-      az_to_private_subnet_ids     = map(list(string))
-      az_to_public_route_table_id  = map(string)
-      az_to_public_subnet_ids      = map(list(string))
-      full_name                    = string
-      id                           = string
-      name                         = string
-      network_cidr                 = string
-      region                       = string
+      account_id                = string
+      private_route_table_ids   = list(string)
+      public_route_table_ids    = list(string)
+      public_special_subnet_ids = list(string)
+      full_name                 = string
+      id                        = string
+      name                      = string
+      network_cidr              = string
+      region                    = string
     })), {})
   })
 

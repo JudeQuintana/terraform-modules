@@ -50,12 +50,12 @@ variable "super_router" {
           destination_cidr_block = string
           transit_gateway_id     = string
         }))
-        vpcs = map(object({
-          network_cidr                 = string
-          az_to_public_route_table_id  = map(string)
-          az_to_private_route_table_id = map(string)
+        vpcs = list(object({
+          network_cidr            = string
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         }))
-      })), {})
+      })), [])
     })
   })
 

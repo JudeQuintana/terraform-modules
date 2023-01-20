@@ -47,5 +47,5 @@ output "vpc_routes" {
 }
 
 output "vpcs" {
-  value = var.centralized_router.vpcs
+  value = [for this in var.centralized_router.vpcs : this]
 }

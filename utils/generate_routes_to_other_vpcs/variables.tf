@@ -1,9 +1,9 @@
 variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
-    network_cidr                 = string
-    az_to_private_route_table_id = map(string)
-    az_to_public_route_table_id  = map(string)
+    network_cidr            = string
+    private_route_table_ids = list(string)
+    public_route_table_ids  = list(string)
   }))
 
   # im using a manual CIDR notation check here because there are no vpc resources in use to validate the CIDR for me.

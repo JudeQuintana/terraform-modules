@@ -17,11 +17,12 @@
 ############################################################################################################
 
 locals {
-  public_label                          = "public"
-  public_az_to_subnet_cidrs             = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
-  public_subnet_cidr_to_az              = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
-  public_subnet_cidr_to_subnet_name     = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
-  public_natgw_az_to_public_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_subnet_cidrs, az)[0] if this.enable_natgw }
+  public_label                           = "public"
+  public_az_to_subnet_cidrs              = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
+  public_subnet_cidr_to_az               = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
+  public_subnet_cidr_to_subnet_name      = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
+  public_az_to_special_subnet_cidr       = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
+  public_natgw_az_to_special_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_special_subnet_cidr, az) if this.enable_natgw }
 }
 
 resource "aws_subnet" "this_public" {
@@ -93,7 +94,7 @@ resource "aws_route_table_association" "this_public" {
 
 # one eip per natgw (one per az)
 resource "aws_eip" "this_public" {
-  for_each = local.public_natgw_az_to_public_subnet_cidr
+  for_each = local.public_natgw_az_to_special_subnet_cidr
 
   vpc = true
   tags = merge(
@@ -123,7 +124,7 @@ resource "aws_eip" "this_public" {
 
 # one natgw per az, put natgw in a single public subnet in relative az if the natgw is enabled for a private subnet
 resource "aws_nat_gateway" "this_public" {
-  for_each = local.public_natgw_az_to_public_subnet_cidr
+  for_each = local.public_natgw_az_to_special_subnet_cidr
 
   allocation_id = lookup(aws_eip.this_public, each.key).id
   subnet_id     = lookup(aws_subnet.this_public, each.value).id

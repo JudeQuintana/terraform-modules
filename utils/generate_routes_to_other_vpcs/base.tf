@@ -3,7 +3,7 @@ locals {
   # { vpc-1-network_cidr => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
   vpc_network_cidr_to_private_and_public_route_table_ids = {
     for this in var.vpcs :
-    this.network_cidr => concat(values(this.az_to_private_route_table_id), values(this.az_to_public_route_table_id))
+    this.network_cidr => concat(this.private_route_table_ids, this.public_route_table_ids)
   }
 
   # [ { rtb_id = "vpc-1-rtb-id-123", other_network_cidrs = [ "other-vpc-2-network_cidr", "other-vpc3-network_cidr", ... ] }, ...]
@@ -24,7 +24,7 @@ locals {
 
   # the better way to serve routes like hotcakes
   # { route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }
-  # need extra toset because there will be dupes per AZ after the flatten call
+  # need extra toset because there will be duplicates per AZ after the flatten call
   routes = toset(flatten(
     [for this in local.associate_private_and_public_route_table_ids_with_other_network_cidrs :
       [for route_table_id_and_network_cidr in setproduct([this.route_table_id], this.other_network_cidrs) : {

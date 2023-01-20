@@ -21,8 +21,9 @@ variable "tiered_vpc" {
         cidr = string
       })), [])
       public_subnets = list(object({
-        name = string
-        cidr = string
+        name    = string
+        cidr    = string
+        special = optional(bool, false)
       }))
     }))
   })
@@ -46,8 +47,8 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = alltrue([for this in var.tiered_vpc.azs : length(this.public_subnets) > 0])
-    error_message = "There must be at least 1 public subnet per AZ in a VPC."
+    condition     = alltrue([for this in var.tiered_vpc.azs : length(this.public_subnets) > 0 && length([for subnet in this.public_subnets : subnet.special if subnet.special]) == 1])
+    error_message = "There must be only one 1 public subnet with a special attribute set to true per AZ in a VPC."
   }
 
   validation {
