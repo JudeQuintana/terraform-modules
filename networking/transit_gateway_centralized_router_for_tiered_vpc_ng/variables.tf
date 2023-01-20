@@ -16,13 +16,13 @@ variable "centralized_router" {
     blackhole_cidrs = optional(list(string), [])
     vpcs = optional(map(object({
       account_id                = string
-      private_route_table_ids   = list(string)
-      public_route_table_ids    = list(string)
-      public_special_subnet_ids = list(string)
       full_name                 = string
       id                        = string
       name                      = string
       network_cidr              = string
+      private_route_table_ids   = list(string)
+      public_route_table_ids    = list(string)
+      public_special_subnet_ids = list(string)
       region                    = string
     })), {})
   })
