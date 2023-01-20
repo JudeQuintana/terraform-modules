@@ -55,7 +55,7 @@ variable "super_router" {
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         }))
-      })), [])
+      })), {})
     })
   })
 
