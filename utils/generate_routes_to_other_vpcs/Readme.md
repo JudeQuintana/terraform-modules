@@ -84,7 +84,7 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr                 = string<br>    az_to_private_route_table_id = map(string)<br>    az_to_public_route_table_id  = map(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr            = string<br>    private_route_table_ids = list(string)<br>    public_route_table_ids  = list(string)<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
