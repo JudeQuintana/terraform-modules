@@ -2,29 +2,20 @@ output "account_id" {
   value = local.account_id
 }
 
-locals {
-  az_to_private_subnet_ids = { for subnet_cidr, this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_az, subnet_cidr) => this.id... } # group subnet_ids by AZ of subnet
-}
-
 output "private_subnet_ids" {
-  value = flatten([for this in local.az_to_private_subnet_ids : this])
+  value = [for this in aws_subnet.this_private : this.id]
 }
 
 output "private_route_table_ids" {
   value = [for this in aws_route_table.this_private : this.id]
 }
 
-locals {
-  az_to_public_subnet_ids     = { for subnet_cidr, this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_az, subnet_cidr) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.this_public.id }                           # Each public subnet shares the same route table
-}
-
 output "public_subnet_ids" {
-  value = flatten([for this in local.az_to_public_subnet_ids : this])
+  value = [for this in aws_subnet.this_public : this.id]
 }
 
 output "public_route_table_ids" {
-  value = [for this in local.az_to_public_route_table_id : this]
+  value = [for this in var.tiered_vpc.azs : aws_route_table.this_public.id] # Each public subnet shares the same route table
 }
 
 output "default_security_group_id" {
