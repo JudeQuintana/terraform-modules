@@ -27,7 +27,7 @@ locals {
   upper_env_prefix = upper(var.env_prefix)
   default_tags = merge({
     Environment = var.env_prefix
-  }, var.tags)
+  })
 
   local_vpc_id_to_network_cidr = { for this in var.super_intra_vpc_security_group_rules.local.vpcs : this.id => this.network }
   peer_vpc_id_to_network_cidr  = { for this in var.super_intra_vpc_security_group_rules.peer.vpcs : this.id => this.network }
