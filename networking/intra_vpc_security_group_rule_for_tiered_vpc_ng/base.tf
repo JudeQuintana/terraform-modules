@@ -24,12 +24,12 @@ locals {
   # complete the security group rule object for each vpc
   vpc_id_to_intra_vpc_security_group_rules = {
     for this in var.intra_vpc_security_group_rule.vpcs :
-    this.id => merge({
-      intra_vpc_security_group_id = this.intra_vpc_security_group_id
-      network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
-      type                        = "ingress"
-      vpc_id                      = this.id # embed vpc id in object for later use
-    }, var.intra_vpc_security_group_rule.rule)
+    this.id => merge(var.intra_vpc_security_group_rule.rule,
+      {
+        intra_vpc_security_group_id = this.intra_vpc_security_group_id
+        network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
+        type                        = "ingress"
+    })
   }
 }
 

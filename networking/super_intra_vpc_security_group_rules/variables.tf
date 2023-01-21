@@ -24,7 +24,6 @@ variable "super_intra_vpc_security_group_rules" {
         network_cidrs               = list(string)
         type                        = string
         region                      = string
-        #vpc_id                     = string
       }))
       vpcs = map(object({
         id           = string
@@ -43,7 +42,7 @@ variable "super_intra_vpc_security_group_rules" {
         intra_vpc_security_group_id = string
         network_cidrs               = list(string)
         type                        = string
-        #vpc_id                      = string
+        region                      = string
       }))
       vpcs = map(object({
         id           = string
@@ -51,7 +50,6 @@ variable "super_intra_vpc_security_group_rules" {
         region       = string
       }))
     })
-
   })
 
   #validations for labels, protocol
