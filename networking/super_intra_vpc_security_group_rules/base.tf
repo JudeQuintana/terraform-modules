@@ -88,23 +88,23 @@ resource "aws_security_group_rule" "this_local" {
   lifecycle {
     # preconditions are evaluated on apply only.
     precondition {
-      condition    = local.local_provider_to_local_vpcs_region_check.condition
-      error_messge = local.local_provider_to_local_vpcs_region_check.error_message
+      condition     = local.local_provider_to_local_vpcs_region_check.condition
+      error_message = local.local_provider_to_local_vpcs_region_check.error_message
     }
 
     precondition {
-      condition    = local.peer_provider_to_peer_vpcs_region_check.condition
-      error_messge = local.peer_provider_to_peer_vpcs_region_check.error_message
+      condition     = local.peer_provider_to_peer_vpcs_region_check.condition
+      error_message = local.peer_provider_to_peer_vpcs_region_check.error_message
     }
 
     precondition {
-      condition    = local.local_provider_to_local_intra_vpc_sg_rule_region_check.condition
-      error_messge = local.local_provider_to_local_intra_vpc_sg_rule_region_check.error_message
+      condition     = local.local_provider_to_local_intra_vpc_sg_rule_region_check.condition
+      error_message = local.local_provider_to_local_intra_vpc_sg_rule_region_check.error_message
     }
 
     precondition {
-      condition    = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.condition
-      error_messge = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.error_message
+      condition     = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.condition
+      error_message = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.error_message
     }
   }
 }
@@ -130,23 +130,23 @@ resource "aws_security_group_rule" "this_peer" {
   lifecycle {
     # preconditions are evaluated on apply only.
     precondition {
-      condition    = local.local_provider_to_local_vpcs_region_check.condition
-      error_messge = local.local_provider_to_local_vpcs_region_check.error_message
+      condition     = local.local_provider_to_local_vpcs_region_check.condition
+      error_message = local.local_provider_to_local_vpcs_region_check.error_message
     }
 
     precondition {
-      condition    = local.peer_provider_to_peer_vpcs_region_check.condition
-      error_messge = local.peer_provider_to_peer_vpcs_region_check.error_message
+      condition     = local.peer_provider_to_peer_vpcs_region_check.condition
+      error_message = local.peer_provider_to_peer_vpcs_region_check.error_message
     }
 
     precondition {
-      condition    = local.local_provider_to_local_intra_vpc_sg_rule_region_check.condition
-      error_messge = local.local_provider_to_local_intra_vpc_sg_rule_region_check.error_message
+      condition     = local.local_provider_to_local_intra_vpc_sg_rule_region_check.condition
+      error_message = local.local_provider_to_local_intra_vpc_sg_rule_region_check.error_message
     }
 
     precondition {
-      condition    = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.condition
-      error_messge = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.error_message
+      condition     = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.condition
+      error_message = local.peer_provider_to_peer_intra_vpc_sg_rule_region_check.error_message
     }
   }
 }
