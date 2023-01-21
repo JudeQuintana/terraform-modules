@@ -23,7 +23,8 @@ variable "super_intra_vpc_security_group_rules" {
         intra_vpc_security_group_id = string
         network_cidrs               = list(string)
         type                        = string
-        #vpc_id                      = string
+        region                      = string
+        #vpc_id                     = string
       }))
       vpcs = map(object({
         id           = string
