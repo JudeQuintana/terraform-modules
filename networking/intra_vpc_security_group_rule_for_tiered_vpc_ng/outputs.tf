@@ -12,6 +12,6 @@ output "vpc_id_to_intra_vpc_security_group_rules" {
 }
 
 output "vpcs" {
-  value = var.vpc_id_to_intra_vpc_security_group_rules.vpcs
+  value = var.intra_vpc_security_group_rules.vpcs
 }
 
