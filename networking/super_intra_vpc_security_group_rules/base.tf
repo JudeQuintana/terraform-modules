@@ -29,8 +29,8 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-  local_vpc_id_to_local_network_cidr = { for this in var.super_intra_vpc_security_group_rules.local.vpcs : this.id => this.network }
-  peer_vpc_id_to_local_network_cidr  = { for this in var.super_intra_vpc_security_group_rules.peer.vpcs : this.id => this.network }
+  local_vpc_id_to_network_cidr = { for this in var.super_intra_vpc_security_group_rules.local.vpcs : this.id => this.network }
+  peer_vpc_id_to_network_cidr  = { for this in var.super_intra_vpc_security_group_rules.peer.vpcs : this.id => this.network }
 
   local_vpc_id_to_peer_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
