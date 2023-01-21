@@ -7,8 +7,7 @@ output "region" {
 }
 
 # using local.intra_vpc_security_group_rules instead of the resource
-# because i have access to the label directly
-output "all" {
-  value = [for this in local.intra_vpc_security_group_rules : this]
+output "vpc_id_to_intra_vpc_security_group_rules" {
+  value = local.vpc_id_to_intra_vpc_security_group_rules
 }
 
