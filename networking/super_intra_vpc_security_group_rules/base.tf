@@ -39,6 +39,18 @@ locals {
     this.id => this.network
   }
 
+  local_vpc_id_to_inbound_network_cidrs = {
+    for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
+    vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
+    if lookup(local.local_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+  }
+
+  peer_vpc_id_to_inbound_network_cidrs = {
+    for vpc_id_and_network_cidr in setproduct(keys(local.peer_vpc_id_to_network_cidr), values(local.local_vpc_id_to_network_cidr)) :
+    vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
+    if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+  }
+
   local_vpc_id_to_local_rule = { for this in var.intra_vpc_security_group_rule.local.all : this.vpc_id => this }
   peer_vpc_id_to_peer_rule   = { for this in var.intra_vpc_security_group_rule.peer.all : this.vpc_id => this }
 
