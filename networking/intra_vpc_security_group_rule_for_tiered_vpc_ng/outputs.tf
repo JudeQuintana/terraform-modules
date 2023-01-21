@@ -11,3 +11,7 @@ output "vpc_id_to_intra_vpc_security_group_rules" {
   value = local.vpc_id_to_intra_vpc_security_group_rules
 }
 
+output "vpcs" {
+  value = var.vpc_id_to_intra_vpc_security_group_rules.vpcs
+}
+
