@@ -7,7 +7,7 @@ output "region" {
 }
 
 # using local.intra_vpc_security_group_rules instead of the resource
-output "vpc_id_to_intra_vpc_security_group_rules" {
+output "vpc_id_to_rule" {
   value = local.vpc_id_to_intra_vpc_security_group_rules
 }
 
