@@ -29,15 +29,8 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
-  local_vpc_id_to_local_networks_cidr = {
-    for this in var.intra_vpc_security_group_rule.local.vpcs :
-    this.id => this.network
-  }
-
-  peer_vpc_id_to_local_networks_cidr = {
-    for this in var.intra_vpc_security_group_rule.peer.vpcs :
-    this.id => this.network
-  }
+  local_vpc_id_to_local_networks_cidr = { for this in var.intra_vpc_security_group_rule.local.vpcs : this.id => this.network }
+  peer_vpc_id_to_local_networks_cidr  = { for this in var.intra_vpc_security_group_rule.peer.vpcs : this.id => this.network }
 
   local_vpc_id_to_peer_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
@@ -86,10 +79,10 @@ resource "aws_security_group_rule" "this_local" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s-%s inbound across VPCs",
+    "%s Env: Allow %s-%s inbound across VPCs that are cross region.",
     upper(var.env_prefix),
     each.value.label,
-    local.region_label
+    local.local_region_label
   )
 
   lifecycle {
@@ -118,10 +111,10 @@ resource "aws_security_group_rule" "this_peer" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s-%s inbound across VPCs",
+    "%s Env: Allow %s-%s inbound across VPCs that are cross region.",
     upper(var.env_prefix),
     each.value.label,
-    local.region_label
+    local.peer_region_label
   )
 
   lifecycle {
