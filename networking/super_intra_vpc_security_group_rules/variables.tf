@@ -9,13 +9,13 @@ variable "region_az_labels" {
 }
 
 variable "super_intra_vpc_security_group_rules" {
-  description = "super intra vpc access configuration"
+  description = "super intra vpc security group rules configuration"
   type = object({
     # security rule object to allow inbound across vpcs intra-vpc security group
     local = object({
       account_id = string
       region     = string
-      all = list(object({
+      vpc_id_to_rule = map(object({
         label                       = string
         protocol                    = string
         from_port                   = number
@@ -23,7 +23,7 @@ variable "super_intra_vpc_security_group_rules" {
         intra_vpc_security_group_id = string
         network_cidrs               = list(string)
         type                        = string
-        vpc_id                      = string
+        #vpc_id                      = string
       }))
       vpcs = map(object({
         id           = string
@@ -34,7 +34,7 @@ variable "super_intra_vpc_security_group_rules" {
     peer = object({
       account_id = string
       region     = string
-      all = list(object({
+      vpc_id_to_rule = map(object({
         label                       = string
         protocol                    = string
         from_port                   = number
@@ -42,7 +42,7 @@ variable "super_intra_vpc_security_group_rules" {
         intra_vpc_security_group_id = string
         network_cidrs               = list(string)
         type                        = string
-        vpc_id                      = string
+        #vpc_id                      = string
       }))
       vpcs = map(object({
         id           = string

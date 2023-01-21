@@ -28,7 +28,7 @@ locals {
       intra_vpc_security_group_id = this.intra_vpc_security_group_id
       network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
       type                        = "ingress"
-      vpc_id                      = this.id # used for output
+      vpc_id                      = this.id # embed vpc id in object for later use
     }, var.intra_vpc_security_group_rule.rule)
   }
 }

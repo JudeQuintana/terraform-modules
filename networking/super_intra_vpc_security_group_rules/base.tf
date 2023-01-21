@@ -39,37 +39,37 @@ locals {
     this.id => this.network
   }
 
-  local_vpc_id_to_inbound_network_cidrs = {
+  local_vpc_id_to_peer_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.local_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  peer_vpc_id_to_inbound_network_cidrs = {
+  peer_vpc_id_to_local_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.peer_vpc_id_to_network_cidr), values(local.local_vpc_id_to_network_cidr)) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  local_vpc_id_to_local_rule = { for this in var.intra_vpc_security_group_rule.local.all : this.vpc_id => this }
-  peer_vpc_id_to_peer_rule   = { for this in var.intra_vpc_security_group_rule.peer.all : this.vpc_id => this }
+  #local_protocol_to_local_rules = { for vpc_id, this in var.intra_vpc_security_group_rule.local.vpc_id_to_rule : this.vpc_id => this }
+  #peer_protocol_to_peer_rules = { for this in var.intra_vpc_security_group_rule.peer.all : this.vpc_id => this }
 
-  local_inbound_network_cidrs = distinct(values(local.local_vpc_id_to_local_networks_cidr))
-  peer_inbound_network_cidrs  = distinct(values(local.peer_vpc_id_to_local_networks_cidr))
+  #local_inbound_network_cidrs = distinct(values(local.local_vpc_id_to_local_networks_cidr))
+  #peer_inbound_network_cidrs  = distinct(values(local.peer_vpc_id_to_local_networks_cidr))
 
   local_vpc_id_to_peer_intra_vpc_security_group_rules = {
-    for this in var.intra_vpc_security_group_rule.peer.vpcs :
-    this.id => merge(
-      lookup(local.local_vpc_id_to_local_rule, this.id),
-      { network_cidrs = local.peer_inbound_network_cidrs }
+    for vpc_id, this in var.local_vpc_id_to_peer_inbound_network_cidrs :
+    vpc_id => merge(
+      lookup(var.intra_vpc_security_group_rule.local.vpc_id_to_rule, vpc_id),
+      { network_cidrs = this }
     )
   }
 
   peer_vpc_id_to_local_intra_vpc_security_group_rules = {
-    for this in var.intra_vpc_security_group_rule.peer.vpcs :
-    this.id => merge(
-      lookup(local.peer_vpc_id_to_local_rule, this.id),
-      { network_cidrs = local.local_inbound_network_cidrs }
+    for vpc_id, this in var.peer_vpc_id_to_local_inbound_network_cidrs :
+    vpc_id => merge(
+      lookup(var.intra_vpc_security_group_rule.local.vpc_id_to_rule, vpc_id),
+      { network_cidrs = this }
     )
   }
 }
@@ -92,13 +92,18 @@ resource "aws_security_group_rule" "this_local" {
     local.region_label
   )
 
-  #lifecycle {
-  ## preconditions are evaluated on apply only.
-  #precondition {
-  #condition     = alltrue([for this in var.intra_vpc_security_group_rule.vpcs : contains([local.region_name], this.region)])
-  #error_message = "All VPC regions must match the aws provider region for Intra VPC Security Group Rules."
-  #}
-  #}
+  lifecycle {
+    # preconditions are evaluated on apply only.
+    precondition {
+      condition    = local.local_provider_to_local_vpcs_region_check.condition
+      error_messge = local.local_provider_to_local_vpcs_region_check.error_message
+    }
+
+    precondition {
+      condition    = local.peer_provider_to_peer_vpcs_region_check.condition
+      error_messge = local.peer_provider_to_peer_vpcs_region_check.error_message
+    }
+  }
 }
 
 resource "aws_security_group_rule" "this_peer" {
@@ -122,8 +127,13 @@ resource "aws_security_group_rule" "this_peer" {
   lifecycle {
     # preconditions are evaluated on apply only.
     precondition {
-      condition     = alltrue([for this in var.intra_vpc_security_group_rule.vpcs : contains([local.region_name], this.region)])
-      error_message = "All VPC regions must match the aws provider region for Intra VPC Security Group Rules."
+      condition    = local.local_provider_to_local_vpcs_region_check.condition
+      error_messge = local.local_provider_to_local_vpcs_region_check.error_message
+    }
+
+    precondition {
+      condition    = local.peer_provider_to_peer_vpcs_region_check.condition
+      error_messge = local.peer_provider_to_peer_vpcs_region_check.error_message
     }
   }
 }
