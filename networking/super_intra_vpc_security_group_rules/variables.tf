@@ -25,6 +25,11 @@ variable "super_intra_vpc_security_group_rules" {
         type                        = string
         vpc_id                      = string
       }))
+      vpcs = map(object({
+        id           = string
+        network_cidr = string
+        region       = string
+      }))
     })
     peer = object({
       account_id = string
@@ -38,6 +43,11 @@ variable "super_intra_vpc_security_group_rules" {
         network_cidrs               = list(string)
         type                        = string
         vpc_id                      = string
+      }))
+      vpcs = map(object({
+        id           = string
+        network_cidr = string
+        region       = string
       }))
     })
 

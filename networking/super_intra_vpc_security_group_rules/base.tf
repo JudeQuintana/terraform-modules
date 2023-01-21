@@ -29,24 +29,34 @@ locals {
     Environment = var.env_prefix
   }, var.tags)
 
+  local_vpc_id_to_local_networks_cidr = {
+    for this in var.intra_vpc_security_group_rule.local.vpcs :
+    this.id => this.network
+  }
+
+  peer_vpc_id_to_local_networks_cidr = {
+    for this in var.intra_vpc_security_group_rule.peer.vpcs :
+    this.id => this.network
+  }
+
   local_vpc_id_to_local_rule = { for this in var.intra_vpc_security_group_rule.local.all : this.vpc_id => this }
   peer_vpc_id_to_peer_rule   = { for this in var.intra_vpc_security_group_rule.peer.all : this.vpc_id => this }
 
-  local_inbound_network_cidrs = distinct(flatten(var.intra_vpc_security_group_rule.local.all[*].network_cidrs))
-  peer_inbound_network_cidrs  = distinct(flatten(var.intra_vpc_security_group_rule.peer.all[*].network_cidrs))
+  local_inbound_network_cidrs = distinct(values(local.local_vpc_id_to_local_networks_cidr))
+  peer_inbound_network_cidrs  = distinct(values(local.peer_vpc_id_to_local_networks_cidr))
 
   local_vpc_id_to_peer_intra_vpc_security_group_rules = {
-    for this in keys(local.local_vpc_id_to_local_rule) :
-    this => merge(
-      lookup(local.local_vpc_id_to_local_rule, this),
+    for this in var.intra_vpc_security_group_rule.peer.vpcs :
+    this.id => merge(
+      lookup(local.local_vpc_id_to_local_rule, this.id),
       { network_cidrs = local.peer_inbound_network_cidrs }
     )
   }
 
   peer_vpc_id_to_local_intra_vpc_security_group_rules = {
-    for this in keys(local.peer_vpc_id_to_peer_rule) :
-    this => merge(
-      lookup(local.peer_vpc_id_to_peer_rule, this),
+    for this in var.intra_vpc_security_group_rule.peer.vpcs :
+    this.id => merge(
+      lookup(local.peer_vpc_id_to_local_rule, this.id),
       { network_cidrs = local.local_inbound_network_cidrs }
     )
   }
