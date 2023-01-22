@@ -24,6 +24,7 @@ variable "intra_vpc_security_group_rule" {
       intra_vpc_security_group_id = string
       network_cidr                = string
       region                      = string
+      account_id                  = string
     }))
   })
 

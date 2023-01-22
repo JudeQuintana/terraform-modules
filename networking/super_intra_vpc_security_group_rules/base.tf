@@ -53,31 +53,42 @@ locals {
     if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  local_vpc_id_to_rule = merge([
-    for this in var.super_intra_vpc_security_group_rules.local :
-    this.vpc_id_to_rule
+  local_rules = [for this in var.super_intra_vpc_security_group_rules.local : this.rule]
+  peer_rules  = [for this in var.super_intra_vpc_security_group_rules.peer : this.rule]
+
+  local_vpc_id_to_intra_vpc_security_group_id = merge([
+    for this in var.super_intra_vpc_security_group_rules.local : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.intra_vpc_security_group_id
+  }]...)
+
+  peer_vpc_id_to_intra_vpc_security_group_id = merge([
+    for this in var.super_intra_vpc_security_group_rules.peer : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.intra_vpc_security_group_id
+  }]...)
+
+  local_vpc_id_to_peer_intra_vpc_security_group_rules = merge([
+    for rule in local.peer_rules : {
+      for vpc_id, this in local.local_vpc_id_to_peer_inbound_network_cidrs :
+      format("%s|%s", vpc_id, rule.label) => merge({
+        intra_vpc_security_group_id = lookup(local.local_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = this
+        type                        = "ingress"
+      }, rule)
+    }
   ]...)
 
-  peer_vpc_id_to_rule = merge([
-    for this in var.super_intra_vpc_security_group_rules.peer :
-    this.vpc_id_to_rule
+  peer_vpc_id_to_local_intra_vpc_security_group_rules = merge([
+    for rule in local.local_rules : {
+      for vpc_id, this in local.peer_vpc_id_to_local_inbound_network_cidrs :
+      format("%s|%s", vpc_id, rule.label) => merge({
+        intra_vpc_security_group_id = lookup(local.peer_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = this
+        type                        = "ingress"
+      }, rule)
+    }
   ]...)
-
-  local_vpc_id_to_peer_intra_vpc_security_group_rules = {
-    for vpc_id, this in local.local_vpc_id_to_peer_inbound_network_cidrs :
-    vpc_id => merge(
-      lookup(local.local_vpc_id_to_rule, vpc_id),
-      { network_cidrs = this }
-    )
-  }
-
-  peer_vpc_id_to_local_intra_vpc_security_group_rules = {
-    for vpc_id, this in local.peer_vpc_id_to_local_inbound_network_cidrs :
-    vpc_id => merge(
-      lookup(local.peer_vpc_id_to_rule, vpc_id),
-      { network_cidrs = this }
-    )
-  }
 }
 
 resource "aws_security_group_rule" "this_local" {
@@ -92,10 +103,11 @@ resource "aws_security_group_rule" "this_local" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s-%s inbound across VPCs that are cross region.",
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
     upper(var.env_prefix),
+    local.local_region_label,
     each.value.label,
-    local.local_region_label
+    local.peer_region_label
   )
 
   lifecycle {
@@ -134,10 +146,11 @@ resource "aws_security_group_rule" "this_peer" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s-%s inbound across VPCs that are cross region.",
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
     upper(var.env_prefix),
+    local.peer_region_label,
     each.value.label,
-    local.peer_region_label
+    local.local_region_label
   )
 
   lifecycle {

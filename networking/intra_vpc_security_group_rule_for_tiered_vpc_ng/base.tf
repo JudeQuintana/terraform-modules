@@ -22,20 +22,19 @@ locals {
   }
 
   # complete the security group rule object for each vpc
-  vpc_id_to_intra_vpc_security_group_rules = {
+  vpc_id_to_intra_vpc_security_group_rule = {
     for this in var.intra_vpc_security_group_rule.vpcs :
     this.id => merge(var.intra_vpc_security_group_rule.rule,
       {
         intra_vpc_security_group_id = this.intra_vpc_security_group_id
         network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
         type                        = "ingress"
-        region                      = local.region_name
     })
   }
 }
 
 resource "aws_security_group_rule" "this" {
-  for_each = local.vpc_id_to_intra_vpc_security_group_rules
+  for_each = local.vpc_id_to_intra_vpc_security_group_rule
 
   security_group_id = each.value.intra_vpc_security_group_id
   cidr_blocks       = each.value.network_cidrs
@@ -44,8 +43,9 @@ resource "aws_security_group_rule" "this" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   description = format(
-    "%s Env: Allow %s-%s inbound across VPCs",
+    "%s-%s: Allow %s inbound from other intra region VPCs in %s.",
     upper(var.env_prefix),
+    local.region_label,
     each.value.label,
     local.region_label
   )
