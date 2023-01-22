@@ -13,7 +13,7 @@ locals {
   }
 
   local_provider_to_local_intra_vpc_sg_rule_region_check = {
-    condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.vpc_id_to_rule : contains([local.local_region_name], this.region)])
+    condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.local.vpc_id_to_rule : contains([local.local_region_name], this.region)])
     error_message = "All Intra VPC Security Group Rules regions must match the aws.local provider alias region for Super Intra VPC Security Group Rules."
   }
 

@@ -12,7 +12,7 @@ variable "super_intra_vpc_security_group_rules" {
   description = "super intra vpc security group rules configuration"
   type = object({
     # security rule object to allow inbound across vpcs intra-vpc security group
-    local = object({
+    local = map(object({
       account_id = string
       region     = string
       vpc_id_to_rule = map(object({
@@ -30,8 +30,8 @@ variable "super_intra_vpc_security_group_rules" {
         network_cidr = string
         region       = string
       }))
-    })
-    peer = object({
+    }))
+    peer = map(object({
       account_id = string
       region     = string
       vpc_id_to_rule = map(object({
@@ -49,7 +49,7 @@ variable "super_intra_vpc_security_group_rules" {
         network_cidr = string
         region       = string
       }))
-    })
+    }))
   })
 
   #validations for labels, protocol
