@@ -29,8 +29,17 @@ locals {
     Environment = var.env_prefix
   })
 
-  local_vpc_id_to_network_cidr = { for this in var.super_intra_vpc_security_group_rules.local.vpcs : this.id => this.network }
-  peer_vpc_id_to_network_cidr  = { for this in var.super_intra_vpc_security_group_rules.peer.vpcs : this.id => this.network }
+  local_vpc_id_to_network_cidr = merge([
+    for this in var.super_intra_vpc_security_group_rules.local : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.network_cidr
+  }]...)
+
+  peer_vpc_id_to_network_cidr = merge([
+    for this in var.super_intra_vpc_security_group_rules.peer : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.network_cidr
+  }]...)
 
   local_vpc_id_to_peer_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
@@ -44,16 +53,20 @@ locals {
     if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  #local_protocol_to_local_rules = { for vpc_id, this in var.intra_vpc_security_group_rule.local.vpc_id_to_rule : this.vpc_id => this }
-  #peer_protocol_to_peer_rules = { for this in var.intra_vpc_security_group_rule.peer.all : this.vpc_id => this }
+  local_vpc_id_to_rule = merge([
+    for this in var.super_intra_vpc_security_group_rules.local :
+    this.vpc_id_to_rule
+  ]...)
 
-  #local_inbound_network_cidrs = distinct(values(local.local_vpc_id_to_local_networks_cidr))
-  #peer_inbound_network_cidrs  = distinct(values(local.peer_vpc_id_to_local_networks_cidr))
+  peer_vpc_id_to_rule = merge([
+    for this in var.super_intra_vpc_security_group_rules.peer :
+    this.vpc_id_to_rule
+  ]...)
 
   local_vpc_id_to_peer_intra_vpc_security_group_rules = {
     for vpc_id, this in local.local_vpc_id_to_peer_inbound_network_cidrs :
     vpc_id => merge(
-      lookup(var.super_intra_vpc_security_group_rules.local.vpc_id_to_rule, vpc_id),
+      lookup(local.local_vpc_id_to_rule, vpc_id),
       { network_cidrs = this }
     )
   }
@@ -61,7 +74,7 @@ locals {
   peer_vpc_id_to_local_intra_vpc_security_group_rules = {
     for vpc_id, this in local.peer_vpc_id_to_local_inbound_network_cidrs :
     vpc_id => merge(
-      lookup(var.super_intra_vpc_security_group_rules.local.vpc_id_to_rule, vpc_id),
+      lookup(local.peer_vpc_id_to_rule, vpc_id),
       { network_cidrs = this }
     )
   }

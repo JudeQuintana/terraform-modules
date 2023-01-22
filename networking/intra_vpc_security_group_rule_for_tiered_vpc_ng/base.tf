@@ -29,6 +29,7 @@ locals {
         intra_vpc_security_group_id = this.intra_vpc_security_group_id
         network_cidrs               = lookup(local.vpc_id_to_inbound_network_cidrs, this.id)
         type                        = "ingress"
+        region                      = local.region_name
     })
   }
 }
