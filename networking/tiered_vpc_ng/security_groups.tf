@@ -1,5 +1,5 @@
 locals {
-  intra_vpc_security_group_name = format("%s-%s-%s-%s", local.upper_env_prefix, local.region_label, var.tiered_vpc.name, "intra-vpc")
+  intra_vpc_security_group_name = format("%s-%s-%s-%s", local.upper_env_prefix, "intra-vpc", var.tiered_vpc.name, local.region_label)
 }
 
 # SG rules will be added to this by the Intra VPC Security Group Rule module for access across VPCs
