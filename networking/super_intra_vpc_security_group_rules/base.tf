@@ -30,13 +30,13 @@ locals {
   })
 
   local_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.local : {
+    for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.network_cidr
   }]...)
 
   peer_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.peer : {
+    for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.network_cidr
   }]...)
@@ -53,17 +53,17 @@ locals {
     if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  local_rules = [for this in var.super_intra_vpc_security_group_rules.local : this.rule]
-  peer_rules  = [for this in var.super_intra_vpc_security_group_rules.peer : this.rule]
+  local_rules = [for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.rule]
+  peer_rules  = [for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.rule]
 
   local_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.local : {
+    for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
   peer_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.peer : {
+    for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)

@@ -22,11 +22,26 @@ variable "intra_vpc_security_group_rule" {
     vpcs = map(object({
       id                          = string
       intra_vpc_security_group_id = string
+      name                        = string
       network_cidr                = string
       region                      = string
       account_id                  = string
     }))
   })
+
+  validation {
+    condition     = length(distinct([for this in var.intra_vpc_security_group_rule.vpcs : this.account_id])) <= 1
+    error_message = "All VPCs must have the same account id as each other."
+  }
+
+  validation {
+    condition = length(distinct([
+      for this in var.intra_vpc_security_group_rule.vpcs : this.name
+      ])) == length([
+      for this in var.intra_vpc_security_group_rule.vpcs : this.name
+    ])
+    error_message = "All VPCs must have unique names."
+  }
 
   validation {
     condition = length(distinct([
