@@ -13,3 +13,4 @@ output "peer" {
     rules      = [for this in local.peer_vpc_id_to_local_intra_vpc_security_group_rules : this]
   }
 }
+

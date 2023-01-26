@@ -68,10 +68,12 @@ locals {
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
+  intra_vpc_security_group_rules_format = "%s|%s"
+
   local_vpc_id_to_peer_intra_vpc_security_group_rules = merge([
     for rule in local.peer_rules : {
       for vpc_id, this in local.local_vpc_id_to_peer_inbound_network_cidrs :
-      format("%s|%s", vpc_id, rule.label) => merge({
+      format(local.intra_vpc_security_group_rules_format, vpc_id, rule.label) => merge({
         intra_vpc_security_group_id = lookup(local.local_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = this
         type                        = "ingress"
@@ -82,7 +84,7 @@ locals {
   peer_vpc_id_to_local_intra_vpc_security_group_rules = merge([
     for rule in local.local_rules : {
       for vpc_id, this in local.peer_vpc_id_to_local_inbound_network_cidrs :
-      format("%s|%s", vpc_id, rule.label) => merge({
+      format(local.intra_vpc_security_group_rules_format, vpc_id, rule.label) => merge({
         intra_vpc_security_group_id = lookup(local.peer_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = this
         type                        = "ingress"
