@@ -35,6 +35,11 @@ variable "intra_vpc_security_group_rule" {
   }
 
   validation {
+    condition     = length(distinct([for this in var.intra_vpc_security_group_rule.vpcs : this.region])) <= 1
+    error_message = "All VPCs must have the same region as each other."
+  }
+
+  validation {
     condition = length(distinct([
       for this in var.intra_vpc_security_group_rule.vpcs : this.name
       ])) == length([
