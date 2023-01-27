@@ -46,19 +46,42 @@ variable "super_intra_vpc_security_group_rules" {
     })) })
   })
 
-  #validations for labels, protocol, regions, account_id
-  # Local Rules
-
   # Local VPCs
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.region
+    ]))) <= 1
+    error_message = "All local Intra VPC Security Group Rules must have the same region as each other and the aws.local provider alias for Super Intra VPC Security Group Rules."
+  }
+
   validation {
     condition = length(distinct(flatten([
       for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.account_id
     ]))) <= 1
-    error_message = "All local Intra VPC Security Group Rules must have the same account id as each other and the aws.local provider alias."
+    error_message = "All local Intra VPC Security Group Rules must have the same account id as each other and the aws.local provider alias for Super Intra VPC Security Group Rules."
   }
 
   validation {
     condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : length(this.vpcs) > 1])
-    error_message = "There must be at least 2 local VPCs per Intra VPC Security Group Rule."
+    error_message = "There must be at least 2 local VPCs per local Intra VPC Security Group Rule."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.region
+    ]))) <= 1
+    error_message = "All peer Intra VPC Security Group Rules must have the same region as each other and the aws.peer provider alias for Super Intra VPC Security Group Rules."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.account_id
+    ]))) <= 1
+    error_message = "All peer Intra VPC Security Group Rules must have the same account id as each other and the aws.peer provider alias for Super Intra VPC Security Group Rules."
+  }
+
+  validation {
+    condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : length(this.vpcs) > 1])
+    error_message = "There must be at least 2 peer VPCs per peer Intra VPC Security Group Rule."
   }
 }
