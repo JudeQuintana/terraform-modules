@@ -55,8 +55,18 @@ resource "aws_ec2_transit_gateway" "this_local" {
     }
 
     precondition {
+      condition     = local.local_provider_to_local_tgws_account_id_check.condition
+      error_message = local.local_provider_to_local_tgws_account_id_check.error_message
+    }
+
+    precondition {
       condition     = local.peer_provider_to_peer_tgws_region_check.condition
       error_message = local.peer_provider_to_peer_tgws_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_tgws_account_id_check.condition
+      error_message = local.peer_provider_to_peer_tgws_account_id_check.error_message
     }
   }
 }
@@ -82,8 +92,18 @@ resource "aws_ec2_transit_gateway" "this_peer" {
     }
 
     precondition {
+      condition     = local.local_provider_to_local_tgws_account_id_check.condition
+      error_message = local.local_provider_to_local_tgws_account_id_check.error_message
+    }
+
+    precondition {
       condition     = local.peer_provider_to_peer_tgws_region_check.condition
       error_message = local.peer_provider_to_peer_tgws_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_tgws_account_id_check.condition
+      error_message = local.peer_provider_to_peer_tgws_account_id_check.error_message
     }
   }
 }
