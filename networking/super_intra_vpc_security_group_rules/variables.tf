@@ -22,8 +22,6 @@ variable "super_intra_vpc_security_group_rules" {
           from_port = number
           to_port   = number
         })
-        vpc_names         = list(string)
-        vpc_network_cidrs = list(string)
         vpcs = map(object({
           id                          = string
           intra_vpc_security_group_id = string
@@ -40,8 +38,6 @@ variable "super_intra_vpc_security_group_rules" {
           from_port = number
           to_port   = number
         })
-        vpc_names         = list(string)
-        vpc_network_cidrs = list(string)
         vpcs = map(object({
           id                          = string
           intra_vpc_security_group_id = string
@@ -64,28 +60,5 @@ variable "super_intra_vpc_security_group_rules" {
   validation {
     condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : length(this.vpcs) > 1])
     error_message = "There must be at least 2 local VPCs per Intra VPC Security Group Rule."
-  }
-
-  # should i keep these last 2 validations?
-  validation {
-    condition = length(distinct(setunion([
-      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules :
-      this.vpc_names
-      ]))) == length(setunion([
-      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules :
-      this.vpc_names
-    ]))
-    error_message = "All local VPCs must have unique names."
-  }
-
-  validation {
-    condition = length(distinct(setunion([
-      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules :
-      this.vpc_network_cidrs
-      ]))) == length(setunion([
-      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules :
-      this.vpc_network_cidrs
-    ]))
-    error_message = "All local VPCs must have unique network CIDRs."
   }
 }
