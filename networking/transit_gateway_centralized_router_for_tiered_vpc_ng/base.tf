@@ -37,6 +37,11 @@ resource "aws_ec2_transit_gateway" "this" {
       condition     = alltrue([for this in var.centralized_router.vpcs : contains([local.region_name], this.region)])
       error_message = "All VPC regions must match the aws provider region for Centralized Router."
     }
+
+    precondition {
+      condition     = alltrue([for this in var.centralized_router.vpcs : contains([local.account_id], this.account_id)])
+      error_message = "All VPC account ID must match the aws provider account ID for Centralized Router."
+    }
   }
 }
 
