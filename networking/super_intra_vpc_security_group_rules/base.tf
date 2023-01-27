@@ -118,10 +118,19 @@ resource "aws_security_group_rule" "this_local" {
       condition     = local.local_provider_to_local_intra_vpc_security_group_rules_region_check.condition
       error_message = local.local_provider_to_local_intra_vpc_security_group_rules_region_check.error_message
     }
+    precondition {
+      condition     = local.local_provider_to_local_intra_vpc_security_group_rules_account_id_check.condition
+      error_message = local.local_provider_to_local_intra_vpc_security_group_rules_account_id_check.error_message
+    }
 
     precondition {
       condition     = local.peer_provider_to_peer_intra_vpc_security_group_rules_region_check.condition
       error_message = local.peer_provider_to_peer_intra_vpc_security_group_rules_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_intra_vpc_security_group_rules_account_id_check.condition
+      error_message = local.peer_provider_to_peer_intra_vpc_security_group_rules_account_id_check.error_message
     }
   }
 }
@@ -153,8 +162,18 @@ resource "aws_security_group_rule" "this_peer" {
     }
 
     precondition {
+      condition     = local.local_provider_to_local_intra_vpc_security_group_rules_account_id_check.condition
+      error_message = local.local_provider_to_local_intra_vpc_security_group_rules_account_id_check.error_message
+    }
+
+    precondition {
       condition     = local.peer_provider_to_peer_intra_vpc_security_group_rules_region_check.condition
       error_message = local.peer_provider_to_peer_intra_vpc_security_group_rules_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.peer_provider_to_peer_intra_vpc_security_group_rules_account_id_check.condition
+      error_message = local.peer_provider_to_peer_intra_vpc_security_group_rules_account_id_check.error_message
     }
   }
 }
