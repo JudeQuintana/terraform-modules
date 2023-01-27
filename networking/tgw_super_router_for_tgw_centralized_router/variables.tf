@@ -22,6 +22,7 @@ variable "super_router" {
         id                = string
         region            = string
         route_table_id    = string
+        vpc_names         = list(string)
         vpc_network_cidrs = list(string)
         vpc_routes = list(object({
           route_table_id         = string
@@ -44,6 +45,7 @@ variable "super_router" {
         id                = string
         region            = string
         route_table_id    = string
+        vpc_names         = list(string)
         vpc_network_cidrs = list(string)
         vpc_routes = list(object({
           route_table_id         = string
@@ -63,17 +65,17 @@ variable "super_router" {
     condition = length(
       distinct([for this in var.super_router.local.centralized_routers : this.amazon_side_asn])
     ) == length([for this in var.super_router.local.centralized_routers : this.amazon_side_asn])
-    error_message = "All local centralized routers must have a unique amazon_side_asn number."
+    error_message = "All local Centralized Routers must have a unique amazon side ASN number."
   }
 
   validation {
     condition     = length(distinct([for this in var.super_router.local.centralized_routers : this.region])) <= 1
-    error_message = "All local centralized routers must have the same region as each other and the aws.local provider alias."
+    error_message = "All local Centralized Routers must have the same region as each other and the aws.local provider alias for Super Router."
   }
 
   validation {
     condition     = length(distinct([for this in var.super_router.local.centralized_routers : this.account_id])) <= 1
-    error_message = "All local centralized routers must have the same account id as each other and the aws.local provider alias."
+    error_message = "All local Centralized Routers must have the same account id as each other and the aws.local provider alias for Super Router."
   }
 
   validation {
@@ -82,24 +84,24 @@ variable "super_router" {
       ) || (
       var.super_router.local.amazon_side_asn >= 4200000000 && var.super_router.local.amazon_side_asn <= 4294967294
     )
-    error_message = "The local super router amazon_side_asn should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+    error_message = "The local Super Router amazon side ASNs should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
   }
 
   validation {
     condition = length(
       distinct([for this in var.super_router.peer.centralized_routers : this.amazon_side_asn])
     ) == length([for this in var.super_router.peer.centralized_routers : this.amazon_side_asn])
-    error_message = "All peer centralized routers must have a unique amazon_side_asn number."
+    error_message = "All peer Centralized Routers must have a unique amazon side ASN number."
   }
 
   validation {
-    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.region])) < 2
-    error_message = "All peer centralized routers must have the same region as each other and the aws.peer provider alias."
+    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.region])) <= 1
+    error_message = "All peer Centralized Routers must have the same region as each other and the aws.peer provider alias for Super Router."
   }
 
   validation {
-    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.account_id])) < 2
-    error_message = "All peer centralized couters must have the same account id as each other and the aws.peer provider alias."
+    condition     = length(distinct([for this in var.super_router.peer.centralized_routers : this.account_id])) <= 1
+    error_message = "All peer Centralized Routers must have the same account id as each other and the aws.peer provider alias for Super Router."
   }
 
   validation {
@@ -108,14 +110,22 @@ variable "super_router" {
       ) || (
       var.super_router.peer.amazon_side_asn >= 4200000000 && var.super_router.peer.amazon_side_asn <= 4294967294
     )
-    error_message = "The peer super router amazon_side_asn should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+    error_message = "The peer Super Router amazon side ASNs should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+  }
+
+  # cross region checks
+  validation {
+    condition = length(
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_names])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_names])))
+    error_message = "All VPC names must be unique across regions."
   }
 
   validation {
     condition = length(
       distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
     ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
-    error_message = "All VPC network_cidrs must be unique across regions."
+    error_message = "All VPC network CIDRs must be unique across regions."
   }
 
   validation {

@@ -30,6 +30,10 @@ output "route_table_id" {
   value = aws_ec2_transit_gateway_route_table.this.id
 }
 
+output "vpc_names" {
+  value = [for this in var.centralized_router.vpcs : this.name]
+}
+
 output "vpc_network_cidrs" {
   value = [for this in var.centralized_router.vpcs : this.network_cidr]
 }
