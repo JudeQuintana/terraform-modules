@@ -30,10 +30,11 @@ resource "aws_subnet" "this_private" {
       Name = format(
         "%s-%s-%s-%s-%s",
         local.upper_env_prefix,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key))),
         var.tiered_vpc.name,
         local.private_label,
-        each.value
+        each.value,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key)))
+
       )
   })
 }
@@ -49,9 +50,9 @@ resource "aws_route_table" "this_private" {
       Name = format(
         "%s-%s-%s-%s",
         local.upper_env_prefix,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
         var.tiered_vpc.name,
-        local.private_label
+        local.private_label,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
       )
   })
 }

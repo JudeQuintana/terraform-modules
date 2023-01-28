@@ -38,10 +38,10 @@ resource "aws_subnet" "this_public" {
       Name = format(
         "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))),
         var.tiered_vpc.name,
         local.public_label,
-        each.value
+        each.value,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))),
       )
   })
 }
@@ -55,10 +55,10 @@ resource "aws_route_table" "this_public" {
       Name = format(
         "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
-        local.region_label,
         var.tiered_vpc.name,
         local.public_label,
-        "all"
+        "all",
+        local.region_label
       )
   })
 }
@@ -103,9 +103,9 @@ resource "aws_eip" "this_public" {
       Name = format(
         "%s-%s-%s-%s",
         local.upper_env_prefix,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
         var.tiered_vpc.name,
-        local.public_label
+        local.public_label,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
       )
   })
 }
@@ -133,9 +133,9 @@ resource "aws_nat_gateway" "this_public" {
       Name = format(
         "%s-%s-%s-%s",
         local.upper_env_prefix,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
         var.tiered_vpc.name,
-        local.public_label
+        local.public_label,
+        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
       )
   })
 
