@@ -46,7 +46,6 @@ variable "super_intra_vpc_security_group_rules" {
     })) })
   })
 
-  # Local VPCs
   validation {
     condition = length(distinct(flatten([
       for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.region
@@ -66,6 +65,7 @@ variable "super_intra_vpc_security_group_rules" {
     error_message = "There must be at least 2 local VPCs per local Intra VPC Security Group Rule."
   }
 
+  # Peer
   validation {
     condition = length(distinct(flatten([
       for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.region
@@ -83,5 +83,15 @@ variable "super_intra_vpc_security_group_rules" {
   validation {
     condition     = alltrue([for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : length(this.vpcs) > 1])
     error_message = "There must be at least 2 peer VPCs per peer Intra VPC Security Group Rule."
+  }
+
+  # cross region rules check
+  validation {
+    condition = [
+      for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.rule
+      ] == [
+      for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.rule
+    ]
+    error_message = "The local Intra VPC Security Group Rules must have the same set of rules as the peer The local Intra VPC Security Group Rules for Super Intra VPC Security Group Rules."
   }
 }
