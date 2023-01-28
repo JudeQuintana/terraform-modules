@@ -18,6 +18,6 @@ locals {
 
   peer_provider_to_peer_tgws_account_id_check = {
     condition     = alltrue([for this in local.peer_tgws[*].account_id : contains([local.peer_account_id], this)])
-    error_message = "All local Centralized Router account IDs must match the aws.peer provider alias account ID for Super Router."
+    error_message = "All peer Centralized Router account IDs must match the aws.peer provider alias account ID for Super Router."
   }
 }
