@@ -20,6 +20,7 @@ variable "super_router" {
         amazon_side_asn   = string
         full_name         = string
         id                = string
+        name              = string
         region            = string
         route_table_id    = string
         vpc_names         = list(string)
@@ -43,6 +44,7 @@ variable "super_router" {
         amazon_side_asn   = string
         full_name         = string
         id                = string
+        name              = string
         region            = string
         route_table_id    = string
         vpc_names         = list(string)
@@ -60,6 +62,13 @@ variable "super_router" {
       })), {})
     })
   })
+
+  validation {
+    condition = length(
+      distinct([for this in var.super_router.local.centralized_routers : this.name])
+    ) == length([for this in var.super_router.local.centralized_routers : this.name])
+    error_message = "All local Centralized Routers must have a unique names."
+  }
 
   validation {
     condition = length(
@@ -85,6 +94,13 @@ variable "super_router" {
       var.super_router.local.amazon_side_asn >= 4200000000 && var.super_router.local.amazon_side_asn <= 4294967294
     )
     error_message = "The local Super Router amazon side ASNs should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+  }
+
+  validation {
+    condition = length(
+      distinct([for this in var.super_router.peer.centralized_routers : this.name])
+    ) == length([for this in var.super_router.peer.centralized_routers : this.name])
+    error_message = "All peer Centralized Routers must have a unique names."
   }
 
   validation {
@@ -126,6 +142,13 @@ variable "super_router" {
       distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
     ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
     error_message = "All VPC network CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat([for this in var.super_router.local.centralized_routers : this.name], [for this in var.super_router.peer.centralized_routers : this.name]))
+    ) == length(concat([for this in var.super_router.local.centralized_routers : this.name], [for this in var.super_router.peer.centralized_routers : this.name]))
+    error_message = "All Centralized Router names must be unique across regions."
   }
 
   validation {
