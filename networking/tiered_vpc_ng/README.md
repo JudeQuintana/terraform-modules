@@ -31,6 +31,10 @@ Baseline Tiered VPC-NG features (same as prototype):
   - I highly recommend naming and allocating a small subnet like a /28 and setting it's special attribute to true (ie `public_subnets = [{name = "natwgw", cidr = "10.0.9.64/28", special = true}, {name = "haproxy1", cidr = "10.0.10.0/24"}]`.
   - Subnets can only be deleted when they are not in use (ie natgws, vpc attachment, ec2 instances, or some other aws server).
 
+- Recommendations:
+  - all vpc names and network cidrs should be unique across regions
+  - the routers will enforce uniqueness along with other validations
+
 Example:
 ```
 locals {
@@ -41,11 +45,11 @@ locals {
       azs = {
         a = {
           private_subnets = [
-            { name = "cluster1", cidr = "10.0.0.0/24" },
+            { name = "cluster1", cidr = "10.0.0.0/24" }
           ]
           public_subnets = [
             { name = "random1", cidr = "10.0.3.0/28" },
-            { name = "haproxy1", cidr = "10.0.4.0/26" },
+            { name = "haproxy1", cidr = "10.0.4.0/26" }
             { name = "natgw", cidr = "10.0.10.0/28", special = true }
           ]
         }
@@ -84,7 +88,7 @@ locals {
             { name = "db1", cidr = "192.168.10.0/24" }
           ]
           public_subnets = [
-            { name = "random1", cidr = "192.168.13.0/28", special = true },
+            { name = "random1", cidr = "192.168.13.0/28", special = true }
           ]
         }
       }

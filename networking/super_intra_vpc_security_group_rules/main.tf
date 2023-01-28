@@ -1,6 +1,12 @@
 /*
+* # Super Intra VPC Secuity Group Rules Description
+* - This allowing inbound protocols across regions based on rules (ie ssh, icmp, etc) that
+*   were used in each intra_vpc_security_group_rules modules for all vpcs in each region.
+*
+* - See [security_group_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_demo/security_group_rules.tf) in the [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo).
+*
+* Example:
 * ```
-* # allowing ssh and ping communication across regions
 * module "super_intra_vpc_security_group_rules_usw2_to_use1" {
 *   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/super_intra_vpc_security_group_rules?ref=moar-better"
 *

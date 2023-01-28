@@ -38,7 +38,7 @@ variable "tiered_vpc" {
       "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
       var.tiered_vpc.network_cidr
     ))
-    error_message = "The VPC network_cidr must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
+    error_message = "The VPC network CIDR must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
   }
 
   validation {
