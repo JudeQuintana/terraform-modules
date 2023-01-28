@@ -92,6 +92,7 @@ variable "super_intra_vpc_security_group_rules" {
       ] == [
       for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.rule
     ]
-    error_message = "The local Intra VPC Security Group Rules must have the same set of rules as the peer The local Intra VPC Security Group Rules for Super Intra VPC Security Group Rules."
+    error_message = "The local Intra VPC Security Group Rules must have the same set of rules as the peer Intra VPC Security Group Rules for Super Intra VPC Security Group Rules."
   }
 }
+
