@@ -41,7 +41,7 @@ resource "aws_subnet" "this_public" {
         var.tiered_vpc.name,
         local.public_label,
         each.value,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))),
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key)))
       )
   })
 }
@@ -135,7 +135,7 @@ resource "aws_nat_gateway" "this_public" {
         local.upper_env_prefix,
         var.tiered_vpc.name,
         local.public_label,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key)),
+        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
       )
   })
 
