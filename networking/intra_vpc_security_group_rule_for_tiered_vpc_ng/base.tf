@@ -1,12 +1,12 @@
 # Pull caller identity data from provider
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "this" {}
 
 # Pull region data from provider
-data "aws_region" "current" {}
+data "aws_region" "this" {}
 
 locals {
-  account_id   = data.aws_caller_identity.current.account_id
-  region_name  = data.aws_region.current.name
+  account_id   = data.aws_caller_identity.this.account_id
+  region_name  = data.aws_region.this.name
   region_label = lookup(var.region_az_labels, local.region_name)
 
   # Each VPC id should have an inbound rule from all other VPC networks except itself.
