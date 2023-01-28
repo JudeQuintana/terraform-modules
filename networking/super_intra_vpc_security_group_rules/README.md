@@ -1,6 +1,7 @@
 # Super Intra VPC Secuity Group Rules Description
 - This allowing inbound protocols across regions based on rules (ie ssh, icmp, etc) that
   were used in each intra\_vpc\_security\_group\_rules modules for all vpcs in each region.
+- Rule sets for local and peer should be the same. also enforce by validation
 
 - See [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_demo/security_group_rules.tf) in the [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo).
 
