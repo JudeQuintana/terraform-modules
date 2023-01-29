@@ -153,9 +153,9 @@ variable "super_router" {
 
   validation {
     condition = length(
-      distinct(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
-    ) == length(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn]))
-    error_message = "All amazon side ASNs must be unique across regions."
+      distinct(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [var.super_router.local.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn], [var.super_router.peer.amazon_side_asn]))
+    ) == length(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [var.super_router.local.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn], [var.super_router.peer.amazon_side_asn]))
+    error_message = "All Centralized Routers and Super Router amazon side ASNs must be unique across regions."
   }
 }
 
