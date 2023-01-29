@@ -1,8 +1,10 @@
 locals {
-  # collect the first public subnet for each az per tiered vpc to be used for each vpc attachment.
-  # i'm using public subnets because they will always exist for a tiered vpc.
-  # this means routing will go through a public subnet to get to a private subnet in the same AZ
-  # i'm not sure about security implications of this pattern but i dont think it matters.
+  # Collect the first public subnet for each az per tiered vpc to be used for each vpc attachment.
+  # I'm using public subnets because they will always exist for a tiered vpc.
+  # This means VPC attachments will use one public subnet from each AZ to route traffic.
+  # This enables traffic to reach resources in every subnet in that AZ.
+  # The public subnet that it will use will be only one with the special attibute set to true per AZ ie `special = true`.
+  # I'm not sure about security implications of this pattern but I dont think it matters.
   #
   # { vpc-1-id  = [ "special-public-subnet-id-of-az-1-for-vpc-1", "special-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
   vpc_id_to_public_special_subnet_ids = { for this in var.centralized_router.vpcs : this.id => this.public_special_subnet_ids }
