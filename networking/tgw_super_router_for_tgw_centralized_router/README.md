@@ -39,7 +39,7 @@ module "super_router_usw2_to_use1" {
 *
 ```
 
-![super-router](https://jq1.io/img/super-refactor-shokunin.png)
+![super-router](https://jq1.io/img/Super_Router_Shokunin.png)
 
 ## Requirements
 

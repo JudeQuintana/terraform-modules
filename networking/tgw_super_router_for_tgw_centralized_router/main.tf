@@ -39,5 +39,5 @@
 *
 *```
 *
-* ![super-router](https://jq1.io/img/super-refactor-shokunin.png)
+* ![super-router](https://jq1.io/img/Super_Router_Shokunin.png)
 */
