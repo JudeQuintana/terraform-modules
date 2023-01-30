@@ -19,7 +19,7 @@
 * - Public subnets now have a special attribute option.
 *   - Only one can have `special = true` which enables 3 things:
 *   - Associate a NAT Gateway if `enable_natgw = true`.
-    - Use for associating VPC attatchments when Tiered VPC is passed to a Centralized Router (one in each AZ).
+*   - Use for associating VPC attatchments when Tiered VPC is passed to a Centralized Router (one in each AZ).
 *   - Existing public subnets can be rearranged in any order in their repective subnet list without forcing new resources.
 *   - The trade off is always having to allocate one public subnet per AZ, even if you don’t need to use it (ie using private subnets only).
 * - Important:
