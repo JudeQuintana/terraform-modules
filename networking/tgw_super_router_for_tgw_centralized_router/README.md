@@ -3,9 +3,9 @@ This is a follow up to the [generating routes post](https://jq1.io/posts/generat
 
 Original Blog Post: [Super Powered, Super Sharp, Super Router!](https://jq1.io/posts/super_router/)
 
-See the new [$init super refactor](https://jq1.io/posts/init_super_refactor/) blog post for moar deets on the refactor!
+Fresh new decentralized design in [$init super refactor](https://jq1.io/posts/init_super_refactor/).
 
-[Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo)
+New features means new steez in [Slappin chrome on the WIP'](https://jq1.io/posts/slappin_chrome_on_the_wip/)!
 
 Super Router provides both intra-region and cross-region peering and routing for Centralized Routers and Tiered VPCs (same AWS account only, no cross account).
 
