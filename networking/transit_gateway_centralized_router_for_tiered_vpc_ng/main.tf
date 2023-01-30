@@ -1,12 +1,4 @@
 /*
-* # Networking Trifecta Demo
-* Blog Post:
-* [Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
-*
-* Main:
-* - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-  * - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
-*
 * # Transit Gateway Centralized Router Description
 * - This Transit Gateway Centralized Router module will use the first public subnet in the list for each AZ of that VPC for the VPC attachments to all AZs.
 * - All attachments will be associated and routes propagated to one TGW Route Table.
@@ -28,4 +20,13 @@
 *   }
 * }
 * ```
+*
+* # Networking Trifecta Demo
+* Blog Post:
+* [Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
+*
+* Main:
+* - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
+  * - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
+*
 */

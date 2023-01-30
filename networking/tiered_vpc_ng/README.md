@@ -1,11 +1,3 @@
-# Networking Trifecta Demo
-Blog Post:
-[Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
-
-Main:
-- [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
-
 # Tiered VPC-NG Description
 Baseline Tiered VPC-NG features (same as prototype):
 
@@ -106,6 +98,14 @@ module "vpcs" {
   tiered_vpc       = each.value
 }
 ```
+
+# Networking Trifecta Demo
+Blog Post:
+[Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
+
+Main:
+- [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
+  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
 ## Requirements
 
