@@ -10,33 +10,33 @@ terraform {
 locals {
   tiered_vpcs = {
     app = {
-      az_to_private_route_table_id = {
-        a = "rtb-0468efad92cd62ab8"
-        b = "rtb-02ad79df1a7c192e7"
-      }
-      az_to_public_route_table_id = {
-        a = "rtb-06b216fb818494594"
-        b = "rtb-06b216fb818494594"
-      }
-      network = "10.0.0.0/20"
+      network_cidr = "10.0.0.0/20"
+      private_route_table_ids = [
+        "rtb-0468efad92cd62ab8",
+        "rtb-02ad79df1a7c192e7"
+      ]
+      public_route_table_ids = [
+        "rtb-06b216fb818494594",
+        "rtb-06b216fb818494594"
+      ]
     }
     cicd = {
-      az_to_private_route_table_id = {
-        a = "rtb-0f8deb7a6682793e2"
-      }
-      az_to_public_route_table_id = {
-        a = "rtb-09a4481eb3684abba"
-      }
-      network = "172.31.0.0/20"
+      network_cidr = "172.31.0.0/20"
+      private_route_table_ids = [
+        "rtb-0f8deb7a6682793e2"
+      ]
+      public_route_table_ids = [
+        "rtb-09a4481eb3684abba"
+      ]
     }
     general = {
-      az_to_private_route_table_id = {
-        c = "rtb-01e5ec4882154a9a1"
-      }
-      az_to_public_route_table_id = {
-        c = "rtb-0ad6cde89a9e386fd"
-      }
-      network = "192.168.0.0/20"
+      network_cidr = "192.168.0.0/20"
+      private_route_table_ids = [
+        "rtb-01e5ec4882154a9a1"
+      ]
+      public_route_table_ids = [
+        "rtb-0ad6cde89a9e386fd"
+      ]
     }
   }
 }
@@ -145,15 +145,15 @@ resource "test_assertions" "generate_routes_to_other_vpcs_call_with_n_greater_th
 locals {
   one_tiered_vpc = {
     app = {
-      az_to_private_route_table_id = {
-        a = "rtb-0468efad92cd62ab8"
-        b = "rtb-02ad79df1a7c192e7"
-      }
-      az_to_public_route_table_id = {
-        a = "rtb-06b216fb818494594"
-        b = "rtb-06b216fb818494594"
-      }
-      network = "10.0.0.0/20"
+      network_cidr = "10.0.0.0/20"
+      private_route_table_ids = [
+        "rtb-0468efad92cd62ab8",
+        "rtb-02ad79df1a7c192e7"
+      ]
+      public_route_table_ids = [
+        "rtb-06b216fb818494594",
+        "rtb-06b216fb818494594"
+      ]
     }
   }
 }

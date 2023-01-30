@@ -66,22 +66,29 @@ The test suite will help when refactoring is needed.
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
+No providers.
+
+## Modules
+
+No modules.
+
+## Resources
+
+No resources.
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| vpcs | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network                      = string<br>    az_to_private_route_table_id = map(string)<br>    az_to_public_route_table_id  = map(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr            = string<br>    private_route_table_ids = list(string)<br>    public_route_table_ids  = list(string)<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| call | n/a |
-| call_legacy | n/a |
+| <a name="output_call"></a> [call](#output\_call) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
+| <a name="output_call_legacy"></a> [call\_legacy](#output\_call\_legacy) | deprecated { "route-table-id\|route" => "route", ... } |

@@ -1,8 +1,8 @@
-# Create routes to other VPC networks in private and public route tables for each VPC
+# Create routes to other VPC network_cidrs in private and public route tables for each VPC
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.1"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.6"
 
-  vpcs = var.vpcs
+  vpcs = var.centralized_router.vpcs
 }
 
 locals {
@@ -12,7 +12,7 @@ locals {
   }
 }
 
-resource "aws_route" "this" {
+resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   for_each = local.vpc_routes_to_other_vpcs
 
   route_table_id         = each.value.route_table_id

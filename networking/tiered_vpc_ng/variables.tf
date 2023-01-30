@@ -8,38 +8,25 @@ variable "region_az_labels" {
   type        = map(string)
 }
 
-variable "tags" {
-  description = "Additional Tags"
-  type        = map(string)
-  default     = {}
-}
-
-variable "tier" {
+variable "tiered_vpc" {
+  description = "Tiered VPC configuration"
   type = object({
+    name         = string
+    network_cidr = string
+    tenancy      = optional(string, "default")
     azs = map(object({
       enable_natgw = optional(bool, false)
-      private      = list(string)
-      public       = list(string)
+      private_subnets = optional(list(object({
+        name = string
+        cidr = string
+      })), [])
+      public_subnets = list(object({
+        name    = string
+        cidr    = string
+        special = optional(bool, false)
+      }))
     }))
-    name    = string
-    network = string
-    tenancy = optional(string, "default")
   })
-
-  # Requiring at least one public subnet allows for
-  # making it easy for `enable_natgw = true` so we
-  # can build everything needed for adding a natgw automatically
-  # ie EIP, update route tables, associate public subnet
-  # it also makes it easy to select and attach AZs to the
-  # TGW Centralized router since it has to be one subnet
-  # either public or private
-  validation {
-    condition = length([
-      for az in var.tier.azs : true
-      if length(az.public) > 0
-    ]) == length(var.tier.azs)
-    error_message = "There must be at least 1 public subnet per az."
-  }
 
   # This is an example of validating CIDR notation
   # I don't think its really needed because the provider
@@ -47,7 +34,44 @@ variable "tier" {
   # the aws provider will error on validate cidr subnets too.
   # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
   validation {
-    condition     = can(regex("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$", var.tier.network))
-    error_message = "Tier network must be in valid cidr notation ie 10.46.0.0/20, x.x.x.x/xx ."
+    condition = can(regex(
+      "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
+      var.tiered_vpc.network_cidr
+    ))
+    error_message = "The VPC network CIDR must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
   }
+
+  validation {
+    condition     = alltrue([for this in keys(var.tiered_vpc.azs) : contains(["a", "b", "c", "e", "f"], this)])
+    error_message = "The AZ key should be a single character for the AZ. a,b,c,d,e or f."
+  }
+
+  validation {
+    condition     = alltrue([for this in var.tiered_vpc.azs : length(this.public_subnets) > 0 && length([for subnet in this.public_subnets : subnet.special if subnet.special]) == 1])
+    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a VPC."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
+      ]))) == length(flatten([
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
+    ]))
+    error_message = "Each subnet name must be unique across all AZs in a VPC."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
+      ]))) == length(flatten([
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
+    ]))
+    error_message = "Each subnet CDIR must be unique across all AZs in a VPC."
+  }
+}
+
+variable "tags" {
+  description = "Additional Tags"
+  type        = map(string)
+  default     = {}
 }

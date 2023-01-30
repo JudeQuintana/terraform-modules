@@ -2,30 +2,6 @@ output "account_id" {
   value = local.account_id
 }
 
-locals {
-  az_to_private_subnet_ids     = { for subnet, this in aws_subnet.private : lookup(local.private_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_private_route_table_id = { for az, route_table in aws_route_table.private : az => route_table.id }
-
-  az_to_public_subnet_ids     = { for subnet, this in aws_subnet.public : lookup(local.public_subnet_to_az, subnet) => this.id... } # group subnet_ids by AZ of subnet
-  az_to_public_route_table_id = { for az, subnet_id in local.az_to_public_subnet_ids : az => aws_route_table.public.id }            # Each public subnet shares the same route table
-}
-
-output "az_to_private_subnet_ids" {
-  value = local.az_to_private_subnet_ids
-}
-
-output "az_to_private_route_table_id" {
-  value = local.az_to_private_route_table_id
-}
-
-output "az_to_public_subnet_ids" {
-  value = local.az_to_public_subnet_ids
-}
-
-output "az_to_public_route_table_id" {
-  value = local.az_to_public_route_table_id
-}
-
 output "default_security_group_id" {
   value = aws_vpc.this.default_security_group_id
 }
@@ -39,12 +15,36 @@ output "id" {
 }
 
 output "intra_vpc_security_group_id" {
-  value = aws_security_group.intra_vpc.id
+  value = aws_security_group.this_intra_vpc.id
 }
 
-output "network" {
+output "name" {
+  value = var.tiered_vpc.name
+}
+
+output "network_cidr" {
   # pass thru what is known pre-apply
-  value = var.tier.network
+  value = var.tiered_vpc.network_cidr
+}
+
+output "private_route_table_ids" {
+  value = [for this in aws_route_table.this_private : this.id]
+}
+
+output "private_subnet_name_to_subnet_id" {
+  value = { for this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
+}
+
+output "public_route_table_ids" {
+  value = [for this in var.tiered_vpc.azs : aws_route_table.this_public.id] # Each public subnet shares the same route table
+}
+
+output "public_special_subnet_ids" {
+  value = [for this in local.public_az_to_special_subnet_cidr : lookup(aws_subnet.this_public, this).id]
+}
+
+output "public_subnet_name_to_subnet_id" {
+  value = { for this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
 
 output "region" {
