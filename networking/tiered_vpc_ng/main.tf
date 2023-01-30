@@ -98,7 +98,7 @@
 * }
 *
 * module "vpcs" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=moar-better"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.4.6"
 *
 *   for_each = { for t in local.tiered_vpcs : t.name => t }
 *

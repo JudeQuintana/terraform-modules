@@ -9,7 +9,7 @@
 * Example:
 * ```
 * module "super_intra_vpc_security_group_rules_usw2_to_use1" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/super_intra_vpc_security_group_rules?ref=moar-better"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/super_intra_vpc_security_group_rules?ref=v1.4.6"
 *
 *   providers = {
 *     aws.local = aws.usw2

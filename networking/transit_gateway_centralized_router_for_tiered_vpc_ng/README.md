@@ -15,7 +15,7 @@ Main:
 Example:
 ```
 module "centralized_router" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=moar-better"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.4.6"
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
@@ -45,7 +45,7 @@ module "centralized_router" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_generate_routes_to_other_vpcs"></a> [generate\_routes\_to\_other\_vpcs](#module\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | moar-better |
+| <a name="module_generate_routes_to_other_vpcs"></a> [generate\_routes\_to\_other\_vpcs](#module\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.6 |
 
 ## Resources
 
