@@ -16,45 +16,43 @@ variable "super_router" {
     local = object({
       amazon_side_asn = number
       centralized_routers = optional(map(object({
-        account_id        = string
-        amazon_side_asn   = string
-        full_name         = string
-        id                = string
-        name              = string
-        region            = string
-        route_table_id    = string
-        vpc_names         = list(string)
-        vpc_network_cidrs = list(string)
-        vpc_routes = list(object({
-          route_table_id         = string
-          destination_cidr_block = string
-          transit_gateway_id     = string
-        }))
-        vpcs = map(object({
-          network_cidr = string
-        }))
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpc = object({
+          names         = list(string)
+          network_cidrs = list(string)
+          routes = list(object({
+            route_table_id         = string
+            destination_cidr_block = string
+            transit_gateway_id     = string
+          }))
+        })
       })), {})
     })
     peer = object({
       amazon_side_asn = number
       centralized_routers = optional(map(object({
-        account_id        = string
-        amazon_side_asn   = string
-        full_name         = string
-        id                = string
-        name              = string
-        region            = string
-        route_table_id    = string
-        vpc_names         = list(string)
-        vpc_network_cidrs = list(string)
-        vpc_routes = list(object({
-          route_table_id         = string
-          destination_cidr_block = string
-          transit_gateway_id     = string
-        }))
-        vpcs = map(object({
-          network_cidr = string
-        }))
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpc = object({
+          names         = list(string)
+          network_cidrs = list(string)
+          routes = list(object({
+            route_table_id         = string
+            destination_cidr_block = string
+            transit_gateway_id     = string
+          }))
+        })
       })), {})
     })
   })
@@ -128,15 +126,15 @@ variable "super_router" {
   # cross region checks
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_names])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_names])))
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.names])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.names])))
     error_message = "All VPC names must be unique across regions."
   }
 
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc_network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc_network_cidrs])))
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
     error_message = "All VPC network CIDRs must be unique across regions."
   }
 

@@ -30,26 +30,18 @@ output "route_table_id" {
   value = aws_ec2_transit_gateway_route_table.this.id
 }
 
-output "vpc_names" {
-  value = [for this in var.centralized_router.vpcs : this.name]
-}
-
-output "vpc_network_cidrs" {
-  value = [for this in var.centralized_router.vpcs : this.network_cidr]
-}
-
-# route object will only have 3 attributes instead of all attributes from the route
-# makes it easier to see when troubleshooting many vpc routes
-# otherwise it can just be [for this in aws_route.this_vpc_routes_to_other_vpcs : this]
-output "vpc_routes" {
-  value = [
-    for this in aws_route.this_vpc_routes_to_other_vpcs : {
-      route_table_id         = this.route_table_id
-      destination_cidr_block = this.destination_cidr_block
-      transit_gateway_id     = this.transit_gateway_id
-  }]
-}
-
-output "vpcs" {
-  value = var.centralized_router.vpcs
+output "vpc" {
+  value = {
+    names         = [for this in var.centralized_router.vpcs : this.name]
+    network_cidrs = [for this in var.centralized_router.vpcs : this.network_cidr]
+    # route object will only have 3 attributes instead of all attributes from the route
+    # makes it easier to see when troubleshooting many vpc routes
+    # otherwise it can just be [for this in aws_route.this_vpc_routes_to_other_vpcs : this]
+    routes = [
+      for this in aws_route.this_vpc_routes_to_other_vpcs : {
+        route_table_id         = this.route_table_id
+        destination_cidr_block = this.destination_cidr_block
+        transit_gateway_id     = this.transit_gateway_id
+    }]
+  }
 }

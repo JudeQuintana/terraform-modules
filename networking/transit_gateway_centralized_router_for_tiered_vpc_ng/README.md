@@ -82,7 +82,4 @@ Main:
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_region"></a> [region](#output\_region) | n/a |
 | <a name="output_route_table_id"></a> [route\_table\_id](#output\_route\_table\_id) | n/a |
-| <a name="output_vpc_names"></a> [vpc\_names](#output\_vpc\_names) | n/a |
-| <a name="output_vpc_network_cidrs"></a> [vpc\_network\_cidrs](#output\_vpc\_network\_cidrs) | n/a |
-| <a name="output_vpc_routes"></a> [vpc\_routes](#output\_vpc\_routes) | route object will only have 3 attributes instead of all attributes from the route makes it easier to see when troubleshooting many vpc routes otherwise it can just be [for this in aws\_route.this\_vpc\_routes\_to\_other\_vpcs : this] |
-| <a name="output_vpcs"></a> [vpcs](#output\_vpcs) | n/a |
+| <a name="output_vpc"></a> [vpc](#output\_vpc) | n/a |
