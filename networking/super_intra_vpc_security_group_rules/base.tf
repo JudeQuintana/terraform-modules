@@ -78,8 +78,7 @@ locals {
         network_cidrs               = this
         type                        = "ingress"
       }, rule)
-    }
-  ]...)
+  }]...)
 
   peer_vpc_id_and_rule_to_local_intra_vpc_security_group_rule = merge([
     for rule in local.local_rules : {
@@ -89,8 +88,7 @@ locals {
         network_cidrs               = this
         type                        = "ingress"
       }, rule)
-    }
-  ]...)
+  }]...)
 }
 
 resource "aws_security_group_rule" "this_local" {

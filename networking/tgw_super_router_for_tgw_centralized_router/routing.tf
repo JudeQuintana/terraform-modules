@@ -24,10 +24,10 @@ resource "aws_ec2_transit_gateway_route_table" "this_local" {
 }
 
 locals {
-  local_vpc_network_cidr_to_local_tgw = merge(
-    [for this in local.local_tgws :
-      { for vpc_network_cidr in this.vpc.network_cidrs :
-        vpc_network_cidr => this
+  local_vpc_network_cidr_to_local_tgw = merge([
+    for this in local.local_tgws : {
+      for vpc_network_cidr in this.vpc.network_cidrs :
+      vpc_network_cidr => this
   }]...)
 }
 
@@ -111,10 +111,10 @@ locals {
   }]
 
   # generate current existing local vpc routes
-  local_current_vpc_routes = flatten(
-    [for this in local.local_tgws :
-      [for vpc_network_cidr in this.vpc.network_cidrs :
-        [for rtb_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, [vpc_network_cidr]) : {
+  local_current_vpc_routes = flatten([
+    for this in local.local_tgws : [
+      for vpc_network_cidr in this.vpc.network_cidrs : [
+        for rtb_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, [vpc_network_cidr]) : {
           route_table_id         = rtb_id_and_vpc_network_cidr[0]
           destination_cidr_block = rtb_id_and_vpc_network_cidr[1]
   }]]])
@@ -175,10 +175,10 @@ locals {
   }]
 
   # generate current existing local tgw routes for its local vpcs
-  local_current_tgw_routes = flatten(
-    [for this in local.local_tgws :
-      [for vpc_network_cidr in this.vpc.network_cidrs :
-        [for rtb_id_and_network_cidr in setproduct(this[*].route_table_id, [vpc_network_cidr]) : {
+  local_current_tgw_routes = flatten([
+    for this in local.local_tgws : [
+      for vpc_network_cidr in this.vpc.network_cidrs : [
+        for rtb_id_and_network_cidr in setproduct(this[*].route_table_id, [vpc_network_cidr]) : {
           route_table_id         = rtb_id_and_network_cidr[0]
           destination_cidr_block = rtb_id_and_network_cidr[1]
   }]]])
@@ -216,10 +216,10 @@ resource "aws_ec2_transit_gateway_route_table" "this_peer" {
 }
 
 locals {
-  peer_vpc_network_cidr_to_peer_tgw = merge(
-    [for this in local.peer_tgws :
-      { for vpc_network_cidr in this.vpc.network_cidrs :
-        vpc_network_cidr => this
+  peer_vpc_network_cidr_to_peer_tgw = merge([
+    for this in local.peer_tgws : {
+      for vpc_network_cidr in this.vpc.network_cidrs :
+      vpc_network_cidr => this
   }]...)
 }
 
@@ -303,10 +303,10 @@ locals {
   }]
 
   # generate current existing peer vpc routes
-  peer_current_vpc_routes = flatten(
-    [for this in local.peer_tgws :
-      [for vpc_network_cidr in this.vpc.network_cidrs :
-        [for rtb_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, [vpc_network_cidr]) : {
+  peer_current_vpc_routes = flatten([
+    for this in local.peer_tgws : [
+      for vpc_network_cidr in this.vpc.network_cidrs : [
+        for rtb_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, [vpc_network_cidr]) : {
           route_table_id         = rtb_id_and_vpc_network_cidr[0]
           destination_cidr_block = rtb_id_and_vpc_network_cidr[1]
   }]]])
@@ -367,10 +367,10 @@ locals {
   }]
 
   # generate current existing peer tgw routes for its peer vpcs
-  peer_current_tgw_routes = flatten(
-    [for this in local.peer_tgws :
-      [for vpc_network_cidr in this.vpc.network_cidrs :
-        [for rtb_id_and_network_cidr in setproduct(this[*].route_table_id, [vpc_network_cidr]) : {
+  peer_current_tgw_routes = flatten([
+    for this in local.peer_tgws : [
+      for vpc_network_cidr in this.vpc.network_cidrs : [
+        for rtb_id_and_network_cidr in setproduct(this[*].route_table_id, [vpc_network_cidr]) : {
           route_table_id         = rtb_id_and_network_cidr[0]
           destination_cidr_block = rtb_id_and_network_cidr[1]
   }]]])
