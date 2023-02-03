@@ -47,16 +47,16 @@ variable "super_intra_vpc_security_group_rules" {
   })
 
   validation {
-    condition = length(distinct(flatten([
+    condition = length(distinct([
       for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.region
-    ]))) <= 1
+    ])) <= 1
     error_message = "All local Intra VPC Security Group Rules must have the same region as each other and the aws.local provider alias for Super Intra VPC Security Group Rules."
   }
 
   validation {
-    condition = length(distinct(flatten([
+    condition = length(distinct([
       for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.account_id
-    ]))) <= 1
+    ])) <= 1
     error_message = "All local Intra VPC Security Group Rules must have the same account id as each other and the aws.local provider alias for Super Intra VPC Security Group Rules."
   }
 
@@ -67,16 +67,16 @@ variable "super_intra_vpc_security_group_rules" {
 
   # Peer
   validation {
-    condition = length(distinct(flatten([
+    condition = length(distinct([
       for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.region
-    ]))) <= 1
+    ])) <= 1
     error_message = "All peer Intra VPC Security Group Rules must have the same region as each other and the aws.peer provider alias for Super Intra VPC Security Group Rules."
   }
 
   validation {
-    condition = length(distinct(flatten([
+    condition = length(distinct([
       for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.account_id
-    ]))) <= 1
+    ])) <= 1
     error_message = "All peer Intra VPC Security Group Rules must have the same account id as each other and the aws.peer provider alias for Super Intra VPC Security Group Rules."
   }
 
