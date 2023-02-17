@@ -422,7 +422,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_this_p
 }
 
 ########################################################################################
-# Begin Local Super Router Router Side
+# Begin Peer Super Router Router Side
 #########################################################################################
 
 # add all local tgw routes to peer tgw super router
