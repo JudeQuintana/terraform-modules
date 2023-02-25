@@ -43,5 +43,6 @@ output "vpc" {
         destination_cidr_block = this.destination_cidr_block
         transit_gateway_id     = this.transit_gateway_id
     }]
+    current_local_only_routes = []
   }
 }
