@@ -31,7 +31,6 @@ output "route_table_id" {
 }
 
 locals {
-  vpcs              = [for this in var.centralized_router.vpcs : this]
   vpc_names         = local.vpcs[*].name
   vpc_network_cidrs = local.vpcs[*].network_cidr
   # route object will only have 3 attributes instead of all attributes from the route
