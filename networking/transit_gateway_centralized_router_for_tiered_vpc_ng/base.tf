@@ -17,7 +17,6 @@ locals {
   }, var.tags)
 
   centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", var.centralized_router.name, local.region_label)
-
   # easier to use list of objects internally
   vpcs = [for this in var.centralized_router.vpcs : this]
 }
