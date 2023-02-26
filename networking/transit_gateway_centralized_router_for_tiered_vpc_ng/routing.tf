@@ -2,6 +2,7 @@
 module "this_generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.8"
 
+  # use pass thru value insted of local.vpcs (list of objects)
   vpcs = var.centralized_router.vpcs
 }
 
