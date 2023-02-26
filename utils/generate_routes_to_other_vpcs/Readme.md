@@ -12,7 +12,7 @@ A list of route objects makes it easier to handle when passing to other route re
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.6"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.8"
 
   vpcs = var.vpcs
 }
@@ -44,7 +44,7 @@ The `call_legacy` output is `{ "rtb-id|route" => "route", ... }`. It has been de
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.6"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.8"
 
   vpcs = var.vpcs
 }
