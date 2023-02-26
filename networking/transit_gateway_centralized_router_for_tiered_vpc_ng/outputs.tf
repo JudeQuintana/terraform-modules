@@ -43,6 +43,7 @@ locals {
       transit_gateway_id     = this.transit_gateway_id
   }]
   # generate current existing local vpc routes for use by super router
+  # it helps to generate (know) routes that would already exist for all vpcs
   vpc_current_local_only_routes = [
     for route_table_id_and_vpc_network_cidr in setproduct(local.vpc_routes[*].route_table_id, local.vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_vpc_network_cidr[0]
