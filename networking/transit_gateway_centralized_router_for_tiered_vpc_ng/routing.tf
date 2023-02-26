@@ -1,6 +1,6 @@
 # Create routes to other VPC network_cidrs in private and public route tables for each VPC
 module "this_generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.8"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.9"
 
   # use pass thru value insted of local.vpcs (list of objects)
   vpcs = var.centralized_router.vpcs

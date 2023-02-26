@@ -7,7 +7,7 @@
 Example:
 ```
 module "centralized_router" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.4.8"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.4.9"
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
@@ -45,7 +45,7 @@ Main:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.8 |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.9 |
 
 ## Resources
 
