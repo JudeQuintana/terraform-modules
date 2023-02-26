@@ -7,10 +7,10 @@ locals {
   # I'm not sure about security implications of this pattern but I dont think it matters.
   #
   # { vpc-1-id  = [ "special-public-subnet-id-of-az-1-for-vpc-1", "special-public-subnet-id-of-az-2-for-vpc-1", ... ], ...}
-  vpc_id_to_public_special_subnet_ids = { for this in var.centralized_router.vpcs : this.id => this.public_special_subnet_ids }
+  vpc_id_to_public_special_subnet_ids = { for this in local.vpcs : this.id => this.public_special_subnet_ids }
 
   # lookup table for each aws_ec2_transit_gateway_vpc_attachment to get the name based on id
-  vpc_id_to_full_name = { for this in var.centralized_router.vpcs : this.id => this.full_name }
+  vpc_id_to_full_name = { for this in local.vpcs : this.id => this.full_name }
 }
 
 # attach vpcs to tgw
