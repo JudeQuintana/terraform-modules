@@ -72,20 +72,20 @@ locals {
 
   local_vpc_id_and_rule_to_peer_intra_vpc_security_group_rule = merge([
     for this in local.peer_rules : {
-      for vpc_id, inbound_network_cidr in local.local_vpc_id_to_peer_inbound_network_cidrs :
+      for vpc_id, inbound_network_cidrs in local.local_vpc_id_to_peer_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.local_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidr
+        network_cidrs               = inbound_network_cidrs
         type                        = "ingress"
       }, this)
   }]...)
 
   peer_vpc_id_and_rule_to_local_intra_vpc_security_group_rule = merge([
     for this in local.local_rules : {
-      for vpc_id, inbound_network_cidr in local.peer_vpc_id_to_local_inbound_network_cidrs :
+      for vpc_id, inbound_network_cidrs in local.peer_vpc_id_to_local_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.peer_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidr
+        network_cidrs               = inbound_network_cidrs
         type                        = "ingress"
       }, this)
   }]...)
