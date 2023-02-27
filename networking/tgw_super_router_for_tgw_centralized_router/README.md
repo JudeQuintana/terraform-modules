@@ -35,7 +35,6 @@ module "super_router_usw2_to_use1" {
     }
   }
 }
-*
 ```
 
 The resulting architecture is a decentralized hub spoke topology:
