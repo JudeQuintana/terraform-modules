@@ -19,4 +19,7 @@ resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
+
+  # make sure route table is available first
+  depends_on = [aws_ec2_transit_gateway_route_table.this]
 }
