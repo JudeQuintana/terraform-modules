@@ -170,7 +170,7 @@ locals {
   # generate current existing local tgw routes for its local vpcs
   local_current_tgw_routes = flatten([
     for this in local.local_tgws : [
-      for route_table_id_and_network_cidr in setproduct(this[*].route_table_id, this.vpc.network_cidrs) : {
+      for route_table_id_and_network_cidr in setproduct([this.route_table_id], this.vpc.network_cidrs) : {
         route_table_id         = route_table_id_and_network_cidr[0]
         destination_cidr_block = route_table_id_and_network_cidr[1]
   }]])
@@ -352,7 +352,7 @@ locals {
   # generate current existing peer tgw routes for its peer vpcs
   peer_current_tgw_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_network_cidr in setproduct(this[*].route_table_id, this.vpc.network_cidrs) : {
+      for route_table_id_and_network_cidr in setproduct([this.route_table_id], this.vpc.network_cidrs) : {
         route_table_id         = route_table_id_and_network_cidr[0]
         destination_cidr_block = route_table_id_and_network_cidr[1]
   }]])
