@@ -42,7 +42,7 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = alltrue([for this in keys(var.tiered_vpc.azs) : contains(["a", "b", "c", "e", "f"], this)])
+    condition     = alltrue([for this in keys(var.tiered_vpc.azs) : contains(["a", "b", "c", "d", "e", "f"], this)])
     error_message = "The AZ key should be a single character for the AZ. a,b,c,d,e or f."
   }
 
