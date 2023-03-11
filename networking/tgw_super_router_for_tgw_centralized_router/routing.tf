@@ -1,13 +1,21 @@
 locals {
+  local_tgws_all_vpc_network_cidrs              = flatten(local.local_tgws[*].vpc.network_cidrs)
+  local_tgws_all_vpc_routes                     = flatten(local.local_tgws[*].vpc.routes)
+  local_tgws_all_current_local_only_vpc_routes  = flatten(local.local_tgws[*].vpc.current_local_only_routes)
+  local_tgws_all_vpc_routes_route_table_ids     = local.local_tgws_all_vpc_routes[*].route_table_id
+  local_tgws_all_vpc_routes_transit_gateway_ids = local.local_tgws_all_vpc_routes[*].transit_gateway_id
+  local_tgws_all_route_table_ids                = local.local_tgws[*].route_table_id
+  local_tgws_all_ids                            = local.local_tgws[*].id
+
+  peer_tgws_all_vpc_network_cidrs              = flatten(local.peer_tgws[*].vpc.network_cidrs)
+  peer_tgws_all_vpc_routes                     = flatten(local.peer_tgws[*].vpc.routes)
+  peer_tgws_all_current_local_only_vpc_routes  = flatten(local.peer_tgws[*].vpc.current_local_only_routes)
+  peer_tgws_all_vpc_routes_route_table_ids     = local.peer_tgws_all_vpc_routes[*].route_table_id
+  peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes[*].transit_gateway_id
+  peer_tgws_all_route_table_ids                = local.peer_tgws[*].route_table_id
+  peer_tgws_all_ids                            = local.peer_tgws[*].id
+
   route_format = "%s|%s"
-
-  local_tgws_all_vpc_network_cidrs             = flatten(local.local_tgws[*].vpc.network_cidrs)
-  local_tgws_all_vpc_routes                    = flatten(local.local_tgws[*].vpc.routes)
-  local_tgws_all_current_local_only_vpc_routes = flatten(local.local_tgws[*].vpc.current_local_only_routes)
-
-  peer_tgws_all_vpc_network_cidrs             = flatten(local.peer_tgws[*].vpc.network_cidrs)
-  peer_tgws_all_vpc_routes                    = flatten(local.peer_tgws[*].vpc.routes)
-  peer_tgws_all_current_local_only_vpc_routes = flatten(local.peer_tgws[*].vpc.current_local_only_routes)
 }
 
 ########################################################################################
@@ -79,11 +87,11 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals
 
 locals {
   # keep track of current rtb-id to tgw-id
-  local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id = zipmap(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_routes[*].transit_gateway_id)
+  local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id = zipmap(local.local_tgws_all_vpc_routes_route_table_ids, local.local_tgws_all_vpc_routes_transit_gateway_ids)
 
   # build new local vpc routes to other peer tgws
   local_vpc_routes_to_peer_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.local_tgws_all_vpc_routes_route_table_ids, local.peer_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
@@ -107,7 +115,7 @@ resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
 locals {
   # build new local vpc routes to other local vpcs
   local_vpc_routes_to_local_tgws = [
-    for route_table_id_and_local_tgw_network_cidr in setproduct(local.local_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_local_tgw_network_cidr in setproduct(local.local_tgws_all_vpc_routes_route_table_ids, local.local_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_local_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_local_tgw_network_cidr[1]
   }]
@@ -130,11 +138,11 @@ resource "aws_route" "this_local_vpcs_routes_to_local_vpcs" {
 }
 
 locals {
-  local_tgw_route_table_id_to_local_tgw_id = zipmap(local.local_tgws[*].route_table_id, local.local_tgws[*].id)
+  local_tgw_route_table_id_to_local_tgw_id = zipmap(local.local_tgws_all_route_table_ids, local.local_tgws_all_ids)
 
   # build new local tgw routes to other peer tgws
   local_tgw_routes_to_peer_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.local_tgws[*].route_table_id, local.peer_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.local_tgws_all_route_table_ids, local.peer_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
@@ -162,7 +170,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_peer_
 locals {
   # build new local tgw routes to other local tgws
   local_tgws_routes_to_local_tgws = [
-    for route_table_id_and_network_cidr in setproduct(local.local_tgws[*].route_table_id, local.local_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_network_cidr in setproduct(local.local_tgws_all_route_table_ids, local.local_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_network_cidr[0]
       destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
@@ -261,11 +269,11 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_peers" 
 
 locals {
   # keep track of current rtb-id to tgw-id
-  peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id = zipmap(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_routes[*].transit_gateway_id)
+  peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id = zipmap(local.peer_tgws_all_vpc_routes_route_table_ids, local.peer_tgws_all_vpc_routes_transit_gateway_ids)
 
   # build new peer vpc routes to other local tgws
   peer_vpc_routes_to_local_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.local_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_all_vpc_routes_route_table_ids, local.local_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
@@ -289,7 +297,7 @@ resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
 locals {
   # build new peer vpc routes to other peer vpcs
   peer_vpc_routes_to_peer_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_all_vpc_routes[*].route_table_id, local.peer_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_all_vpc_routes_route_table_ids, local.peer_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
@@ -312,11 +320,11 @@ resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
 }
 
 locals {
-  peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws[*].route_table_id, local.peer_tgws[*].id)
+  peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws_all_route_table_ids, local.peer_tgws_all_ids)
 
   # build new peer tgw routes to other peer tgws
   peer_tgw_routes_to_local_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws[*].route_table_id, local.local_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_all_route_table_ids, local.local_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
@@ -344,7 +352,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_peer_t
 locals {
   # build new peer tgw routes to other peer tgws
   peer_tgws_routes_to_peer_tgws = [
-    for route_table_id_and_network_cidr in setproduct(local.peer_tgws[*].route_table_id, local.peer_tgws_all_vpc_network_cidrs) : {
+    for route_table_id_and_network_cidr in setproduct(local.peer_tgws_all_route_table_ids, local.peer_tgws_all_vpc_network_cidrs) : {
       route_table_id         = route_table_id_and_network_cidr[0]
       destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
@@ -375,7 +383,7 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_peer_tgws" {
 }
 
 ########################################################################################
-# Begin Local Super Router Router Side
+# Begin Local Super Router Side
 #########################################################################################
 
 # add all peer tgw routes to local tgw super router
@@ -404,7 +412,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_this_p
 }
 
 ########################################################################################
-# Begin Peer Super Router Router Side
+# Begin Peer Super Router Side
 #########################################################################################
 
 # add all local tgw routes to peer tgw super router
