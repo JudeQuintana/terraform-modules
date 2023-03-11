@@ -320,7 +320,7 @@ resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
 }
 
 locals {
-  peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws_all_route_table_ids, local.peer_tgws_all_vpc_routes_transit_gateway_ids)
+  peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws_all_route_table_ids, peer_tgws_all_ids)
 
   # build new peer tgw routes to other peer tgws
   peer_tgw_routes_to_local_tgws = [
