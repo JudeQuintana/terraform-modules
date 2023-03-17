@@ -118,7 +118,6 @@ locals {
       destination_cidr_block = route_table_id_and_local_tgw_network_cidr[1]
   }]
 
-  #local_tgws_all_vpc_routes_route_table_ids     = local.local_tgws_all_vpc_routes[*].route_table_id
   # generate current existing local vpc routes
   local_current_vpc_routes = flatten([
     for this in local.local_tgws : [
