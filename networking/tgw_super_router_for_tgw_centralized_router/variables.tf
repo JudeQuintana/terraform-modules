@@ -31,10 +31,6 @@ variable "super_router" {
             destination_cidr_block = string
             transit_gateway_id     = string
           }))
-          current_local_only_routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-          }))
         })
       })), {})
     })
@@ -55,10 +51,6 @@ variable "super_router" {
             route_table_id         = string
             destination_cidr_block = string
             transit_gateway_id     = string
-          }))
-          current_local_only_routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
           }))
         })
       })), {})
