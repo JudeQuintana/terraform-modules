@@ -1,7 +1,8 @@
 locals {
+  route_format = "%s|%s"
+
   local_tgws_all_vpc_network_cidrs              = flatten(local.local_tgws[*].vpc.network_cidrs)
   local_tgws_all_vpc_routes                     = flatten(local.local_tgws[*].vpc.routes)
-  local_tgws_all_current_local_only_vpc_routes  = flatten(local.local_tgws[*].vpc.current_local_only_routes)
   local_tgws_all_vpc_routes_route_table_ids     = local.local_tgws_all_vpc_routes[*].route_table_id
   local_tgws_all_vpc_routes_transit_gateway_ids = local.local_tgws_all_vpc_routes[*].transit_gateway_id
   local_tgws_all_route_table_ids                = local.local_tgws[*].route_table_id
@@ -9,13 +10,10 @@ locals {
 
   peer_tgws_all_vpc_network_cidrs              = flatten(local.peer_tgws[*].vpc.network_cidrs)
   peer_tgws_all_vpc_routes                     = flatten(local.peer_tgws[*].vpc.routes)
-  peer_tgws_all_current_local_only_vpc_routes  = flatten(local.peer_tgws[*].vpc.current_local_only_routes)
   peer_tgws_all_vpc_routes_route_table_ids     = local.peer_tgws_all_vpc_routes[*].route_table_id
   peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes[*].transit_gateway_id
   peer_tgws_all_route_table_ids                = local.peer_tgws[*].route_table_id
   peer_tgws_all_ids                            = local.peer_tgws[*].id
-
-  route_format = "%s|%s"
 }
 
 ########################################################################################
@@ -120,9 +118,17 @@ locals {
       destination_cidr_block = route_table_id_and_local_tgw_network_cidr[1]
   }]
 
+  # generate current existing local vpc routes
+  local_current_vpc_routes = flatten([
+    for this in local.local_tgws : [
+      for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+        route_table_id         = route_table_id_and_vpc_network_cidr[0]
+        destination_cidr_block = route_table_id_and_vpc_network_cidr[1]
+  }]])
+
   # subtract all current existing local vpc routes from all local vpc routes
   local_tgw_all_new_vpc_routes_to_local_vpcs = {
-    for this in setsubtract(local.local_vpc_routes_to_local_tgws, local.local_tgws_all_current_local_only_vpc_routes) :
+    for this in setsubtract(local.local_vpc_routes_to_local_tgws, local.local_current_vpc_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
@@ -302,9 +308,17 @@ locals {
       destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
   }]
 
-  # subtract current existing local vpc routes from all local vpc routes
+  # generate current existing peer vpc routes
+  peer_current_vpc_routes = flatten([
+    for this in local.peer_tgws : [
+      for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+        route_table_id         = route_table_id_and_vpc_network_cidr[0]
+        destination_cidr_block = route_table_id_and_vpc_network_cidr[1]
+  }]])
+
+  # subtract current existing peer vpc routes from all peer vpc routes
   peer_tgw_all_new_vpc_routes_to_peer_vpcs = {
-    for this in setsubtract(local.peer_vpc_routes_to_peer_tgws, local.peer_tgws_all_current_local_only_vpc_routes) :
+    for this in setsubtract(local.peer_vpc_routes_to_peer_tgws, local.peer_current_vpc_routes) :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
