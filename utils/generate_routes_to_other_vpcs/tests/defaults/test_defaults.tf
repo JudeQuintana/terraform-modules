@@ -6,7 +6,7 @@ terraform {
   }
 }
 
-# Multiple private and route table ids a vpc network cidr
+# Multiple private and route table ids for a vpc network cidr
 locals {
   tiered_vpcs = {
     app = {
