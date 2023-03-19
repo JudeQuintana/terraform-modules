@@ -6,36 +6,42 @@ terraform {
   }
 }
 
-# Multiple routes for a map with more than one tiered vpc
+# Multiple private and route table ids a vpc network cidr
 locals {
   tiered_vpcs = {
     app = {
       network_cidr = "10.0.0.0/20"
       private_route_table_ids = [
-        "rtb-0468efad92cd62ab8",
-        "rtb-02ad79df1a7c192e7"
+        "rtb-09210b506aad8cccc",
+        "rtb-0707c5783a639c0be",
+        "rtb-0059681f31f6819f6"
       ]
       public_route_table_ids = [
-        "rtb-06b216fb818494594",
-        "rtb-06b216fb818494594"
+        "rtb-0b0b9d1c342f155a9",
+        "rtb-0b0b9d1c342f155a9",
+        "rtb-0b0b9d1c342f155a9"
       ]
     }
     cicd = {
-      network_cidr = "172.31.0.0/20"
+      network_cidr = "172.16.0.0/20"
       private_route_table_ids = [
-        "rtb-0f8deb7a6682793e2"
+        "rtb-0e36393dc78c51235",
+        "rtb-0bdbabf9e8e133fa8"
       ]
       public_route_table_ids = [
-        "rtb-09a4481eb3684abba"
+        "rtb-026bb809ef2dcbf02",
+        "rtb-026bb809ef2dcbf02"
       ]
     }
     general = {
       network_cidr = "192.168.0.0/20"
       private_route_table_ids = [
-        "rtb-01e5ec4882154a9a1"
+        "rtb-0edcf7e461359d8b2",
+        "rtb-0afd28d1d8cae5563"
       ]
       public_route_table_ids = [
-        "rtb-0ad6cde89a9e386fd"
+        "rtb-0a97d8dd5f739f7bc",
+        "rtb-0a97d8dd5f739f7bc"
       ]
     }
   }
@@ -49,79 +55,109 @@ module "main" {
 
 locals {
   map_of_routes_to_other_vpcs = {
-    "rtb-01e5ec4882154a9a1|10.0.0.0/20"    = "10.0.0.0/20"
-    "rtb-01e5ec4882154a9a1|172.31.0.0/20"  = "172.31.0.0/20"
-    "rtb-02ad79df1a7c192e7|172.31.0.0/20"  = "172.31.0.0/20"
-    "rtb-02ad79df1a7c192e7|192.168.0.0/20" = "192.168.0.0/20"
-    "rtb-0468efad92cd62ab8|172.31.0.0/20"  = "172.31.0.0/20"
-    "rtb-0468efad92cd62ab8|192.168.0.0/20" = "192.168.0.0/20"
-    "rtb-06b216fb818494594|172.31.0.0/20"  = "172.31.0.0/20"
-    "rtb-06b216fb818494594|192.168.0.0/20" = "192.168.0.0/20"
-    "rtb-09a4481eb3684abba|10.0.0.0/20"    = "10.0.0.0/20"
-    "rtb-09a4481eb3684abba|192.168.0.0/20" = "192.168.0.0/20"
-    "rtb-0ad6cde89a9e386fd|10.0.0.0/20"    = "10.0.0.0/20"
-    "rtb-0ad6cde89a9e386fd|172.31.0.0/20"  = "172.31.0.0/20"
-    "rtb-0f8deb7a6682793e2|10.0.0.0/20"    = "10.0.0.0/20"
-    "rtb-0f8deb7a6682793e2|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0059681f31f6819f6|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-0059681f31f6819f6|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-026bb809ef2dcbf02|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-026bb809ef2dcbf02|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0707c5783a639c0be|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-0707c5783a639c0be|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-09210b506aad8cccc|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-09210b506aad8cccc|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0a97d8dd5f739f7bc|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-0a97d8dd5f739f7bc|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-0afd28d1d8cae5563|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-0afd28d1d8cae5563|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-0b0b9d1c342f155a9|172.16.0.0/20"  = "172.16.0.0/20"
+    "rtb-0b0b9d1c342f155a9|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0bdbabf9e8e133fa8|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-0bdbabf9e8e133fa8|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0e36393dc78c51235|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-0e36393dc78c51235|192.168.0.0/20" = "192.168.0.0/20"
+    "rtb-0edcf7e461359d8b2|10.0.0.0/20"    = "10.0.0.0/20"
+    "rtb-0edcf7e461359d8b2|172.16.0.0/20"  = "172.16.0.0/20"
   }
 
   set_of_route_objects_to_other_vpcs = toset([
     {
       destination_cidr_block = "10.0.0.0/20"
-      route_table_id         = "rtb-01e5ec4882154a9a1"
+      route_table_id         = "rtb-026bb809ef2dcbf02"
     },
     {
       destination_cidr_block = "10.0.0.0/20"
-      route_table_id         = "rtb-09a4481eb3684abba"
+      route_table_id         = "rtb-0a97d8dd5f739f7bc"
     },
     {
       destination_cidr_block = "10.0.0.0/20"
-      route_table_id         = "rtb-0ad6cde89a9e386fd"
+      route_table_id         = "rtb-0afd28d1d8cae5563"
     },
     {
       destination_cidr_block = "10.0.0.0/20"
-      route_table_id         = "rtb-0f8deb7a6682793e2"
+      route_table_id         = "rtb-0bdbabf9e8e133fa8"
     },
     {
-      destination_cidr_block = "172.31.0.0/20"
-      route_table_id         = "rtb-01e5ec4882154a9a1"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0e36393dc78c51235"
     },
     {
-      destination_cidr_block = "172.31.0.0/20"
-      route_table_id         = "rtb-02ad79df1a7c192e7"
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0edcf7e461359d8b2"
     },
     {
-      destination_cidr_block = "172.31.0.0/20"
-      route_table_id         = "rtb-0468efad92cd62ab8"
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0059681f31f6819f6"
     },
     {
-      destination_cidr_block = "172.31.0.0/20"
-      route_table_id         = "rtb-06b216fb818494594"
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0707c5783a639c0be"
     },
     {
-      destination_cidr_block = "172.31.0.0/20"
-      route_table_id         = "rtb-0ad6cde89a9e386fd"
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-09210b506aad8cccc"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0a97d8dd5f739f7bc"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0afd28d1d8cae5563"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0b0b9d1c342f155a9"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0edcf7e461359d8b2"
     },
     {
       destination_cidr_block = "192.168.0.0/20"
-      route_table_id         = "rtb-02ad79df1a7c192e7"
+      route_table_id         = "rtb-0059681f31f6819f6"
     },
     {
       destination_cidr_block = "192.168.0.0/20"
-      route_table_id         = "rtb-0468efad92cd62ab8"
+      route_table_id         = "rtb-026bb809ef2dcbf02"
     },
     {
       destination_cidr_block = "192.168.0.0/20"
-      route_table_id         = "rtb-06b216fb818494594"
+      route_table_id         = "rtb-0707c5783a639c0be"
     },
     {
       destination_cidr_block = "192.168.0.0/20"
-      route_table_id         = "rtb-09a4481eb3684abba"
+      route_table_id         = "rtb-09210b506aad8cccc"
     },
     {
       destination_cidr_block = "192.168.0.0/20"
-      route_table_id         = "rtb-0f8deb7a6682793e2"
+      route_table_id         = "rtb-0b0b9d1c342f155a9"
     },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0bdbabf9e8e133fa8"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0e36393dc78c51235"
+    }
   ])
 }
 
