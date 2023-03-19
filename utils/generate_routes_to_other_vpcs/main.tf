@@ -13,7 +13,7 @@
 * ```hcl
 * # snippet
 * module "generate_routes_to_other_vpcs" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.9"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
 *
 *   vpcs = var.vpcs
 * }
@@ -31,6 +31,9 @@
 *   destination_cidr_block = each.value.destination_cidr_block
 *   route_table_id         = each.value.route_table_id
 *   transit_gateway_id     = aws_ec2_transit_gateway.this.id
+*
+*   # make sure the tgw route table is available first before the setting routes routes on the vpcs
+*   depends_on = [aws_ec2_transit_gateway_route_table.this]
 * }
 * ```
 *
@@ -45,7 +48,7 @@
 * ```hcl
 * # snippet
 * module "generate_routes_to_other_vpcs" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.9"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
 *
 *   vpcs = var.vpcs
 * }
@@ -56,6 +59,9 @@
 *   destination_cidr_block = each.value
 *   route_table_id         = split("|", each.key)[0]
 *   transit_gateway_id     = aws_ec2_transit_gateway.this.id
+*
+*   # make sure the tgw route table is available first before the setting routes routes on the vpcs
+*   depends_on = [aws_ec2_transit_gateway_route_table.this]
 * }
 * ```
 *

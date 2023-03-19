@@ -1,6 +1,6 @@
 # Create routes to other VPC network_cidrs in private and public route tables for each VPC
 module "this_generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.9"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
 
   # use pass thru value insted of local.vpcs (list of objects)
   vpcs = var.centralized_router.vpcs
@@ -20,6 +20,6 @@ resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 
-  # make sure route table is available first
+  # make sure the tgw route table is available first before the setting routes on the vpcs
   depends_on = [aws_ec2_transit_gateway_route_table.this]
 }

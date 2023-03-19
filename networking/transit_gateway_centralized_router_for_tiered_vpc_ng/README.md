@@ -45,7 +45,7 @@ Main:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.9 |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.16 |
 
 ## Resources
 
