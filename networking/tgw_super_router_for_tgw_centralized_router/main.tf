@@ -39,5 +39,5 @@
 * ```
 *
 * The resulting architecture is a decentralized hub spoke topology:
-* ![super-router](https://jq1.io/img/Super_Router_Shokunin.png)
+* ![super-router-shokunin](https://jq1-io.s3.amazonaws.com/super-router/super-router-shokunin.png)
 */
