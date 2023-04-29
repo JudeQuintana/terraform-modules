@@ -65,10 +65,6 @@ resource "aws_route" "this_private_route_out" {
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.this_private, each.key).id
   nat_gateway_id         = lookup(aws_nat_gateway.this_public, each.key).id
-
-  lifecycle {
-    ignore_changes = [route_table_id, nat_gateway_id]
-  }
 }
 
 # associate each private subnet to its respective AZ's route table
@@ -77,8 +73,4 @@ resource "aws_route_table_association" "this_private" {
 
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
   route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id
-
-  lifecycle {
-    ignore_changes = [subnet_id, route_table_id]
-  }
 }
