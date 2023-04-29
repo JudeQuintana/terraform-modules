@@ -167,10 +167,6 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_vpcs_in_peer_
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, each.value.route_table_id)).id
-
-  lifecycle {
-    ignore_changes = [transit_gateway_attachment_id]
-  }
 }
 
 locals {
@@ -357,10 +353,6 @@ resource "aws_ec2_transit_gateway_route" "this_peer_tgw_routes_to_vpcs_in_peer_t
   transit_gateway_route_table_id = each.value.route_table_id
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers, lookup(local.peer_tgw_route_table_id_to_peer_tgw_id, each.value.route_table_id)).id
-
-  lifecycle {
-    ignore_changes = [transit_gateway_attachment_id]
-  }
 }
 
 locals {

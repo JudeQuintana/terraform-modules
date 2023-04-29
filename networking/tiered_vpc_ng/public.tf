@@ -76,13 +76,6 @@ resource "aws_route_table_association" "this_public" {
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
   route_table_id = aws_route_table.this_public.id
-
-  lifecycle {
-    # route_table_id is not needed here because the value
-    # is not a part of the for_each iteration and therefore
-    # wont trigger forcing a new resource
-    ignore_changes = [subnet_id]
-  }
 }
 
 #######################################################
@@ -140,8 +133,4 @@ resource "aws_nat_gateway" "this_public" {
   })
 
   depends_on = [aws_internet_gateway.this]
-
-  lifecycle {
-    ignore_changes = [allocation_id, subnet_id]
-  }
 }
