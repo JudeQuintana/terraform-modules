@@ -22,10 +22,10 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_to_this_peer" 
   peer_region             = local.peer_region_name
   peer_transit_gateway_id = aws_ec2_transit_gateway.this_peer.id
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
-  tags = {
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, local.local_super_router_name, local.peer_super_router_name)
     Side = "Local Creator"
-  }
+  })
 }
 
 # accept it in cross region.
@@ -33,11 +33,10 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_th
   provider = aws.peer
 
   transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment.this_local_to_this_peer.id
-  tags = {
-    Name = local.peer_super_router_name
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, local.peer_super_router_name, local.local_super_router_name)
     Side = "Peer Accepter"
-  }
+  })
 }
 
 ########################################################################################
@@ -53,10 +52,10 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_local_to_locals" {
   peer_region             = each.value.region
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_local.id
-  tags = {
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, each.value.full_name, local.local_super_router_name)
     Side = "Local Creator"
-  }
+  })
 }
 
 # data source needed for intra-region peering.
@@ -86,10 +85,10 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_local_to_lo
   for_each = local.local_tgw_id_to_local_tgw
 
   transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_local_to_locals, each.key).id
-  tags = {
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, each.value.full_name, local.local_super_router_name)
     Side = "Local Accepter"
-  }
+  })
 
   lifecycle {
     ignore_changes = [transit_gateway_attachment_id]
@@ -109,10 +108,10 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_peer_to_peers" {
   peer_region             = each.value.region
   peer_transit_gateway_id = each.key
   transit_gateway_id      = aws_ec2_transit_gateway.this_peer.id
-  tags = {
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, each.value.full_name, local.peer_super_router_name)
     Side = "Peer Creator"
-  }
+  })
 }
 
 # data source needed for intra-region peering.
@@ -142,10 +141,10 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_peer_to_pee
   for_each = local.peer_tgw_id_to_peer_tgw
 
   transit_gateway_attachment_id = lookup(data.aws_ec2_transit_gateway_peering_attachment.this_peer_to_peers, each.key).id
-  tags = {
+  tags = merge(local.default_tags, {
     Name = format(local.peering_name_format, each.value.full_name, local.peer_super_router_name)
     Side = "Peer Accepter"
-  }
+  })
 
   lifecycle {
     ignore_changes = [transit_gateway_attachment_id]
