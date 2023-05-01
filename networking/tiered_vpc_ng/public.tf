@@ -43,7 +43,8 @@ resource "aws_subnet" "this_public" {
         each.value,
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key)))
       )
-  })
+    }
+  )
 }
 
 # one public route table for all public subnets across azs
@@ -60,7 +61,8 @@ resource "aws_route_table" "this_public" {
         "all",
         local.region_label
       )
-  })
+    }
+  )
 }
 
 # one public route out through IGW for all public subnets across azs
@@ -100,7 +102,8 @@ resource "aws_eip" "this_public" {
         local.public_label,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
       )
-  })
+    }
+  )
 }
 
 #######################################################
@@ -130,7 +133,8 @@ resource "aws_nat_gateway" "this_public" {
         local.public_label,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
       )
-  })
+    }
+  )
 
   depends_on = [aws_internet_gateway.this]
 }

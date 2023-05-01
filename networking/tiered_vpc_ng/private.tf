@@ -35,7 +35,8 @@ resource "aws_subnet" "this_private" {
         each.value,
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key)))
       )
-  })
+    }
+  )
 }
 
 # one private route table per az
@@ -53,7 +54,8 @@ resource "aws_route_table" "this_private" {
         local.private_label,
         lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
       )
-  })
+    }
+  )
 }
 
 # one private route out through natgw per az
