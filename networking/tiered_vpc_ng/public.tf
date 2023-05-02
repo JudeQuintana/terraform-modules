@@ -60,8 +60,7 @@ resource "aws_route_table" "this_public" {
         "all",
         local.region_label
       )
-    }
-  )
+  })
 }
 
 # one public route out through IGW for all public subnets across azs
