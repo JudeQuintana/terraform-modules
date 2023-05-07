@@ -1,9 +1,11 @@
 variable "base_cidr_block" {
-  type = string
+  description = "Large starting CIDR block ie 10.0.0.0/16"
+  type        = string
 }
 
 variable "tiers" {
-  type = set(object({
+  description = "Networking tiers"
+  type = list(object({
     name   = string
     acl    = string
     newbit = number
@@ -11,6 +13,7 @@ variable "tiers" {
 }
 
 variable "az_newbits" {
-  type = map(number)
+  description = "New bits to add to calculated cidr blocks for subnets per AZ"
+  type        = map(number)
 }
 

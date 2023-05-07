@@ -49,65 +49,115 @@ az_newbits = {
 
 ```
 
-
-`terraform refresh`
+`terraform apply`
 ```
-$ terraform refresh
+$ terraform apply
 
-Empty or non-existent state file.
+Changes to Outputs:
+  + calculated_tiers = [
+      + {
+          + acl     = "public"
+          + azs     = {
+              + "a" = "10.0.0.0/24"
+              + "b" = "10.0.1.0/24"
+              + "c" = "10.0.2.0/24"
+              + "d" = "10.0.3.0/24"
+            }
+          + name    = "app"
+          + network = "10.0.0.0/20"
+        },
+      + {
+          + acl     = "private"
+          + azs     = {
+              + "a" = "10.0.16.0/24"
+              + "b" = "10.0.17.0/24"
+              + "c" = "10.0.18.0/24"
+              + "d" = "10.0.19.0/24"
+            }
+          + name    = "db"
+          + network = "10.0.16.0/20"
+        },
+      + {
+          + acl     = "private"
+          + azs     = {
+              + "a" = "10.0.32.0/24"
+              + "b" = "10.0.33.0/24"
+              + "c" = "10.0.34.0/24"
+              + "d" = "10.0.35.0/24"
+            }
+          + name    = "worker"
+          + network = "10.0.32.0/20"
+        },
+      + {
+          + acl     = "public"
+          + azs     = {
+              + "a" = "10.0.48.0/24"
+              + "b" = "10.0.49.0/24"
+              + "c" = "10.0.50.0/24"
+              + "d" = "10.0.51.0/24"
+            }
+          + name    = "lbs"
+          + network = "10.0.48.0/20"
+        },
+    ]
 
-Refresh will do nothing. Refresh does not error or return an erroneous
-exit status because many automation scripts use refresh, plan, then apply
-and may not have a state file yet for the first run.
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.
 
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 
 Outputs:
 
 calculated_tiers = [
   {
     "acl" = "public"
-    "azs" = {
+    "azs" = tomap({
       "a" = "10.0.0.0/24"
       "b" = "10.0.1.0/24"
       "c" = "10.0.2.0/24"
       "d" = "10.0.3.0/24"
-    }
+    })
     "name" = "app"
     "network" = "10.0.0.0/20"
   },
   {
     "acl" = "private"
-    "azs" = {
+    "azs" = tomap({
       "a" = "10.0.16.0/24"
       "b" = "10.0.17.0/24"
       "c" = "10.0.18.0/24"
       "d" = "10.0.19.0/24"
-    }
+    })
     "name" = "db"
     "network" = "10.0.16.0/20"
   },
   {
     "acl" = "private"
-    "azs" = {
+    "azs" = tomap({
       "a" = "10.0.32.0/24"
       "b" = "10.0.33.0/24"
       "c" = "10.0.34.0/24"
       "d" = "10.0.35.0/24"
-    }
+    })
     "name" = "worker"
     "network" = "10.0.32.0/20"
   },
   {
     "acl" = "public"
-    "azs" = {
+    "azs" = tomap({
       "a" = "10.0.48.0/24"
       "b" = "10.0.49.0/24"
       "c" = "10.0.50.0/24"
       "d" = "10.0.51.0/24"
-    }
+    })
     "name" = "lbs"
     "network" = "10.0.48.0/20"
   },
 ]
 ```
-
