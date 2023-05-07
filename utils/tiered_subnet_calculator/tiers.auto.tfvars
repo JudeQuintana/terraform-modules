@@ -4,7 +4,7 @@ tiers = [
   {
     name   = "app"
     acl    = "public"
-    newbit = 3
+    newbit = 4
   },
   {
     name   = "db"
@@ -14,12 +14,12 @@ tiers = [
   {
     name   = "worker"
     acl    = "private"
-    newbit = 5
+    newbit = 4
   },
   {
     name   = "lbs"
     acl    = "public"
-    newbit = 6
+    newbit = 4
   }
 ]
 

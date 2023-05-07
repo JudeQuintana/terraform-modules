@@ -3,7 +3,7 @@ variable "base_cidr_block" {
 }
 
 variable "tiers" {
-  type = set(object({
+  type = list(object({
     name   = string
     acl    = string
     newbit = number
