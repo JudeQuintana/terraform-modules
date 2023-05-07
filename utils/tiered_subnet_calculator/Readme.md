@@ -40,64 +40,63 @@ az_newbits = {
 
 ```
 
-`terraform apply -refresh-only`
+`terraform apply`
 ```
-$ terraform apply -refresh-only
+$ terraform apply
 
 Changes to Outputs:
   + calculated_tiers = [
       + {
-          + acl     = "private"
+          + acl     = "public"
           + azs     = {
               + "a" = "10.0.0.0/24"
               + "b" = "10.0.1.0/24"
               + "c" = "10.0.2.0/24"
               + "d" = "10.0.3.0/24"
             }
-          + name    = "db"
+          + name    = "app"
           + network = "10.0.0.0/20"
         },
       + {
           + acl     = "private"
           + azs     = {
-              + "a" = "10.0.16.0/25"
-              + "b" = "10.0.16.128/25"
-              + "c" = "10.0.17.0/25"
-              + "d" = "10.0.17.128/25"
+              + "a" = "10.0.16.0/24"
+              + "b" = "10.0.17.0/24"
+              + "c" = "10.0.18.0/24"
+              + "d" = "10.0.19.0/24"
+            }
+          + name    = "db"
+          + network = "10.0.16.0/20"
+        },
+      + {
+          + acl     = "private"
+          + azs     = {
+              + "a" = "10.0.32.0/24"
+              + "b" = "10.0.33.0/24"
+              + "c" = "10.0.34.0/24"
+              + "d" = "10.0.35.0/24"
             }
           + name    = "worker"
-          + network = "10.0.16.0/21"
+          + network = "10.0.32.0/20"
         },
       + {
           + acl     = "public"
           + azs     = {
-              + "a" = "10.0.32.0/23"
-              + "b" = "10.0.34.0/23"
-              + "c" = "10.0.36.0/23"
-              + "d" = "10.0.38.0/23"
-            }
-          + name    = "app"
-          + network = "10.0.32.0/19"
-        },
-      + {
-          + acl     = "public"
-          + azs     = {
-              + "a" = "10.0.64.0/26"
-              + "b" = "10.0.64.64/26"
-              + "c" = "10.0.64.128/26"
-              + "d" = "10.0.64.192/26"
+              + "a" = "10.0.48.0/24"
+              + "b" = "10.0.49.0/24"
+              + "c" = "10.0.50.0/24"
+              + "d" = "10.0.51.0/24"
             }
           + name    = "lbs"
-          + network = "10.0.64.0/22"
+          + network = "10.0.48.0/20"
         },
     ]
 
-You can apply this plan to save these new output values to the Terraform state,
-without changing any real infrastructure.
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.
 
-Would you like to update the Terraform state to reflect these detected changes?
-  Terraform will write these changes to the state without modifying any real infrastructure.
-  There is no undo. Only 'yes' will be accepted to confirm.
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
 
   Enter a value: yes
 
@@ -108,49 +107,48 @@ Outputs:
 
 calculated_tiers = [
   {
-    "acl" = "private"
+    "acl" = "public"
     "azs" = tomap({
       "a" = "10.0.0.0/24"
       "b" = "10.0.1.0/24"
       "c" = "10.0.2.0/24"
       "d" = "10.0.3.0/24"
     })
-    "name" = "db"
+    "name" = "app"
     "network" = "10.0.0.0/20"
   },
   {
     "acl" = "private"
     "azs" = tomap({
-      "a" = "10.0.16.0/25"
-      "b" = "10.0.16.128/25"
-      "c" = "10.0.17.0/25"
-      "d" = "10.0.17.128/25"
+      "a" = "10.0.16.0/24"
+      "b" = "10.0.17.0/24"
+      "c" = "10.0.18.0/24"
+      "d" = "10.0.19.0/24"
+    })
+    "name" = "db"
+    "network" = "10.0.16.0/20"
+  },
+  {
+    "acl" = "private"
+    "azs" = tomap({
+      "a" = "10.0.32.0/24"
+      "b" = "10.0.33.0/24"
+      "c" = "10.0.34.0/24"
+      "d" = "10.0.35.0/24"
     })
     "name" = "worker"
-    "network" = "10.0.16.0/21"
+    "network" = "10.0.32.0/20"
   },
   {
     "acl" = "public"
     "azs" = tomap({
-      "a" = "10.0.32.0/23"
-      "b" = "10.0.34.0/23"
-      "c" = "10.0.36.0/23"
-      "d" = "10.0.38.0/23"
-    })
-    "name" = "app"
-    "network" = "10.0.32.0/19"
-  },
-  {
-    "acl" = "public"
-    "azs" = tomap({
-      "a" = "10.0.64.0/26"
-      "b" = "10.0.64.64/26"
-      "c" = "10.0.64.128/26"
-      "d" = "10.0.64.192/26"
+      "a" = "10.0.48.0/24"
+      "b" = "10.0.49.0/24"
+      "c" = "10.0.50.0/24"
+      "d" = "10.0.51.0/24"
     })
     "name" = "lbs"
-    "network" = "10.0.64.0/22"
+    "network" = "10.0.48.0/20"
   },
 ]
 ```
-
