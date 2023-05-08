@@ -1,35 +1,3 @@
-# Update May 23th 2023:
-
-Things have changed since Terraform `v0.13.0` like the resulting order (lexical sorting) of a set of objects with `for`.
-```
-variable "tiers" {
-  description = "Networking tiers"
-  type = set(object({
-    name   = string
-    acl    = string
-    newbit = number
-  }))
-}
-```
-
-Using a list of objects will keep it's current order so I can use the `var.base_cidr_block` as a starting point for generating network subnets for AWS.
-```
-variable "tiers" {
-  description = "Networking tiers"
-  type = list(object({
-    name   = string
-    acl    = string
-    newbit = number
-  }))
-}
-```
-
-Updated the article with newer outputs from Terraform `v1.3.9`, examples
-using `terraform apply` instead of `terraform refresh` (deprecated), and fixes
-from the [PR](https://github.com/JudeQuintana/terraform-modules/pull/13).
-
-~jq1 #StayUp
-
 # Overview
 
 Used to generate tiered subnets for a VPC. Please see my [Tiered Subnet
