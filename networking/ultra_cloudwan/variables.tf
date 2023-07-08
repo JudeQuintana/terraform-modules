@@ -15,7 +15,7 @@ variable "ultra_cloudwan" {
 
   type = object({
     name = string
-    super_routers = map(object({
+    super_routers = list(object({
       local = object({
         account_id      = string
         amazon_side_asn = string
