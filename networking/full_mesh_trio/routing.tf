@@ -155,13 +155,13 @@ resource "aws_route" "this_three_vpc_routes_to_two_tgws" {
   transit_gateway_id     = local.three_tgw.id
 }
 
-# TGWs
-#
+# TGWs mesh Route Tables?
+# one
+
 locals {
   tgw_route_table_full_mesh_trio_label = "full-mesh-trio"
 }
 
-# one
 resource "aws_ec2_transit_gateway_route_table" "one_mesh" {
   provider = aws.one
 
@@ -171,6 +171,30 @@ resource "aws_ec2_transit_gateway_route_table" "one_mesh" {
     { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.one_tgw.name) }
   )
 }
+# two
+resource "aws_ec2_transit_gateway_route_table" "two_mesh" {
+  provider = aws.two
+
+  transit_gateway_id = local.two_tgw.id
+  tags = merge(
+    local.default_tags,
+    { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.two_tgw.name) }
+  )
+}
+
+
+# three
+resource "aws_ec2_transit_gateway_route_table" "three_mesh" {
+  provider = aws.three
+
+  transit_gateway_id = local.three_tgw.id
+  tags = merge(
+    local.default_tags,
+    { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.three_tgw.name) }
+  )
+}
+
+# TGWs mesh Routes?
 
 locals {
   one_tgw_routes_to_two_vpcs = [
@@ -231,17 +255,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_three_t
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
 }
 
-# two
-resource "aws_ec2_transit_gateway_route_table" "two_mesh" {
-  provider = aws.two
-
-  transit_gateway_id = local.two_tgw.id
-  tags = merge(
-    local.default_tags,
-    { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.two_tgw.name) }
-  )
-}
-
+#two
 locals {
   two_tgw_routes_to_one_vpcs = [
     for this in local.two_vpc_routes_to_one_tgws : {
@@ -301,16 +315,6 @@ resource "aws_ec2_transit_gateway_route" "this_two_tgw_routes_to_vpcs_in_three_t
 }
 
 # three
-resource "aws_ec2_transit_gateway_route_table" "three_mesh" {
-  provider = aws.three
-
-  transit_gateway_id = local.three_tgw.id
-  tags = merge(
-    local.default_tags,
-    { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.three_tgw.name) }
-  )
-}
-
 locals {
   three_tgw_routes_to_one_vpcs = [
     #for this in toset(local.three_vpc_routes_to_one_tgws[*].destination_cidr_block) : {
