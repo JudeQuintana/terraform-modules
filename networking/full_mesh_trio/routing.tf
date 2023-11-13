@@ -1,34 +1,18 @@
 locals {
   route_format = "%s|%s"
 
-  one_tgws_all_vpc_network_cidrs              = local.one_tgw.vpc.network_cidrs
-  one_tgws_all_vpc_routes                     = local.one_tgw.vpc.routes
-  one_tgws_all_vpc_routes_route_table_ids     = local.one_tgws_all_vpc_routes[*].route_table_id
-  one_tgws_all_vpc_routes_transit_gateway_ids = local.one_tgws_all_vpc_routes[*].transit_gateway_id
-  one_tgws_all_route_table_ids                = local.one_tgw.route_table_id
-  one_tgws_all_ids                            = local.one_tgw.id
+  one_tgws_all_vpc_network_cidrs          = local.one_tgw.vpc.network_cidrs
+  one_tgws_all_vpc_routes                 = local.one_tgw.vpc.routes
+  one_tgws_all_vpc_routes_route_table_ids = local.one_tgws_all_vpc_routes[*].route_table_id
 
-  two_tgws_all_vpc_network_cidrs              = local.two_tgw.vpc.network_cidrs
-  two_tgws_all_vpc_routes                     = local.two_tgw.vpc.routes
-  two_tgws_all_vpc_routes_route_table_ids     = local.two_tgws_all_vpc_routes[*].route_table_id
-  two_tgws_all_vpc_routes_transit_gateway_ids = local.two_tgws_all_vpc_routes[*].transit_gateway_id
-  two_tgws_all_route_table_ids                = local.two_tgw.route_table_id
-  two_tgws_all_ids                            = local.two_tgw.id
+  two_tgws_all_vpc_network_cidrs          = local.two_tgw.vpc.network_cidrs
+  two_tgws_all_vpc_routes                 = local.two_tgw.vpc.routes
+  two_tgws_all_vpc_routes_route_table_ids = local.two_tgws_all_vpc_routes[*].route_table_id
 
-  three_tgws_all_vpc_network_cidrs              = local.three_tgw.vpc.network_cidrs
-  three_tgws_all_vpc_routes                     = local.three_tgw.vpc.routes
-  three_tgws_all_vpc_routes_route_table_ids     = local.three_tgws_all_vpc_routes[*].route_table_id
-  three_tgws_all_vpc_routes_transit_gateway_ids = local.three_tgws_all_vpc_routes[*].transit_gateway_id
-  three_tgws_all_route_table_ids                = local.three_tgw.route_table_id
-  three_tgws_all_ids                            = local.three_tgw.id
+  three_tgws_all_vpc_network_cidrs          = local.three_tgw.vpc.network_cidrs
+  three_tgws_all_vpc_routes                 = local.three_tgw.vpc.routes
+  three_tgws_all_vpc_routes_route_table_ids = local.three_tgws_all_vpc_routes[*].route_table_id
 }
-
-locals {
-  # one route table for all vpc network_cidrs
-  # route table
-}
-
-
 
 locals {
   # build new one vpc routes to two tgws
@@ -217,28 +201,6 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_two_tgw
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
 }
 
-
-resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_two" {
-  provider = aws.one
-
-  transit_gateway_route_table_id = local.one_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_one_to_this_two.id
-
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_three" {
-  provider = aws.one
-
-  transit_gateway_route_table_id = local.one_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one.id
-
-  # make sure the peer links are up before adding the route table association.
-  #depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
-}
-
-
 locals {
   one_tgw_routes_to_three_vpcs = [
     for this in local.one_vpc_routes_to_three_tgws : {
@@ -268,17 +230,6 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_three_t
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
 }
-
-#resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_three" {
-#provider = aws.one
-
-#transit_gateway_route_table_id = local.one_tgw.route_table_id
-#transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_two_to_this_three.id
-
-## make sure the peer links are up before adding the route table association.
-#depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
-#}
-
 
 # two
 resource "aws_ec2_transit_gateway_route_table" "two_mesh" {
@@ -320,27 +271,6 @@ resource "aws_ec2_transit_gateway_route" "this_two_tgw_routes_to_vpcs_in_one_tgw
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
 }
 
-resource "aws_ec2_transit_gateway_route_table_association" "this_two_to_this_one" {
-  provider = aws.two
-
-  transit_gateway_route_table_id = local.two_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_one_to_this_two.id
-
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "this_two_to_this_three" {
-  provider = aws.two
-
-  transit_gateway_route_table_id = local.two_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_two_to_this_three.id
-
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two]
-}
-
-
 locals {
   two_tgw_routes_to_three_vpcs = [
     #for this in toset(local.two_vpc_routes_to_three_tgws[*].destination_cidr_block) : {
@@ -370,18 +300,6 @@ resource "aws_ec2_transit_gateway_route" "this_two_tgw_routes_to_vpcs_in_three_t
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three]
 }
 
-#resource "aws_ec2_transit_gateway_route_table_association" "this_one_tgw_to_this_three_tgws" {
-#provider = aws.one
-
-#for_each = local.one_new_tgw_routes_to_three_vpcs
-
-#transit_gateway_route_table_id = each.value.transit_gateway_route_table_id
-#transit_gateway_attachment_id  = each.value.transit_gateway_attachment_id
-
-## make sure the peer links are up before adding the route table association.
-#depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
-#}
-
 # three
 resource "aws_ec2_transit_gateway_route_table" "three_mesh" {
   provider = aws.three
@@ -392,7 +310,6 @@ resource "aws_ec2_transit_gateway_route_table" "three_mesh" {
     { Name = format("%s-%s", local.tgw_route_table_full_mesh_trio_label, local.three_tgw.name) }
   )
 }
-
 
 locals {
   three_tgw_routes_to_one_vpcs = [
@@ -423,26 +340,6 @@ resource "aws_ec2_transit_gateway_route" "this_three_tgw_routes_to_vpcs_in_one_t
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
 }
 
-resource "aws_ec2_transit_gateway_route_table_association" "this_three_to_this_one" {
-  provider = aws.three
-
-  transit_gateway_route_table_id = local.three_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.this_three_to_this_one.id
-
-  # make sure the peer links are up before adding the route table association.
-  depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "this_three_to_this_two" {
-  provider = aws.three
-
-  transit_gateway_route_table_id = local.three_tgw.route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three.id
-
-  # make sure the peer links are up before adding the route table association.
-  #depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one]
-}
-
 locals {
   three_tgw_routes_to_two_vpcs = [
     #for this in toset(local.three_vpc_routes_to_two_tgws[*].destination_cidr_block) : {
@@ -470,4 +367,50 @@ resource "aws_ec2_transit_gateway_route" "this_three_tgw_routes_to_vpcs_in_two_t
 
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three]
+}
+
+## Associations
+# one
+resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_two" {
+  provider = aws.one
+
+  transit_gateway_route_table_id = local.one_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_three" {
+  provider = aws.one
+
+  transit_gateway_route_table_id = local.one_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one.id
+}
+
+#two
+resource "aws_ec2_transit_gateway_route_table_association" "this_two_to_this_one" {
+  provider = aws.two
+
+  transit_gateway_route_table_id = local.two_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_two_to_this_three" {
+  provider = aws.two
+
+  transit_gateway_route_table_id = local.two_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three.id
+}
+
+# three
+resource "aws_ec2_transit_gateway_route_table_association" "this_three_to_this_one" {
+  provider = aws.three
+
+  transit_gateway_route_table_id = local.three_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_three_to_this_two" {
+  provider = aws.three
+
+  transit_gateway_route_table_id = local.three_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three.id
 }

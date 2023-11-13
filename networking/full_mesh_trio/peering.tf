@@ -2,17 +2,9 @@ locals {
   peering_name_format = "%s <-> %s"
 
   # renaming var to shorter name
-  one_tgw               = var.full_mesh_trio.one.centralized_router
-  one_tgws              = [var.full_mesh_trio.one.centralized_router]
-  one_tgw_id_to_one_tgw = { for this in local.one_tgws : this.id => this }
-
-  two_tgw               = var.full_mesh_trio.two.centralized_router
-  two_tgws              = [var.full_mesh_trio.two.centralized_router]
-  two_tgw_id_to_two_tgw = { for this in local.two_tgws : this.id => this }
-
-  three_tgw                 = var.full_mesh_trio.three.centralized_router
-  three_tgws                = [var.full_mesh_trio.three.centralized_router]
-  three_tgw_id_to_three_tgw = { for this in local.three_tgws : this.id => this }
+  one_tgw   = var.full_mesh_trio.one.centralized_router
+  two_tgw   = var.full_mesh_trio.two.centralized_router
+  three_tgw = var.full_mesh_trio.three.centralized_router
 }
 
 ########################################################################################
@@ -24,7 +16,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_one_to_this_two" {
   provider = aws.one
 
   peer_account_id         = var.full_mesh_trio.two.centralized_router.account_id
-  peer_region             = local.two_region_name
+  peer_region             = var.full_mesh_trio.two.centralized_router.region
   peer_transit_gateway_id = var.full_mesh_trio.two.centralized_router.id
   transit_gateway_id      = var.full_mesh_trio.one.centralized_router.id
   tags = merge(
@@ -59,7 +51,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
   provider = aws.two
 
   peer_account_id         = var.full_mesh_trio.three.centralized_router.account_id
-  peer_region             = local.three_region_name
+  peer_region             = var.full_mesh_trio.three.centralized_router.region
   peer_transit_gateway_id = var.full_mesh_trio.three.centralized_router.id
   transit_gateway_id      = var.full_mesh_trio.two.centralized_router.id
   tags = merge(
@@ -94,7 +86,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_three_to_this_one" {
   provider = aws.three
 
   peer_account_id         = var.full_mesh_trio.one.centralized_router.account_id
-  peer_region             = local.one_region_name
+  peer_region             = var.full_mesh_trio.one.centralized_router.region
   peer_transit_gateway_id = var.full_mesh_trio.one.centralized_router.id
   transit_gateway_id      = var.full_mesh_trio.three.centralized_router.id
   tags = merge(
