@@ -1,7 +1,6 @@
 /*
 * Full Mesh Trio will take in three Centralized Routers and compose a full mesh peering configuration between them. It will then generate routes for all tgws and their respsective VPCs.
 *
-*
 * ```
 * module "full_mesh_trio" {
 *   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.5.0"
