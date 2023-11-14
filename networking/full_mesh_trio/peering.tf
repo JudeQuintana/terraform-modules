@@ -14,10 +14,10 @@ locals {
 resource "aws_ec2_transit_gateway_peering_attachment" "this_one_to_this_two" {
   provider = aws.one
 
-  transit_gateway_id      = var.full_mesh_trio.one.centralized_router.id
-  peer_account_id         = var.full_mesh_trio.two.centralized_router.account_id
-  peer_region             = var.full_mesh_trio.two.centralized_router.region
-  peer_transit_gateway_id = var.full_mesh_trio.two.centralized_router.id
+  transit_gateway_id      = local.one_tgw.id
+  peer_account_id         = local.two_tgw.account_id
+  peer_region             = local.two_tgw.region
+  peer_transit_gateway_id = local.two_tgw.id
   tags = merge(
     local.default_tags,
     {
@@ -38,6 +38,26 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_one_to_this_two" {
     precondition {
       condition     = local.one_tgw_provider_account_id_check.condition
       error_message = local.one_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.two_tgw_provider_region_check.condition
+      error_message = local.two_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.two_tgw_provider_account_id_check.condition
+      error_message = local.two_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.three_tgw_provider_region_check.condition
+      error_message = local.three_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.three_tgw_provider_account_id_check.condition
+      error_message = local.three_tgw_provider_account_id_check.error_message
     }
   }
 }
@@ -62,10 +82,10 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_one_to_this
 resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
   provider = aws.two
 
-  transit_gateway_id      = var.full_mesh_trio.two.centralized_router.id
-  peer_account_id         = var.full_mesh_trio.three.centralized_router.account_id
-  peer_region             = var.full_mesh_trio.three.centralized_router.region
-  peer_transit_gateway_id = var.full_mesh_trio.three.centralized_router.id
+  transit_gateway_id      = local.two_tgw.id
+  peer_account_id         = local.three_tgw.account_id
+  peer_region             = local.three_tgw.region
+  peer_transit_gateway_id = local.three_tgw.id
   tags = merge(
     local.default_tags,
     {
@@ -78,6 +98,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
     # cant use dynamic block for lifecycle blocks
     # tgw region and account id preconditions are evaluated only on apply
     # see preconditions.tf
+    precondition {
+      condition     = local.one_tgw_provider_region_check.condition
+      error_message = local.one_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.one_tgw_provider_account_id_check.condition
+      error_message = local.one_tgw_provider_account_id_check.error_message
+    }
+
     precondition {
       condition     = local.two_tgw_provider_region_check.condition
       error_message = local.two_tgw_provider_region_check.error_message
@@ -110,10 +140,10 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_two_to_this
 resource "aws_ec2_transit_gateway_peering_attachment" "this_three_to_this_one" {
   provider = aws.three
 
-  transit_gateway_id      = var.full_mesh_trio.three.centralized_router.id
-  peer_account_id         = var.full_mesh_trio.one.centralized_router.account_id
-  peer_region             = var.full_mesh_trio.one.centralized_router.region
-  peer_transit_gateway_id = var.full_mesh_trio.one.centralized_router.id
+  transit_gateway_id      = local.three_tgw.id
+  peer_account_id         = local.one_tgw.account_id
+  peer_region             = local.one_tgw.region
+  peer_transit_gateway_id = local.one_tgw.id
   tags = merge(
     local.default_tags,
     {
@@ -126,6 +156,26 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_three_to_this_one" {
     # cant use dynamic block for lifecycle blocks
     # tgw region and account id preconditions are evaluated only on apply
     # see preconditions.tf
+    precondition {
+      condition     = local.one_tgw_provider_region_check.condition
+      error_message = local.one_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.one_tgw_provider_account_id_check.condition
+      error_message = local.one_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.two_tgw_provider_region_check.condition
+      error_message = local.two_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.two_tgw_provider_account_id_check.condition
+      error_message = local.two_tgw_provider_account_id_check.error_message
+    }
+
     precondition {
       condition     = local.three_tgw_provider_region_check.condition
       error_message = local.three_tgw_provider_region_check.error_message
