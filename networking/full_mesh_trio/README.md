@@ -1,4 +1,4 @@
-Full Mesh Trio will take in three Centralized Routers and compose a full mesh peering and routing configuration between them and their respsective VPCs.
+Full Mesh Trio will take in three Centralized Routers and compose a full mesh peering configuration between them. It will then generate routes for all tgws and their respsective VPCs.
 
 ```
 module "full_mesh_trio" {
