@@ -11,7 +11,6 @@ locals {
 # Begin Full Mesh Trio One Side to Two Side
 ########################################################################################
 
-# Create the Peering attachment in cross region to full mesh trio (same acct) for the one provider
 resource "aws_ec2_transit_gateway_peering_attachment" "this_one_to_this_two" {
   provider = aws.one
 
@@ -28,7 +27,6 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_one_to_this_two" {
   )
 }
 
-# accept it in cross region.
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_one_to_this_two" {
   provider = aws.two
 
@@ -46,7 +44,6 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_one_to_this
 # Begin Full Mesh Trio Two Side to Three Side
 ########################################################################################
 
-# Create the Peering attachment in cross region to full mesh trio (same acct) for the two provider
 resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
   provider = aws.two
 
@@ -63,7 +60,6 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
   )
 }
 
-# accept it in cross region.
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_two_to_this_three" {
   provider = aws.three
 
@@ -81,7 +77,6 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_two_to_this
 # Begin Full Mesh Trio Three Side to One Side
 ########################################################################################
 
-# Create the Peering attachment in cross region to full mesh trio (same acct) for the three provider
 resource "aws_ec2_transit_gateway_peering_attachment" "this_three_to_this_one" {
   provider = aws.three
 
@@ -98,7 +93,6 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_three_to_this_one" {
   )
 }
 
-# accept it in cross region.
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_three_to_this_one" {
   provider = aws.one
 
