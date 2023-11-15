@@ -14,23 +14,23 @@ locals {
 ## vpc routes
 # one
 locals {
-  # build new one vpc routes to two tgw
-  one_vpc_routes_to_two_tgw = [
+  # build new one vpc routes to two tgw vpcs
+  one_vpc_routes_to_two_tgw_vpcs = [
     for one_route_table_id_and_two_tgw_network_cidr in setproduct(local.one_tgw_vpc_routes_route_table_ids, local.two_tgw_vpc_network_cidrs) : {
       route_table_id         = one_route_table_id_and_two_tgw_network_cidr[0]
       destination_cidr_block = one_route_table_id_and_two_tgw_network_cidr[1]
   }]
 
-  one_tgw_new_vpc_routes_to_two_tgw = {
-    for this in local.one_vpc_routes_to_two_tgw :
+  one_tgw_new_vpc_routes_to_two_tgw_vpcs = {
+    for this in local.one_vpc_routes_to_two_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_one_vpc_routes_to_two_tgw" {
+resource "aws_route" "this_one_vpc_routes_to_two_tgw_vpcs" {
   provider = aws.one
 
-  for_each = local.one_tgw_new_vpc_routes_to_two_tgw
+  for_each = local.one_tgw_new_vpc_routes_to_two_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -38,22 +38,22 @@ resource "aws_route" "this_one_vpc_routes_to_two_tgw" {
 }
 
 locals {
-  one_vpc_routes_to_three_tgw = [
+  one_vpc_routes_to_three_tgw_vpcs = [
     for one_route_table_id_and_two_tgw_network_cidr in setproduct(local.one_tgw_vpc_routes_route_table_ids, local.three_tgw_vpc_network_cidrs) : {
       route_table_id         = one_route_table_id_and_two_tgw_network_cidr[0]
       destination_cidr_block = one_route_table_id_and_two_tgw_network_cidr[1]
   }]
 
-  one_tgw_new_vpc_routes_to_three_tgw = {
-    for this in local.one_vpc_routes_to_three_tgw :
+  one_tgw_new_vpc_routes_to_three_tgw_vpcs = {
+    for this in local.one_vpc_routes_to_three_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_one_vpc_routes_to_three_tgw" {
+resource "aws_route" "this_one_vpc_routes_to_three_tgw_vpcs" {
   provider = aws.one
 
-  for_each = local.one_tgw_new_vpc_routes_to_three_tgw
+  for_each = local.one_tgw_new_vpc_routes_to_three_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -62,23 +62,23 @@ resource "aws_route" "this_one_vpc_routes_to_three_tgw" {
 
 # two
 locals {
-  # build new two vpc routes to one tgw
-  two_vpc_routes_to_one_tgw = [
+  # build new two vpc routes to one tgw vpcs
+  two_vpc_routes_to_one_tgw_vpcs = [
     for two_route_table_id_and_one_tgw_network_cidr in setproduct(local.two_tgw_vpc_routes_route_table_ids, local.one_tgw_vpc_network_cidrs) : {
       route_table_id         = two_route_table_id_and_one_tgw_network_cidr[0]
       destination_cidr_block = two_route_table_id_and_one_tgw_network_cidr[1]
   }]
 
-  two_tgw_new_vpc_routes_to_one_tgw = {
-    for this in local.two_vpc_routes_to_one_tgw :
+  two_tgw_new_vpc_routes_to_one_tgw_vpcs = {
+    for this in local.two_vpc_routes_to_one_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_two_vpc_routes_to_one_tgw" {
+resource "aws_route" "this_two_vpc_routes_to_one_tgw_vpcs" {
   provider = aws.two
 
-  for_each = local.two_tgw_new_vpc_routes_to_one_tgw
+  for_each = local.two_tgw_new_vpc_routes_to_one_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -86,22 +86,22 @@ resource "aws_route" "this_two_vpc_routes_to_one_tgw" {
 }
 
 locals {
-  two_vpc_routes_to_three_tgw = [
+  two_vpc_routes_to_three_tgw_vpcs = [
     for two_route_table_id_and_three_tgw_network_cidr in setproduct(local.two_tgw_vpc_routes_route_table_ids, local.three_tgw_vpc_network_cidrs) : {
       route_table_id         = two_route_table_id_and_three_tgw_network_cidr[0]
       destination_cidr_block = two_route_table_id_and_three_tgw_network_cidr[1]
   }]
 
-  two_tgw_new_vpc_routes_to_three_tgw = {
-    for this in local.two_vpc_routes_to_three_tgw :
+  two_tgw_new_vpc_routes_to_three_tgw_vpcs = {
+    for this in local.two_vpc_routes_to_three_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_two_vpc_routes_to_three_tgw" {
+resource "aws_route" "this_two_vpc_routes_to_three_tgw_vpcs" {
   provider = aws.two
 
-  for_each = local.two_tgw_new_vpc_routes_to_three_tgw
+  for_each = local.two_tgw_new_vpc_routes_to_three_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -110,23 +110,23 @@ resource "aws_route" "this_two_vpc_routes_to_three_tgw" {
 
 # three
 locals {
-  # build new three vpc routes to one tgw
-  three_vpc_routes_to_one_tgw = [
+  # build new three vpc routes to one tgw vpcs
+  three_vpc_routes_to_one_tgw_vpcs = [
     for three_route_table_id_and_one_tgw_network_cidr in setproduct(local.three_tgw_vpc_routes_route_table_ids, local.one_tgw_vpc_network_cidrs) : {
       route_table_id         = three_route_table_id_and_one_tgw_network_cidr[0]
       destination_cidr_block = three_route_table_id_and_one_tgw_network_cidr[1]
   }]
 
-  three_tgw_new_vpc_routes_to_one_tgw = {
-    for this in local.three_vpc_routes_to_one_tgw :
+  three_tgw_new_vpc_routes_to_one_tgw_vpcs = {
+    for this in local.three_vpc_routes_to_one_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_three_vpc_routes_to_one_tgw" {
+resource "aws_route" "this_three_vpc_routes_to_one_tgw_vpcs" {
   provider = aws.three
 
-  for_each = local.three_tgw_new_vpc_routes_to_one_tgw
+  for_each = local.three_tgw_new_vpc_routes_to_one_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -134,22 +134,22 @@ resource "aws_route" "this_three_vpc_routes_to_one_tgw" {
 }
 
 locals {
-  three_vpc_routes_to_two_tgw = [
+  three_vpc_routes_to_two_tgw_vpcs = [
     for three_route_table_id_and_two_tgw_network_cidr in setproduct(local.three_tgw_vpc_routes_route_table_ids, local.two_tgw_vpc_network_cidrs) : {
       route_table_id         = three_route_table_id_and_two_tgw_network_cidr[0]
       destination_cidr_block = three_route_table_id_and_two_tgw_network_cidr[1]
   }]
 
-  three_tgw_new_vpc_routes_to_two_tgw = {
-    for this in local.three_vpc_routes_to_two_tgw :
+  three_tgw_new_vpc_routes_to_two_tgw_vpcs = {
+    for this in local.three_vpc_routes_to_two_tgw_vpcs :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
   }
 }
 
-resource "aws_route" "this_three_vpc_routes_to_two_tgw" {
+resource "aws_route" "this_three_vpc_routes_to_two_tgw_vpcs" {
   provider = aws.three
 
-  for_each = local.three_tgw_new_vpc_routes_to_two_tgw
+  for_each = local.three_tgw_new_vpc_routes_to_two_tgw_vpcs
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
