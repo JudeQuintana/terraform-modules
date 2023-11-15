@@ -2,16 +2,13 @@ locals {
   route_format = "%s|%s"
 
   one_tgw_vpc_network_cidrs          = local.one_tgw.vpc.network_cidrs
-  one_tgw_vpc_routes                 = local.one_tgw.vpc.routes
-  one_tgw_vpc_routes_route_table_ids = local.one_tgw_vpc_routes[*].route_table_id
+  one_tgw_vpc_routes_route_table_ids = local.one_tgw.vpc.routes[*].route_table_id
 
   two_tgw_vpc_network_cidrs          = local.two_tgw.vpc.network_cidrs
-  two_tgw_vpc_routes                 = local.two_tgw.vpc.routes
-  two_tgw_vpc_routes_route_table_ids = local.two_tgw_vpc_routes[*].route_table_id
+  two_tgw_vpc_routes_route_table_ids = local.two_tgw.vpc.routes[*].route_table_id
 
   three_tgw_vpc_network_cidrs          = local.three_tgw.vpc.network_cidrs
-  three_tgw_vpc_routes                 = local.three_tgw.vpc.routes
-  three_tgw_vpc_routes_route_table_ids = local.three_tgw_vpc_routes[*].route_table_id
+  three_tgw_vpc_routes_route_table_ids = local.three_tgw.vpc.routes[*].route_table_id
 }
 
 ## vpc routes
