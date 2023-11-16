@@ -88,24 +88,6 @@ variable "full_mesh_trio" {
   }
 
   validation {
-    condition = ((
-      var.full_mesh_trio.one.centralized_router.amazon_side_asn >= 64512 && var.full_mesh_trio.one.centralized_router.amazon_side_asn <= 65534
-      ) && (
-      var.full_mesh_trio.two.centralized_router.amazon_side_asn >= 64512 && var.full_mesh_trio.two.centralized_router.amazon_side_asn <= 65534
-      ) && (
-      var.full_mesh_trio.three.centralized_router.amazon_side_asn >= 64512 && var.full_mesh_trio.three.centralized_router.amazon_side_asn <= 65534
-      )) || ((
-      var.full_mesh_trio.one.centralized_router.amazon_side_asn >= 4200000000 && var.full_mesh_trio.one.centralized_router.amazon_side_asn <= 4294967294
-      ) && (
-      var.full_mesh_trio.two.centralized_router.amazon_side_asn >= 4200000000 && var.full_mesh_trio.two.centralized_router.amazon_side_asn <= 4294967294
-      ) && (
-      var.full_mesh_trio.three.centralized_router.amazon_side_asn >= 4200000000 && var.full_mesh_trio.three.centralized_router.amazon_side_asn <= 4294967294
-    ))
-
-    error_message = "All Centralized Routers amazon side ASNs should be within 64512 to 65534 (inclusive) for 16-bit ASNs or 4200000000 to 4294967294 (inclusive) for 32-bit ASNs.."
-  }
-
-  validation {
     condition = length(
       distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.names, var.full_mesh_trio.two.centralized_router.vpc.names, var.full_mesh_trio.three.centralized_router.vpc.names))
     ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.names, var.full_mesh_trio.two.centralized_router.vpc.names, var.full_mesh_trio.three.centralized_router.vpc.names))
