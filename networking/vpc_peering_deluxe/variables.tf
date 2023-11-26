@@ -18,6 +18,7 @@ variable "vpc_peering_deluxe" {
         public_route_table_ids  = list(string)
         region                  = string
       })
+      only_route_subnet_cidrs = optional(list(string), [])
     })
     peer = object({
       vpc = object({
@@ -32,6 +33,7 @@ variable "vpc_peering_deluxe" {
         public_route_table_ids  = list(string)
         region                  = string
       })
+      only_route_subnet_cidrs = optional(list(string), [])
     })
   })
 }
