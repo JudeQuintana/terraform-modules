@@ -1,7 +1,7 @@
 locals {
   route_format = "%s|%s"
 
-  only_route_subnet_cidrs = length(var.vpc_peering_deluxe.local.only_route_subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.local.only_route_subnet_cidrs) > 0
+  only_route_subnet_cidrs = length(var.vpc_peering_deluxe.local.only_route_subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.peer.only_route_subnet_cidrs) > 0
 
   local_vpc_route_table_ids = concat(var.vpc_peering_deluxe.local.vpc.private_route_table_ids, var.vpc_peering_deluxe.local.vpc.public_route_table_ids)
   local_vpc_subnet_cidrs    = local.only_route_subnet_cidrs ? var.vpc_peering_deluxe.local.only_route_subnet_cidrs : concat(var.vpc_peering_deluxe.local.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_subnet_cidrs)
