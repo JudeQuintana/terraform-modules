@@ -3,7 +3,7 @@ variable "env_prefix" {
   type        = string
 }
 
-variable "vpc_peering" {
+variable "vpc_peering_deluxe" {
   type = object({
     local = object({
       vpc = object({

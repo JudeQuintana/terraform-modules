@@ -9,15 +9,15 @@ locals {
 resource "aws_vpc_peering_connection" "this_local_to_this_peer" {
   provider = aws.local
 
-  vpc_id        = var.vpc_peering.local.vpc.id
-  peer_region   = var.vpc_peering.peer.vpc.region
-  peer_vpc_id   = var.vpc_peering.peer.vpc.id
-  peer_owner_id = var.vpc_peering.peer.vpc.account_id
+  vpc_id        = var.vpc_peering_deluxe.local.vpc.id
+  peer_region   = var.vpc_peering_deluxe.peer.vpc.region
+  peer_vpc_id   = var.vpc_peering_deluxe.peer.vpc.id
+  peer_owner_id = var.vpc_peering_deluxe.peer.vpc.account_id
 
   tags = merge(
     local.default_tags,
     {
-      Name = format(local.peering_name_format, var.vpc_peering.local.vpc.full_name, var.vpc_peering.peer.vpc.full_name)
+      Name = format(local.peering_name_format, var.vpc_peering_deluxe.local.vpc.full_name, var.vpc_peering_deluxe.peer.vpc.full_name)
       Side = "Local Creator"
     }
   )
@@ -32,7 +32,7 @@ resource "aws_vpc_peering_connection_accepter" "this_local_to_this_peer" {
   tags = merge(
     local.default_tags,
     {
-      Name = format(local.peering_name_format, var.vpc_peering.peer.vpc.full_name, var.vpc_peering.local.vpc.full_name)
+      Name = format(local.peering_name_format, var.vpc_peering_deluxe.peer.vpc.full_name, var.vpc_peering_deluxe.local.vpc.full_name)
       Side = "Peer Accepter"
     }
   )
