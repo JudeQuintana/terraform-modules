@@ -1,5 +1,8 @@
 VPC Peering Deluxe module will create appropriate routes for all subnets in each cross region Tiered VPC-NG by default.
+
 Should also work for intra region VPCs.
+
+Can be used in tandem with Centralized Router, Super Router and Full Mesh Trio for workloads that transfer lots of data to save on cost instead of via TGW.
 ```
 module "vpc_peering_deluxe" {
  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
