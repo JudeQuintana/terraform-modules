@@ -25,7 +25,7 @@
 * }
 * ```
 *
-* Specific subnet cidrs can be selected (instead of default behavior of allow all subnets) to route across the VPC peering connection via var.only_route_subnet_cidrs list is populated.
+* Specific subnet cidrs can be selected (instead of default behavior of allow all subnets) to route across the VPC peering connection via only_route_subnet_cidrs variable list is populated.
 *
 * Additional option to allow remote dns resolution too.
 * ```
