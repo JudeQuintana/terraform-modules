@@ -1,4 +1,3 @@
-
 output "peering" {
   value = {
     allow_remote_vpc_dns_resolution = var.vpc_peering_deluxe.allow_remote_vpc_dns_resolution
