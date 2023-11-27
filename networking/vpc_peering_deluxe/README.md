@@ -3,6 +3,9 @@ VPC Peering Deluxe module will create appropriate routes for all subnets in each
 Should also work for intra region VPCs.
 
 Can be used in tandem with Centralized Router, Super Router and Full Mesh Trio for workloads that transfer lots of data to save on cost instead of via TGW.
+
+See it in action in [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo)
+
 ```
 module "vpc_peering_deluxe" {
  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
