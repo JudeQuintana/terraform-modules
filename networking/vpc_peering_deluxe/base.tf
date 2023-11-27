@@ -23,7 +23,6 @@ resource "aws_vpc_peering_connection" "this_local_to_this_peer" {
   )
 }
 
-# Accept VPC peering request
 resource "aws_vpc_peering_connection_accepter" "this_local_to_this_peer" {
   provider = aws.peer
 
@@ -36,5 +35,37 @@ resource "aws_vpc_peering_connection_accepter" "this_local_to_this_peer" {
       Side = "Peer Accepter"
     }
   )
+}
+
+# connection options
+# https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/vpc_peering_connection_options
+# Docs say not to use aws_vpc_peering_connection_options with aws_vpc_peering_connection but this is apprently how you do it (in 4.x aws provider)
+# :shruglife:
+locals {
+  vpc_peering_connection_options = { for this in [var.vpc_peering_deluxe.allow_remote_vpc_dns_resolution] : this => this if var.vpc_peering_deluxe.allow_remote_vpc_dns_resolution }
+}
+
+resource "aws_vpc_peering_connection_options" "this_local" {
+  provider = aws.local
+
+  for_each = local.vpc_peering_connection_options
+
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.this_local_to_this_peer.id
+
+  requester {
+    allow_remote_vpc_dns_resolution = each.value
+  }
+}
+
+resource "aws_vpc_peering_connection_options" "this_peer" {
+  provider = aws.peer
+
+  for_each = local.vpc_peering_connection_options
+
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.this_local_to_this_peer.id
+
+  accepter {
+    allow_remote_vpc_dns_resolution = each.value
+  }
 }
 

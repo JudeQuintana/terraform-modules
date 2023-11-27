@@ -6,6 +6,7 @@ variable "env_prefix" {
 variable "vpc_peering_deluxe" {
   description = "VPC Peering Deluxe configuration. Will create appropriate routes for all subnets in each VPC by default unless specific subnet cidrs are selected to route across the VPC peering connection via only_route_subnet_cidrs list is populated."
   type = object({
+    allow_remote_vpc_dns_resolution = optional(bool, false)
     local = object({
       vpc = object({
         account_id              = string
