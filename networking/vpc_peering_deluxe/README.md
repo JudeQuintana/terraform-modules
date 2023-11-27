@@ -94,4 +94,6 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_peering"></a> [peering](#output\_peering) | n/a |
