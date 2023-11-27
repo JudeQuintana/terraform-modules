@@ -1,5 +1,5 @@
 /*
-* VPC Peering Deluxe module will create appropriate routes for all subnets in each cross region VPC by default.
+* VPC Peering Deluxe module will create appropriate routes for all subnets in each cross region Tiered VPC-NG by default.
 * Should also work for intra region VPCs.
 * ```
 * module "vpc_peering_deluxe" {
