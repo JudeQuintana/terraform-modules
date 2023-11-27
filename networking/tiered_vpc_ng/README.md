@@ -168,8 +168,10 @@ No modules.
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | n/a |
 | <a name="output_private_route_table_ids"></a> [private\_route\_table\_ids](#output\_private\_route\_table\_ids) | n/a |
+| <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | n/a |
 | <a name="output_private_subnet_name_to_subnet_id"></a> [private\_subnet\_name\_to\_subnet\_id](#output\_private\_subnet\_name\_to\_subnet\_id) | n/a |
 | <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | n/a |
 | <a name="output_public_special_subnet_ids"></a> [public\_special\_subnet\_ids](#output\_public\_special\_subnet\_ids) | n/a |
+| <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | n/a |
 | <a name="output_public_subnet_name_to_subnet_id"></a> [public\_subnet\_name\_to\_subnet\_id](#output\_public\_subnet\_name\_to\_subnet\_id) | n/a |
 | <a name="output_region"></a> [region](#output\_region) | n/a |
