@@ -9,7 +9,7 @@
 *
 * ```
 * module "vpc_peering_deluxe" {
-*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
 *
 *  providers = {
 *    aws.local = aws.use1
@@ -33,7 +33,7 @@
 * Additional option to allow remote dns resolution too.
 * ```
 * module "vpc_peering_deluxe" {
-*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
 *
 *  providers = {
 *    aws.local = aws.use1

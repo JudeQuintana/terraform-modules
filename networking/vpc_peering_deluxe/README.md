@@ -8,7 +8,7 @@ See it in action in [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraf
 
 ```
 module "vpc_peering_deluxe" {
- source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
+ source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
 
  providers = {
    aws.local = aws.use1
@@ -32,7 +32,7 @@ Specific subnet cidrs can be selected (instead of default behavior of allow all 
 Additional option to allow remote dns resolution too.
 ```
 module "vpc_peering_deluxe" {
- source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.0"
+ source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
 
  providers = {
    aws.local = aws.use1
