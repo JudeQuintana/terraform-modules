@@ -64,6 +64,24 @@ variable "vpc_peering_deluxe" {
     ])
     error_message = "If the var.vpc_peering_deluxe.peer.only_route_subnet_cidrs is popluated then all its subnets must already exist in the peer VPC."
   }
+
+  validation {
+    condition = length(distinct(
+      [var.vpc_peering_deluxe.local.vpc.name, var.vpc_peering_deluxe.peer.vpc.name]
+      )) == length(
+      [var.vpc_peering_deluxe.local.vpc.name, var.vpc_peering_deluxe.peer.vpc.name]
+    )
+    error_message = "Each VPC name must be unique."
+  }
+
+  validation {
+    condition = length(distinct(
+      [var.vpc_peering_deluxe.local.vpc.network_cidr, var.vpc_peering_deluxe.peer.vpc.network_cidr]
+      )) == length(
+      [var.vpc_peering_deluxe.local.vpc.network_cidr, var.vpc_peering_deluxe.peer.vpc.network_cidr]
+    )
+    error_message = "Each VPC network cidr must be unique."
+  }
 }
 
 variable "tags" {

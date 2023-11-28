@@ -10,9 +10,9 @@ locals {
   peer_vpc_subnet_cidrs = local.only_route_subnet_cidrs ? var.vpc_peering_deluxe.peer.only_route_subnet_cidrs : concat(var.vpc_peering_deluxe.peer.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_subnet_cidrs)
 
   local_vpc_routes_to_peer_vpc_subnet_cidrs = [
-    for local_vpc_route_table_id_and_peer_vpc_network_cidr in setproduct(local.local_vpc_route_table_ids, local.peer_vpc_subnet_cidrs) : {
-      route_table_id         = local_vpc_route_table_id_and_peer_vpc_network_cidr[0]
-      destination_cidr_block = local_vpc_route_table_id_and_peer_vpc_network_cidr[1]
+    for local_vpc_route_table_id_and_peer_vpc_subnet_cidr in setproduct(local.local_vpc_route_table_ids, local.peer_vpc_subnet_cidrs) : {
+      route_table_id         = local_vpc_route_table_id_and_peer_vpc_subnet_cidr[0]
+      destination_cidr_block = local_vpc_route_table_id_and_peer_vpc_subnet_cidr[1]
   }]
 
   local_new_vpc_routes_to_peer_vpc_subnet_cidrs = {
@@ -21,9 +21,9 @@ locals {
   }
 
   peer_vpc_routes_to_local_vpc_subnet_cidrs = [
-    for peer_vpc_route_table_id_and_local_vpc_network_cidr in setproduct(local.peer_route_table_ids, local.local_vpc_subnet_cidrs) : {
-      route_table_id         = peer_vpc_route_table_id_and_local_vpc_network_cidr[0]
-      destination_cidr_block = peer_vpc_route_table_id_and_local_vpc_network_cidr[1]
+    for peer_vpc_route_table_id_and_local_vpc_subnet_cidr in setproduct(local.peer_route_table_ids, local.local_vpc_subnet_cidrs) : {
+      route_table_id         = peer_vpc_route_table_id_and_local_vpc_subnet_cidr[0]
+      destination_cidr_block = peer_vpc_route_table_id_and_local_vpc_subnet_cidr[1]
   }]
 
   peer_new_vpc_routes_to_local_vpc_subnet_cidrs = {
