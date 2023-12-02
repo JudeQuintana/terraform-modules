@@ -106,7 +106,14 @@ locals {
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
+  three_vpc_id_to_intra_vpc_security_group_id = merge([
+    for this in var.super_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.intra_vpc_security_group_id
+  }]...)
+
   intra_vpc_security_group_rules_format = "%s|%s-%s-%s"
+  intra_vpc_security_group_rule_type    = "ingress"
 
   one_vpc_id_and_rule_to_two_intra_vpc_security_group_rule = merge([
     for this in local.two_rules : {
@@ -114,7 +121,17 @@ locals {
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
-        type                        = "ingress"
+        type                        = local.intra_vpc_security_group_rule_type
+      }, this)
+  }]...)
+
+  one_vpc_id_and_rule_to_three_intra_vpc_security_group_rule = merge([
+    for this in local.three_rules : {
+      for vpc_id, inbound_network_cidrs in local.one_vpc_id_to_three_inbound_network_cidrs :
+      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+        intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = inbound_network_cidrs
+        type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
 
@@ -124,93 +141,123 @@ locals {
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.two_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
-        type                        = "ingress"
+        type                        = local.intra_vpc_security_group_rule_type
+      }, this)
+  }]...)
+
+  two_vpc_id_and_rule_to_three_intra_vpc_security_group_rule = merge([
+    for this in local.three_rules : {
+      for vpc_id, inbound_network_cidrs in local.two_vpc_id_to_three_inbound_network_cidrs :
+      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+        intra_vpc_security_group_id = lookup(local.two_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = inbound_network_cidrs
+        type                        = local.intra_vpc_security_group_rule_type
+      }, this)
+  }]...)
+
+  three_vpc_id_and_rule_to_one_intra_vpc_security_group_rule = merge([
+    for this in local.one_rules : {
+      for vpc_id, inbound_network_cidrs in local.three_vpc_id_to_one_inbound_network_cidrs :
+      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+        intra_vpc_security_group_id = lookup(local.three_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = inbound_network_cidrs
+        type                        = local.intra_vpc_security_group_rule_type
+      }, this)
+  }]...)
+
+  three_vpc_id_and_rule_to_two_intra_vpc_security_group_rule = merge([
+    for this in local.two_rules : {
+      for vpc_id, inbound_network_cidrs in local.one_vpc_id_to_three_inbound_network_cidrs :
+      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+        intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        network_cidrs               = inbound_network_cidrs
+        type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
 }
 
-resource "aws_security_group_rule" "this_one" {
-  provider = aws.one
+#resource "aws_security_group_rule" "this_one" {
+#provider = aws.one
 
-  for_each = local.one_vpc_id_and_rule_to_two_intra_vpc_security_group_rule
+#for_each = local.one_vpc_id_and_rule_to_two_intra_vpc_security_group_rule
 
-  security_group_id = each.value.intra_vpc_security_group_id
-  cidr_blocks       = each.value.network_cidrs
-  type              = each.value.type
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  protocol          = each.value.protocol
-  description = format(
-    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
-    local.one_region_label,
-    each.value.label,
-    local.two_region_label
-  )
+#security_group_id = each.value.intra_vpc_security_group_id
+#cidr_blocks       = each.value.network_cidrs
+#type              = each.value.type
+#from_port         = each.value.from_port
+#to_port           = each.value.to_port
+#protocol          = each.value.protocol
+#description = format(
+#"%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+#upper(var.env_prefix),
+#local.one_region_label,
+#each.value.label,
+#local.two_region_label
+#)
 
-  #lifecycle {
-  ## preconditions are evaluated on apply only.
-  #precondition {
-  #condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
-  #error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
-  #}
+#lifecycle {
+## preconditions are evaluated on apply only.
+#precondition {
+#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
+#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
-  #error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
-  #}
+#precondition {
+#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
+#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
-  #error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
-  #}
+#precondition {
+#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
+#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
-  #error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
-  #}
-  #}
-}
+#precondition {
+#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
+#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
+#}
+#}
+#}
 
-resource "aws_security_group_rule" "this_two" {
-  provider = aws.two
+#resource "aws_security_group_rule" "this_two" {
+#provider = aws.two
 
-  for_each = local.two_vpc_id_and_rule_to_one_intra_vpc_security_group_rule
+#for_each = local.two_vpc_id_and_rule_to_one_intra_vpc_security_group_rule
 
-  security_group_id = each.value.intra_vpc_security_group_id
-  cidr_blocks       = each.value.network_cidrs
-  type              = each.value.type
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  protocol          = each.value.protocol
-  description = format(
-    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
-    local.two_region_label,
-    each.value.label,
-    local.one_region_label
-  )
+#security_group_id = each.value.intra_vpc_security_group_id
+#cidr_blocks       = each.value.network_cidrs
+#type              = each.value.type
+#from_port         = each.value.from_port
+#to_port           = each.value.to_port
+#protocol          = each.value.protocol
+#description = format(
+#"%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+#upper(var.env_prefix),
+#local.two_region_label,
+#each.value.label,
+#local.one_region_label
+#)
 
-  #lifecycle {
-  ## preconditions are evaluated on apply only.
-  #precondition {
-  #condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
-  #error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
-  #}
+#lifecycle {
+## preconditions are evaluated on apply only.
+#precondition {
+#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
+#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
-  #error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
-  #}
+#precondition {
+#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
+#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
-  #error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
-  #}
+#precondition {
+#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
+#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
+#}
 
-  #precondition {
-  #condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
-  #error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
-  #}
-  #}
-}
+#precondition {
+#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
+#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
+#}
+#}
+#}
