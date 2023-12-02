@@ -176,88 +176,123 @@ locals {
   }]...)
 }
 
-#resource "aws_security_group_rule" "this_one" {
-#provider = aws.one
+resource "aws_security_group_rule" "this_one_to_this_two" {
+  provider = aws.one
 
-#for_each = local.one_vpc_id_and_rule_to_two_intra_vpc_security_group_rule
+  for_each = local.one_vpc_id_and_rule_to_two_intra_vpc_security_group_rule
 
-#security_group_id = each.value.intra_vpc_security_group_id
-#cidr_blocks       = each.value.network_cidrs
-#type              = each.value.type
-#from_port         = each.value.from_port
-#to_port           = each.value.to_port
-#protocol          = each.value.protocol
-#description = format(
-#"%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-#upper(var.env_prefix),
-#local.one_region_label,
-#each.value.label,
-#local.two_region_label
-#)
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.one_region_label,
+    each.value.label,
+    local.two_region_label
+  )
+}
 
-#lifecycle {
-## preconditions are evaluated on apply only.
-#precondition {
-#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
-#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
-#}
+resource "aws_security_group_rule" "this_one_to_this_three" {
+  provider = aws.one
 
-#precondition {
-#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
-#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
-#}
+  for_each = local.one_vpc_id_and_rule_to_three_intra_vpc_security_group_rule
 
-#precondition {
-#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
-#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
-#}
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.one_region_label,
+    each.value.label,
+    local.three_region_label
+  )
+}
 
-#precondition {
-#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
-#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
-#}
-#}
-#}
+resource "aws_security_group_rule" "this_two_to_this_one" {
+  provider = aws.two
 
-#resource "aws_security_group_rule" "this_two" {
-#provider = aws.two
+  for_each = local.two_vpc_id_and_rule_to_one_intra_vpc_security_group_rule
 
-#for_each = local.two_vpc_id_and_rule_to_one_intra_vpc_security_group_rule
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.two_region_label,
+    each.value.label,
+    local.one_region_label
+  )
+}
 
-#security_group_id = each.value.intra_vpc_security_group_id
-#cidr_blocks       = each.value.network_cidrs
-#type              = each.value.type
-#from_port         = each.value.from_port
-#to_port           = each.value.to_port
-#protocol          = each.value.protocol
-#description = format(
-#"%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-#upper(var.env_prefix),
-#local.two_region_label,
-#each.value.label,
-#local.one_region_label
-#)
+resource "aws_security_group_rule" "this_two_to_this_three" {
+  provider = aws.two
 
-#lifecycle {
-## preconditions are evaluated on apply only.
-#precondition {
-#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
-#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
-#}
+  for_each = local.two_vpc_id_and_rule_to_three_intra_vpc_security_group_rule
 
-#precondition {
-#condition     = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.condition
-#error_message = local.one_provider_to_one_intra_vpc_security_group_rules_account_id_check.error_message
-#}
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.two_region_label,
+    each.value.label,
+    local.three_region_label
+  )
+}
 
-#precondition {
-#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.condition
-#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_region_check.error_message
-#}
+resource "aws_security_group_rule" "this_three_to_this_one" {
+  provider = aws.three
 
-#precondition {
-#condition     = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.condition
-#error_message = local.two_provider_to_two_intra_vpc_security_group_rules_account_id_check.error_message
-#}
-#}
-#}
+  for_each = local.three_vpc_id_and_rule_to_one_intra_vpc_security_group_rule
+
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.three_region_label,
+    each.value.label,
+    local.one_region_label
+  )
+}
+
+resource "aws_security_group_rule" "this_three_to_this_two" {
+  provider = aws.three
+
+  for_each = local.three_vpc_id_and_rule_to_two_intra_vpc_security_group_rule
+
+  security_group_id = each.value.intra_vpc_security_group_id
+  cidr_blocks       = each.value.network_cidrs
+  type              = each.value.type
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  description = format(
+    "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
+    upper(var.env_prefix),
+    local.three_region_label,
+    each.value.label,
+    local.two_region_label
+  )
+}
+
