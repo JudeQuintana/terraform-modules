@@ -172,9 +172,9 @@ locals {
 
   three_vpc_id_and_rule_to_two_intra_vpc_security_group_rule = merge([
     for this in local.two_rules : {
-      for vpc_id, inbound_network_cidrs in local.one_vpc_id_to_three_inbound_network_cidrs :
+      for vpc_id, inbound_network_cidrs in local.three_vpc_id_to_two_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
-        intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
+        intra_vpc_security_group_id = lookup(local.three_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
