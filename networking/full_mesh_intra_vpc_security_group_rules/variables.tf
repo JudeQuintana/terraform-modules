@@ -9,7 +9,7 @@ variable "region_az_labels" {
 }
 
 variable "full_mesh_intra_vpc_security_group_rules" {
-  description = "super intra vpc security group rules configuration"
+  description = "full mesh intra vpc security group rules configuration"
   type = object({
     # security rule object to allow inbound across vpcs intra-vpc security group
     one = object({
@@ -61,6 +61,5 @@ variable "full_mesh_intra_vpc_security_group_rules" {
         }))
     })) })
   })
-
 }
 

@@ -15,7 +15,6 @@ data "aws_region" "this_two" {
   provider = aws.two
 }
 
-
 data "aws_caller_identity" "this_three" {
   provider = aws.three
 }
@@ -43,13 +42,19 @@ locals {
   })
 
   one_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
+    for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.network_cidr
   }]...)
 
   two_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : {
+    for this in var.full_mesh_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : {
+      for vpc in this.vpcs :
+      vpc.id => vpc.network_cidr
+  }]...)
+
+  three_vpc_id_to_network_cidr = merge([
+    for this in var.full_mesh_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.network_cidr
   }]...)
@@ -90,24 +95,24 @@ locals {
     if lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
-  one_rules   = [for this in var.super_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : this.rule]
-  two_rules   = [for this in var.super_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : this.rule]
-  three_rules = [for this in var.super_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : this.rule]
+  one_rules   = [for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : this.rule]
+  two_rules   = [for this in var.full_mesh_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : this.rule]
+  three_rules = [for this in var.full_mesh_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : this.rule]
 
   one_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
+    for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
   two_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : {
+    for this in var.full_mesh_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
   three_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : {
+    for this in var.full_mesh_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
