@@ -198,7 +198,6 @@ resource "aws_security_group_rule" "this_one_to_this_two" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
@@ -251,7 +250,6 @@ resource "aws_security_group_rule" "this_one_to_this_three" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
@@ -304,7 +302,6 @@ resource "aws_security_group_rule" "this_two_to_this_one" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
@@ -357,7 +354,6 @@ resource "aws_security_group_rule" "this_two_to_this_three" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
@@ -410,7 +406,6 @@ resource "aws_security_group_rule" "this_three_to_this_one" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
@@ -463,7 +458,6 @@ resource "aws_security_group_rule" "this_three_to_this_two" {
   )
 
   lifecycle {
-    # preconditions are evaluated on apply only.
     precondition {
       condition     = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.condition
       error_message = local.one_provider_to_one_intra_vpc_security_group_rules_region_check.error_message
