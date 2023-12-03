@@ -1,6 +1,5 @@
 locals {
-  # used on both aws_security_group_rule.this_one and aws_security_group_rule.this_peer
-  # guarantee the centralized routers match their relative provider's region.
+  # used on all aws_security_group_rule resources to guarantee the intra vpc security group rules match their relative provider's region.
   one_provider_to_one_intra_vpc_security_group_rules_region_check = {
     condition = alltrue([
       for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules :
