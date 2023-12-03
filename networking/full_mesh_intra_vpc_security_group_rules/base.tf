@@ -37,9 +37,6 @@ locals {
   three_region_label = lookup(var.region_az_labels, local.three_region_name)
 
   upper_env_prefix = upper(var.env_prefix)
-  default_tags = merge({
-    Environment = var.env_prefix
-  })
 
   one_vpc_id_to_network_cidr = merge([
     for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
@@ -194,7 +191,7 @@ resource "aws_security_group_rule" "this_one_to_this_two" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.one_region_label,
     each.value.label,
     local.two_region_label
@@ -247,7 +244,7 @@ resource "aws_security_group_rule" "this_one_to_this_three" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.one_region_label,
     each.value.label,
     local.three_region_label
@@ -300,7 +297,7 @@ resource "aws_security_group_rule" "this_two_to_this_one" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.two_region_label,
     each.value.label,
     local.one_region_label
@@ -353,7 +350,7 @@ resource "aws_security_group_rule" "this_two_to_this_three" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.two_region_label,
     each.value.label,
     local.three_region_label
@@ -406,7 +403,7 @@ resource "aws_security_group_rule" "this_three_to_this_one" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.three_region_label,
     each.value.label,
     local.one_region_label
@@ -459,7 +456,7 @@ resource "aws_security_group_rule" "this_three_to_this_two" {
   protocol          = each.value.protocol
   description = format(
     "%s-%s: Allow %s inbound from other cross region VPCs in %s.",
-    upper(var.env_prefix),
+    local.upper_env_prefix,
     local.three_region_label,
     each.value.label,
     local.two_region_label
