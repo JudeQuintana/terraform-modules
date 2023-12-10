@@ -1,6 +1,7 @@
 /*
 * # Transit Gateway Centralized Router Description
-* - This Transit Gateway Centralized Router module will use the special public subnet in each AZ when a Tiered VPC is passed to it.
+* - This Transit Gateway Centralized Router module will create a hub spoke topology from existing Tiered VPCs.
+* - Will use the special public subnet in each AZ when a Tiered VPC is passed to it.
 * - All attachments will be associated and routes propagated to one TGW Route Table.
 * - Each Tiered VPC will have all their route tables updated in each VPC with a route to all other VPC networks via the TGW.
 * - Will generate and add routes in each VPC to all other networks.
