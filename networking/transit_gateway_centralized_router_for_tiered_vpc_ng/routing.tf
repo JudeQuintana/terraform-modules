@@ -2,15 +2,6 @@ locals {
   route_format = "%s|%s"
 }
 
-# one route table for all vpc network_cidrs
-resource "aws_ec2_transit_gateway_route_table" "this" {
-  transit_gateway_id = aws_ec2_transit_gateway.this.id
-  tags = merge(
-    local.default_tags,
-    { Name = local.centralized_router_name }
-  )
-}
-
 # Create routes to other VPC network_cidrs in private and public route tables for each VPC
 module "this_generate_routes_to_other_vpcs" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
