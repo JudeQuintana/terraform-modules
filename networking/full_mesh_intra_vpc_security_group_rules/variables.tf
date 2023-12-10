@@ -137,7 +137,7 @@ variable "full_mesh_intra_vpc_security_group_rules" {
       ] == [
       for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : this.rule
     ]
-    error_message = "The Intra VPC Security Group Rules for One, Two and Three must all have the same set of rules as each other for Full Mesh Intra VPC Security Group Rules for Super Intra VPC Security Group Rules."
+    error_message = "The Intra VPC Security Group Rules for One, Two and Three must all have the same set of rules as each other for Full Mesh Intra VPC Security Group Rules."
   }
 }
 
