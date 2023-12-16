@@ -54,6 +54,28 @@ module "vpc_peering_deluxe" {
 }
 ```
 
+Inter region VPC peering works too, route all subnets across peering connection
+```
+module "vpc_peering_deluxe_inter_region" {
+ source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
+
+ providers = {
+   aws.local = aws.usw2
+   aws.peer  = aws.usw2
+ }
+
+ env_prefix                        = var.env_prefix
+ vpc_peering_deluxe                = {
+   local = {
+     vpc                     = module.vpc_usw2
+   }
+   peer = {
+     vpc                     = module.vpc_usw2
+   }
+ }
+}
+```
+
 ## Requirements
 
 | Name | Version |
