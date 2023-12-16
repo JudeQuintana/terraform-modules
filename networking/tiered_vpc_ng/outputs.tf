@@ -40,7 +40,7 @@ output "private_subnet_name_to_subnet_id" {
 }
 
 output "public_route_table_ids" {
-  value = [for this in var.tiered_vpc.azs : aws_route_table.this_public.id] # Each public subnet shares the same route table
+  value = [aws_route_table.this_public.id] # Each public subnet across AZs shares the same route table
 }
 
 output "public_subnet_cidrs" {

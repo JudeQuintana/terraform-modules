@@ -36,9 +36,15 @@ variable "tiered_vpc" {
   validation {
     condition = can(regex(
       "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
-      var.tiered_vpc.network_cidr
-    ))
-    error_message = "The VPC network CIDR must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20)."
+      var.tiered_vpc.network_cidr)) && alltrue(flatten([
+        for this in var.tiered_vpc.azs : [
+          for subnet_cidr in concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr) :
+          can(regex(
+            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
+            subnet_cidr
+        ))]
+    ]))
+    error_message = "The VPC network CIDR and subnet CDIRs must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
@@ -48,7 +54,7 @@ variable "tiered_vpc" {
 
   validation {
     condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in this.public_subnets : subnet.special if subnet.special]) == 1])
-    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a VPC."
+    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a Tierd VPC."
   }
 
   validation {
@@ -57,7 +63,7 @@ variable "tiered_vpc" {
       ]))) == length(flatten([
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
     ]))
-    error_message = "Each subnet name must be unique across all AZs in a VPC."
+    error_message = "Each subnet name must be unique across all AZs in a Tiered VPC."
   }
 
   validation {
@@ -66,7 +72,7 @@ variable "tiered_vpc" {
       ]))) == length(flatten([
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
     ]))
-    error_message = "Each subnet CDIR must be unique across all AZs in a VPC."
+    error_message = "Each subnet CDIR must be unique across all AZs in a Tiered VPC."
   }
 }
 
