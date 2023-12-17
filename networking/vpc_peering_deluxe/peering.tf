@@ -8,6 +8,7 @@ locals {
   # have to code around it when setting the Side tag and keeping the Name exaclty the same.
   # super annoying but whatever
   is_inter_region_vpc_peering = var.vpc_peering_deluxe.local.vpc.region == var.vpc_peering_deluxe.peer.vpc.region
+  peering_name_format         = "%s <-> %s"
 }
 
 resource "aws_vpc_peering_connection" "this_local_to_this_peer" {
