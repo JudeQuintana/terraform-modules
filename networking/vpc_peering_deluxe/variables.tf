@@ -54,7 +54,7 @@ variable "vpc_peering_deluxe" {
       for this in var.vpc_peering_deluxe.local.only_route_subnet_cidrs :
       contains(concat(var.vpc_peering_deluxe.local.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_subnet_cidrs), this)
     ])
-    error_message = "If the var.vpc_peering_deluxe.local.only_route_subnet_cidrs is popluated then all its subnets must already exist in the local VPC."
+    error_message = "If the var.vpc_peering_deluxe.local.only_route_subnet_cidrs is popluated then those subnets must already exist in the local VPC."
   }
 
   validation {
@@ -62,7 +62,7 @@ variable "vpc_peering_deluxe" {
       for this in var.vpc_peering_deluxe.peer.only_route_subnet_cidrs :
       contains(concat(var.vpc_peering_deluxe.peer.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_subnet_cidrs), this)
     ])
-    error_message = "If the var.vpc_peering_deluxe.peer.only_route_subnet_cidrs is popluated then all its subnets must already exist in the peer VPC."
+    error_message = "If the var.vpc_peering_deluxe.peer.only_route_subnet_cidrs is popluated then those subnets must already exist in the peer VPC."
   }
 
   validation {

@@ -64,13 +64,13 @@ module "vpc_peering_deluxe_inter_region" {
    aws.peer  = aws.usw2
  }
 
- env_prefix                        = var.env_prefix
- vpc_peering_deluxe                = {
+ env_prefix         = var.env_prefix
+ vpc_peering_deluxe = {
    local = {
-     vpc                     = module.vpc_usw2
+     vpc = module.vpc_usw2
    }
    peer = {
-     vpc                     = module.vpc_usw2
+     vpc = module.vpc_usw2
    }
  }
 }
