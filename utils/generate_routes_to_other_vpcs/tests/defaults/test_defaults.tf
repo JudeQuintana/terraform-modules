@@ -18,8 +18,6 @@ locals {
       ]
       public_route_table_ids = [
         "rtb-0b0b9d1c342f155a9",
-        "rtb-0b0b9d1c342f155a9",
-        "rtb-0b0b9d1c342f155a9"
       ]
     }
     cicd = {
@@ -30,7 +28,6 @@ locals {
       ]
       public_route_table_ids = [
         "rtb-026bb809ef2dcbf02",
-        "rtb-026bb809ef2dcbf02"
       ]
     }
     general = {
@@ -41,7 +38,6 @@ locals {
       ]
       public_route_table_ids = [
         "rtb-0a97d8dd5f739f7bc",
-        "rtb-0a97d8dd5f739f7bc"
       ]
     }
   }

@@ -22,8 +22,7 @@ locals {
   peer_provider_account_id  = data.aws_caller_identity.this_peer.account_id
   peer_provider_region_name = data.aws_region.this_peer.name
 
-  peering_name_format = "%s <-> %s"
-  upper_env_prefix    = upper(var.env_prefix)
+  upper_env_prefix = upper(var.env_prefix)
   default_tags = merge({
     Environment = var.env_prefix
   }, var.tags)

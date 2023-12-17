@@ -1,3 +1,16 @@
+locals {
+  # for some strange reason when the vpc peering is inter region
+  # the tags for aws_vpc_peering_connection and aws_vpc_peering_connection_accepter will stomp on each other if they are different (not exaclty the same)
+  # leading to an endless drift and non idempodent state
+  # happens for both aws 4.x and 5.x providers
+  # this doesnt happen if the vpc peering is cross region so it must be a bug in the provider
+  # nor do any other resources have this issue (ie aws_vpc_route)
+  # have to code around it when setting the Side tag and keeping the Name exaclty the same.
+  # super annoying but whatever
+  is_inter_region_vpc_peering = var.vpc_peering_deluxe.local.vpc.region == var.vpc_peering_deluxe.peer.vpc.region
+  peering_name_format         = "%s <-> %s"
+}
+
 resource "aws_vpc_peering_connection" "this_local_to_this_peer" {
   provider = aws.local
 
@@ -10,7 +23,7 @@ resource "aws_vpc_peering_connection" "this_local_to_this_peer" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, var.vpc_peering_deluxe.local.vpc.full_name, var.vpc_peering_deluxe.peer.vpc.full_name)
-      Side = "Local Creator"
+      Side = local.is_inter_region_vpc_peering ? "Peered" : "Local Creator"
     }
   )
 
@@ -45,8 +58,8 @@ resource "aws_vpc_peering_connection_accepter" "this_local_to_this_peer" {
   tags = merge(
     local.default_tags,
     {
-      Name = format(local.peering_name_format, var.vpc_peering_deluxe.peer.vpc.full_name, var.vpc_peering_deluxe.local.vpc.full_name)
-      Side = "Peer Accepter"
+      Name = format(local.peering_name_format, var.vpc_peering_deluxe.local.vpc.full_name, var.vpc_peering_deluxe.peer.vpc.full_name)
+      Side = local.is_inter_region_vpc_peering ? "Peered" : "Peer Accepter"
     }
   )
 }
