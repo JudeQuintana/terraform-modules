@@ -7,7 +7,7 @@ See it in action in the [Full Mesh Trio Demo](https://github.com/JudeQuintana/te
 
 ```
 module "full_mesh_trio" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.5.0"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.7.4"
 
   providers = {
     aws.one   = aws.use1

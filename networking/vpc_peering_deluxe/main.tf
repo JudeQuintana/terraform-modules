@@ -9,7 +9,7 @@
 *
 * ```
 * module "vpc_peering_deluxe" {
-*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.7.4"
 *
 *  providers = {
 *    aws.local = aws.use1
@@ -33,7 +33,7 @@
 * Additional option to allow remote dns resolution too.
 * ```
 * module "vpc_peering_deluxe" {
-*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.7.4"
 *
 *  providers = {
 *    aws.local = aws.use1
@@ -58,7 +58,7 @@
 * Inter region VPC peering works too, route all subnets across peering connection
 * ```
 * module "vpc_peering_deluxe_inter_region" {
-*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.7.4"
 *
 *  providers = {
 *    aws.local = aws.usw2

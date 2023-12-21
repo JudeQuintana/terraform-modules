@@ -1,5 +1,5 @@
 # Transit Gateway Centralized Router Description
-- This Transit Gateway Centralized Router module will create a hub spoke topology
+- This Transit Gateway Centralized Router module will create a hub spoke topology from existing Tiered VPCs.
 - Will use the special public subnet in each AZ when a Tiered VPC is passed to it.
 - All attachments will be associated and routes propagated to one TGW Route Table.
 - Each Tiered VPC will have all their route tables updated in each VPC with a route to all other VPC networks via the TGW.
@@ -8,7 +8,7 @@
 Example:
 ```
 module "centralized_router" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.4.18"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.7.4"
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
@@ -46,7 +46,7 @@ Main:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.4.16 |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.7.4 |
 
 ## Resources
 
