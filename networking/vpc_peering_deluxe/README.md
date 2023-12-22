@@ -8,7 +8,7 @@ See it in action in [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraf
 
 ```
 module "vpc_peering_deluxe" {
- source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.6.1"
+ source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.7.4"
 
  providers = {
    aws.local = aws.use1
