@@ -1,0 +1,2 @@
+- expand on the original tiered_subnet_calculator but should output tiered vpc ng objects with calculated subnets
+- experiment and hopefully add useful features
