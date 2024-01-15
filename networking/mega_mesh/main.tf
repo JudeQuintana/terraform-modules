@@ -10,6 +10,7 @@
 *     aws.two   = aws.use2
 *     aws.three = aws.usw2
 *     aws.four  = aws.usw1
+*     aws.five  = aws.apne1
 *   }
 *
 *  env_prefix = var.env_prefix
@@ -21,10 +22,13 @@
 *      centralized_router = module.centralized_router_use2
 *    }
 *    three = {
-*      centralized_router = module.centralized_router_usw2
+*      centralized_router = module.centralized_router_usw1
 *    }
 *    four = {
-*      centralized_router = module.centralized_router_usw1
+*      centralized_router = module.centralized_router_usw2
+*    }
+*    five = {
+*      centralized_router = module.centralized_router_apne1
 *    }
 *  }
 * }

@@ -31,6 +31,14 @@ data "aws_region" "this_four" {
   provider = aws.four
 }
 
+data "aws_caller_identity" "this_five" {
+  provider = aws.five
+}
+
+data "aws_region" "this_five" {
+  provider = aws.five
+}
+
 locals {
   one_provider_account_id  = data.aws_caller_identity.this_one.account_id
   one_provider_region_name = data.aws_region.this_one.name
@@ -43,6 +51,9 @@ locals {
 
   four_provider_account_id  = data.aws_caller_identity.this_four.account_id
   four_provider_region_name = data.aws_region.this_four.name
+
+  five_provider_account_id  = data.aws_caller_identity.this_five.account_id
+  five_provider_region_name = data.aws_region.this_five.name
 
   upper_env_prefix = upper(var.env_prefix)
   default_tags = merge({
