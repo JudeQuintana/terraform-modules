@@ -7,6 +7,7 @@ locals {
   three_tgw = var.mega_mesh.three.centralized_router
   four_tgw  = var.mega_mesh.four.centralized_router
   five_tgw  = var.mega_mesh.five.centralized_router
+  six_tgw   = var.mega_mesh.six.centralized_router
 }
 
 ########################################################################################
@@ -310,7 +311,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_three_to_th
 resource "aws_ec2_transit_gateway_peering_attachment" "this_four_to_this_one" {
   provider = aws.four
 
-  transit_gateway_id      = local.four.id
+  transit_gateway_id      = local.four_tgw.id
   peer_account_id         = local.one_tgw.account_id
   peer_region             = local.one_tgw.region
   peer_transit_gateway_id = local.one_tgw.id
@@ -605,7 +606,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_four_to_thi
 resource "aws_ec2_transit_gateway_peering_attachment" "this_five_to_this_one" {
   provider = aws.five
 
-  transit_gateway_id      = local.five.id
+  transit_gateway_id      = local.five_tgw.id
   peer_account_id         = local.one_tgw.account_id
   peer_region             = local.one_tgw.region
   peer_transit_gateway_id = local.one_tgw.id
@@ -997,7 +998,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_five_to_thi
 resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_one" {
   provider = aws.six
 
-  transit_gateway_id      = local.six.id
+  transit_gateway_id      = local.six_tgw.id
   peer_account_id         = local.one_tgw.account_id
   peer_region             = local.one_tgw.region
   peer_transit_gateway_id = local.one_tgw.id

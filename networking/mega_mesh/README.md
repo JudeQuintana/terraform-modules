@@ -2,7 +2,7 @@
 
 ```
 module "mega_mesh" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/mega-mesh?ref=mega-mesh"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/mega_mesh?ref=mega-mesh"
 
   providers = {
     aws.one   = aws.use1

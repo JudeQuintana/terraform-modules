@@ -150,7 +150,7 @@ variable "mega_mesh" {
   validation {
     condition = length(
       distinct(concat(var.mega_mesh.one.centralized_router.vpc.names, var.mega_mesh.two.centralized_router.vpc.names, var.mega_mesh.three.centralized_router.vpc.names, var.mega_mesh.four.centralized_router.vpc.names, var.mega_mesh.five.centralized_router.vpc.names, var.mega_mesh.six.centralized_router.vpc.names))
-    ) == length(concat(var.mega_mesh.one.centralized_router.vpc.names, var.mega_mesh.two.centralized_router.vpc.names, var.mega_mesh.three.centralized_router.vpc.names, var.mega_mesh.four.centralized_router.vpc.names, var.mega_mesh.five.centralized_router.vpc.names, var.mega_mesh.six.centralized_router.vpc.name))
+    ) == length(concat(var.mega_mesh.one.centralized_router.vpc.names, var.mega_mesh.two.centralized_router.vpc.names, var.mega_mesh.three.centralized_router.vpc.names, var.mega_mesh.four.centralized_router.vpc.names, var.mega_mesh.five.centralized_router.vpc.names, var.mega_mesh.six.centralized_router.vpc.names))
     error_message = "All VPC names must be unique across regions."
   }
 
