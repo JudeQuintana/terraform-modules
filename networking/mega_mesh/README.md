@@ -7,8 +7,8 @@ module "mega_mesh" {
   providers = {
     aws.one   = aws.use1
     aws.two   = aws.use2
-    aws.three = aws.usw2
-    aws.four  = aws.usw1
+    aws.three = aws.usw1
+    aws.four  = aws.usw2
     aws.five  = aws.apne1
     aws.six   = aws.apse1
   }
