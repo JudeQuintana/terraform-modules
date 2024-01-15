@@ -15,6 +15,11 @@ locals {
     error_message = "Centralized Router Three's region must match the aws.three provider alias region for Full Mesh Trio."
   }
 
+  four_tgw_provider_region_check = {
+    condition     = contains([local.four_provider_region_name], local.four_tgw.region)
+    error_message = "Centralized Router Four's region must match the aws.four provider alias region for Full Mesh Trio."
+  }
+
   one_tgw_provider_account_id_check = {
     condition     = contains([local.one_provider_account_id], local.one_tgw.account_id)
     error_message = "Centralized Router One's account ID must match the aws.one provider alias account ID Full Mesh Trio."
@@ -28,5 +33,10 @@ locals {
   three_tgw_provider_account_id_check = {
     condition     = contains([local.three_provider_account_id], local.three_tgw.account_id)
     error_message = "Centralized Router Three's account ID must match the aws.three provider alias account ID Full Mesh Trio."
+  }
+
+  four_tgw_provider_account_id_check = {
+    condition     = contains([local.four_provider_account_id], local.four_tgw.account_id)
+    error_message = "Centralized Router Four's account ID must match the aws.four provider alias account ID Full Mesh Trio."
   }
 }
