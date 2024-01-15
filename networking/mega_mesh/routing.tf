@@ -15,6 +15,9 @@ locals {
 
   five_tgw_vpc_network_cidrs          = local.five_tgw.vpc.network_cidrs
   five_tgw_vpc_routes_route_table_ids = local.five_tgw.vpc.routes[*].route_table_id
+
+  six_tgw_vpc_network_cidrs          = local.six_tgw.vpc.network_cidrs
+  six_tgw_vpc_routes_route_table_ids = local.six_tgw.vpc.routes[*].route_table_id
 }
 
 ## vpc routes
@@ -332,6 +335,127 @@ resource "aws_route" "this_five_vpc_routes_to_four_tgw_vpcs" {
   destination_cidr_block = each.value.destination_cidr_block
 }
 
+# six
+locals {
+  # build new six vpc routes to one tgw vpcs
+  six_vpc_routes_to_one_tgw_vpcs = [
+    for six_route_table_id_and_one_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.one_tgw_vpc_network_cidrs) : {
+      route_table_id         = six_route_table_id_and_one_tgw_network_cidr[0]
+      destination_cidr_block = six_route_table_id_and_one_tgw_network_cidr[1]
+  }]
+
+  six_tgw_new_vpc_routes_to_one_tgw_vpcs = {
+    for this in local.six_vpc_routes_to_one_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_six_vpc_routes_to_one_tgw_vpcs" {
+  provider = aws.six
+
+  for_each = local.six_tgw_new_vpc_routes_to_one_tgw_vpcs
+
+  transit_gateway_id     = local.six_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
+locals {
+  # build new six vpc routes to two tgw vpcs
+  six_vpc_routes_to_two_tgw_vpcs = [
+    for six_route_table_id_and_two_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.two_tgw_vpc_network_cidrs) : {
+      route_table_id         = six_route_table_id_and_two_tgw_network_cidr[0]
+      destination_cidr_block = six_route_table_id_and_two_tgw_network_cidr[1]
+  }]
+
+  six_tgw_new_vpc_routes_to_two_tgw_vpcs = {
+    for this in local.six_vpc_routes_to_two_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_six_vpc_routes_to_two_tgw_vpcs" {
+  provider = aws.six
+
+  for_each = local.six_tgw_new_vpc_routes_to_two_tgw_vpcs
+
+  transit_gateway_id     = local.six_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
+locals {
+  # build new six vpc routes to three tgw vpcs
+  six_vpc_routes_to_three_tgw_vpcs = [
+    for six_route_table_id_and_three_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.three_tgw_vpc_network_cidrs) : {
+      route_table_id         = six_route_table_id_and_three_tgw_network_cidr[0]
+      destination_cidr_block = six_route_table_id_and_three_tgw_network_cidr[1]
+  }]
+
+  six_tgw_new_vpc_routes_to_three_tgw_vpcs = {
+    for this in local.six_vpc_routes_to_three_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_six_vpc_routes_to_three_tgw_vpcs" {
+  provider = aws.six
+
+  for_each = local.six_tgw_new_vpc_routes_to_three_tgw_vpcs
+
+  transit_gateway_id     = local.six_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
+locals {
+  # build new six vpc routes to four tgw vpcs
+  six_vpc_routes_to_four_tgw_vpcs = [
+    for six_route_table_id_and_four_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.four_tgw_vpc_network_cidrs) : {
+      route_table_id         = six_route_table_id_and_four_tgw_network_cidr[0]
+      destination_cidr_block = six_route_table_id_and_four_tgw_network_cidr[1]
+  }]
+
+  six_tgw_new_vpc_routes_to_four_tgw_vpcs = {
+    for this in local.six_vpc_routes_to_four_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_six_vpc_routes_to_four_tgw_vpcs" {
+  provider = aws.six
+
+  for_each = local.six_tgw_new_vpc_routes_to_four_tgw_vpcs
+
+  transit_gateway_id     = local.six_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
+locals {
+  # build new six vpc routes to five tgw vpcs
+  six_vpc_routes_to_five_tgw_vpcs = [
+    for six_route_table_id_and_five_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.five_tgw_vpc_network_cidrs) : {
+      route_table_id         = six_route_table_id_and_five_tgw_network_cidr[0]
+      destination_cidr_block = six_route_table_id_and_five_tgw_network_cidr[1]
+  }]
+
+  six_tgw_new_vpc_routes_to_five_tgw_vpcs = {
+    for this in local.six_vpc_routes_to_five_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_six_vpc_routes_to_five_tgw_vpcs" {
+  provider = aws.six
+
+  for_each = local.six_tgw_new_vpc_routes_to_five_tgw_vpcs
+
+  transit_gateway_id     = local.six_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
 ## tgw mesh routes
 # one
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_two_tgw" {
@@ -468,6 +592,57 @@ resource "aws_ec2_transit_gateway_route" "this_five_tgw_routes_to_vpcs_in_four_t
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_five_to_this_four.id
 }
 
+# six
+resource "aws_ec2_transit_gateway_route" "this_six_tgw_routes_to_vpcs_in_one_tgw" {
+  provider = aws.six
+
+  for_each = toset(local.one_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_one.id
+}
+
+resource "aws_ec2_transit_gateway_route" "this_six_tgw_routes_to_vpcs_in_two_tgw" {
+  provider = aws.six
+
+  for_each = toset(local.two_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_two.id
+}
+
+resource "aws_ec2_transit_gateway_route" "this_six_tgw_routes_to_vpcs_in_three_tgw" {
+  provider = aws.six
+
+  for_each = toset(local.three_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_three.id
+}
+
+resource "aws_ec2_transit_gateway_route" "this_six_tgw_routes_to_vpcs_in_four_tgw" {
+  provider = aws.six
+
+  for_each = toset(local.four_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_four.id
+}
+
+resource "aws_ec2_transit_gateway_route" "this_six_tgw_routes_to_vpcs_in_five_tgw" {
+  provider = aws.six
+
+  for_each = toset(local.five_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_five.id
+}
+
 ## Associations
 # one
 resource "aws_ec2_transit_gateway_route_table_association" "this_one_to_this_two" {
@@ -563,4 +738,40 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_five_to_this_fo
 
   transit_gateway_route_table_id = local.five_tgw.route_table_id
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_five_to_this_four.id
+}
+
+# six
+resource "aws_ec2_transit_gateway_route_table_association" "this_six_to_this_one" {
+  provider = aws.six
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_one.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_six_to_this_two" {
+  provider = aws.six
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_two.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_six_to_this_three" {
+  provider = aws.six
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_three.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_six_to_this_four" {
+  provider = aws.six
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_four.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_six_to_this_five" {
+  provider = aws.six
+
+  transit_gateway_route_table_id = local.six_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_five.id
 }
