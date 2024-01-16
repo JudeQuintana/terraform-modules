@@ -390,7 +390,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_four_to_this_one" {
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_four_to_this_one" {
-  provider = aws.four
+  provider = aws.one
 
   transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment.this_four_to_this_one.id
   tags = merge(
@@ -685,7 +685,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_five_to_this_one" {
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_five_to_this_one" {
-  provider = aws.five
+  provider = aws.one
 
   transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment.this_five_to_this_one.id
   tags = merge(
@@ -1077,7 +1077,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_one" {
 }
 
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_six_to_this_one" {
-  provider = aws.six
+  provider = aws.one
 
   transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment.this_six_to_this_one.id
   tags = merge(
