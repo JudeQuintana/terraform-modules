@@ -26,3 +26,10 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_five_to_this_fo
   transit_gateway_route_table_id = local.five_tgw.route_table_id
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_five_to_this_four.id
 }
+
+resource "aws_ec2_transit_gateway_route_table_association" "this_five_to_this_six" {
+  provider = aws.five
+
+  transit_gateway_route_table_id = local.five_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_five.id
+}
