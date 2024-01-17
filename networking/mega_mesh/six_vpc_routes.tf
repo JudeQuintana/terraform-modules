@@ -2,9 +2,9 @@
 locals {
   # build new six vpc routes to one tgw vpcs
   six_vpc_routes_to_one_tgw_vpcs = [
-    for six_route_table_id_and_one_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.one_tgw_vpc_network_cidrs) : {
-      route_table_id         = six_route_table_id_and_one_tgw_network_cidr[0]
-      destination_cidr_block = six_route_table_id_and_one_tgw_network_cidr[1]
+    for route_table_id_and_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.one_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
 
   six_tgw_new_vpc_routes_to_one_tgw_vpcs = {
@@ -26,9 +26,9 @@ resource "aws_route" "this_six_vpc_routes_to_one_tgw_vpcs" {
 locals {
   # build new six vpc routes to two tgw vpcs
   six_vpc_routes_to_two_tgw_vpcs = [
-    for six_route_table_id_and_two_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.two_tgw_vpc_network_cidrs) : {
-      route_table_id         = six_route_table_id_and_two_tgw_network_cidr[0]
-      destination_cidr_block = six_route_table_id_and_two_tgw_network_cidr[1]
+    for route_table_id_and_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.two_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
 
   six_tgw_new_vpc_routes_to_two_tgw_vpcs = {
@@ -50,9 +50,9 @@ resource "aws_route" "this_six_vpc_routes_to_two_tgw_vpcs" {
 locals {
   # build new six vpc routes to three tgw vpcs
   six_vpc_routes_to_three_tgw_vpcs = [
-    for six_route_table_id_and_three_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.three_tgw_vpc_network_cidrs) : {
-      route_table_id         = six_route_table_id_and_three_tgw_network_cidr[0]
-      destination_cidr_block = six_route_table_id_and_three_tgw_network_cidr[1]
+    for route_table_id_and_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.three_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
 
   six_tgw_new_vpc_routes_to_three_tgw_vpcs = {
@@ -74,9 +74,9 @@ resource "aws_route" "this_six_vpc_routes_to_three_tgw_vpcs" {
 locals {
   # build new six vpc routes to four tgw vpcs
   six_vpc_routes_to_four_tgw_vpcs = [
-    for six_route_table_id_and_four_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.four_tgw_vpc_network_cidrs) : {
-      route_table_id         = six_route_table_id_and_four_tgw_network_cidr[0]
-      destination_cidr_block = six_route_table_id_and_four_tgw_network_cidr[1]
+    for route_table_id_and_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.four_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
 
   six_tgw_new_vpc_routes_to_four_tgw_vpcs = {
@@ -98,9 +98,9 @@ resource "aws_route" "this_six_vpc_routes_to_four_tgw_vpcs" {
 locals {
   # build new six vpc routes to five tgw vpcs
   six_vpc_routes_to_five_tgw_vpcs = [
-    for six_route_table_id_and_five_tgw_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.five_tgw_vpc_network_cidrs) : {
-      route_table_id         = six_route_table_id_and_five_tgw_network_cidr[0]
-      destination_cidr_block = six_route_table_id_and_five_tgw_network_cidr[1]
+    for route_table_id_and_network_cidr in setproduct(local.six_tgw_vpc_routes_route_table_ids, local.five_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
   }]
 
   six_tgw_new_vpc_routes_to_five_tgw_vpcs = {
