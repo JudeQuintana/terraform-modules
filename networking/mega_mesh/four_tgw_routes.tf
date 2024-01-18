@@ -49,4 +49,13 @@ resource "aws_ec2_transit_gateway_route" "this_four_tgw_routes_to_vpcs_in_six_tg
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_six_to_this_four.id
 }
 
+resource "aws_ec2_transit_gateway_route" "this_four_tgw_routes_to_vpcs_in_seven_tgw" {
+  provider = aws.four
+
+  for_each = toset(local.seven_tgw_vpc_network_cidrs)
+
+  transit_gateway_route_table_id = local.four_tgw.route_table_id
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_seven_to_this_four.id
+}
 

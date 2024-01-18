@@ -80,6 +80,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_one" {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -177,6 +187,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_two" {
     precondition {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
     }
   }
 }
@@ -276,6 +296,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_three" {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -374,6 +404,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_four" {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -471,6 +511,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_six_to_this_five" {
     precondition {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
     }
   }
 }
