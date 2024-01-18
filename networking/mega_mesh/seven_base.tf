@@ -11,7 +11,7 @@ locals {
   seven_provider_region_name = data.aws_region.this_seven.name
 
   seven_tgw                            = var.mega_mesh.seven.centralized_router
-  seven_tgw_vpc_network_cidrs          = local.seven_tgw.vpc.network_cidrs
-  seven_tgw_vpc_routes_route_table_ids = local.seven_tgw.vpc.routes[*].route_table_id
+  seven_tgw_vpc_network_cidrs          = toset(local.seven_tgw.vpc.network_cidrs)
+  seven_tgw_vpc_routes_route_table_ids = toset(local.seven_tgw.vpc.routes[*].route_table_id)
 }
 

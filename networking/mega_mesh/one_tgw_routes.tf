@@ -2,7 +2,7 @@
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_two_tgw" {
   provider = aws.one
 
-  for_each = toset(local.two_tgw_vpc_network_cidrs)
+  for_each = local.two_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value
@@ -12,7 +12,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_two_tgw
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_three_tgw" {
   provider = aws.one
 
-  for_each = toset(local.three_tgw_vpc_network_cidrs)
+  for_each = local.three_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value
@@ -22,7 +22,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_three_t
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_four_tgw" {
   provider = aws.one
 
-  for_each = toset(local.four_tgw_vpc_network_cidrs)
+  for_each = local.four_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value
@@ -32,7 +32,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_four_tg
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_five_tgw" {
   provider = aws.one
 
-  for_each = toset(local.five_tgw_vpc_network_cidrs)
+  for_each = local.five_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value
@@ -42,7 +42,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_five_tg
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_six_tgw" {
   provider = aws.one
 
-  for_each = toset(local.six_tgw_vpc_network_cidrs)
+  for_each = local.six_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value
@@ -52,7 +52,7 @@ resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_six_tgw
 resource "aws_ec2_transit_gateway_route" "this_one_tgw_routes_to_vpcs_in_seven_tgw" {
   provider = aws.one
 
-  for_each = toset(local.seven_tgw_vpc_network_cidrs)
+  for_each = local.seven_tgw_vpc_network_cidrs
 
   transit_gateway_route_table_id = local.one_tgw.route_table_id
   destination_cidr_block         = each.value

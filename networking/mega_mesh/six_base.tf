@@ -11,7 +11,7 @@ locals {
   six_provider_region_name = data.aws_region.this_six.name
 
   six_tgw                            = var.mega_mesh.six.centralized_router
-  six_tgw_vpc_network_cidrs          = local.six_tgw.vpc.network_cidrs
-  six_tgw_vpc_routes_route_table_ids = local.six_tgw.vpc.routes[*].route_table_id
+  six_tgw_vpc_network_cidrs          = toset(local.six_tgw.vpc.network_cidrs)
+  six_tgw_vpc_routes_route_table_ids = toset(local.six_tgw.vpc.routes[*].route_table_id)
 }
 
