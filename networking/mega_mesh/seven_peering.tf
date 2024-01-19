@@ -821,7 +821,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_seven_to_th
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.six_tgw.full_name, local.seven_tgw.full_name)
-      Side = "six Accepter"
+      Side = "Six Accepter"
     }
   )
 }

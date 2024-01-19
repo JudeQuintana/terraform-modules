@@ -7,6 +7,6 @@ locals {
 
   two_tgw_provider_account_id_check = {
     condition     = contains([local.two_provider_account_id], local.two_tgw.account_id)
-    error_message = "Centralized Router Two's account ID must match the aws.two provider alias account ID Mega Mesh."
+    error_message = "Centralized Router Two's account ID must match the aws.two provider alias account ID for Mega Mesh."
   }
 }

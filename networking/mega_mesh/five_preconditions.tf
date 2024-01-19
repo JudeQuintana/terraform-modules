@@ -7,6 +7,6 @@ locals {
 
   five_tgw_provider_account_id_check = {
     condition     = contains([local.five_provider_account_id], local.five_tgw.account_id)
-    error_message = "Centralized Router Five's account ID must match the aws.five provider alias account ID Mega Mesh."
+    error_message = "Centralized Router Five's account ID must match the aws.five provider alias account ID for Mega Mesh."
   }
 }

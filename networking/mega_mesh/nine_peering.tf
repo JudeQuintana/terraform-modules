@@ -13,7 +13,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_one" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.one_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -151,7 +151,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_two" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.two_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -289,7 +289,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_three" 
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.three_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -427,7 +427,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_four" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.four_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -565,7 +565,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_five" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.five_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -703,7 +703,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_six" {
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.six_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -841,7 +841,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_seven" 
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.seven_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -979,7 +979,7 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_nine_to_this_eight" 
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.nine_tgw.full_name, local.eight_tgw.full_name)
-      Side = "nine Creator"
+      Side = "Nine Creator"
     }
   )
 
@@ -1097,7 +1097,7 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "this_nine_to_thi
     local.default_tags,
     {
       Name = format(local.peering_name_format, local.eight_tgw.full_name, local.nine_tgw.full_name)
-      Side = "eight Accepter"
+      Side = "Eight Accepter"
     }
   )
 }

@@ -7,7 +7,7 @@ locals {
 
   four_tgw_provider_account_id_check = {
     condition     = contains([local.four_provider_account_id], local.four_tgw.account_id)
-    error_message = "Centralized Router Four's account ID must match the aws.four provider alias account ID Mega Mesh."
+    error_message = "Centralized Router Four's account ID must match the aws.four provider alias account ID for Mega Mesh."
   }
 }
 
