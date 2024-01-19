@@ -12,6 +12,10 @@
 *     aws.four  = aws.usw2
 *     aws.five  = aws.apne1
 *     aws.six   = aws.apse1
+*     aws.seven = aws.cac1
+*     aws.eight = aws.euc1
+*     aws.nine  = aws.euw1
+*     aws.ten   = aws.sae1
 *   }
 *
 *  env_prefix = var.env_prefix
@@ -33,6 +37,18 @@
 *    }
 *    six = {
 *      centralized_router = module.centralized_router_apse1
+*    }
+*    seven = {
+*      centralized_router = module.centralized_router_cac1
+*    }
+*    eight = {
+*      centralized_router = module.centralized_router_euc1
+*    }
+*    nine = {
+*      centralized_router = module.centralized_router_euw1
+*    }
+*    ten = {
+*      centralized_router = module.centralized_router_sae1
 *    }
 *  }
 * }
