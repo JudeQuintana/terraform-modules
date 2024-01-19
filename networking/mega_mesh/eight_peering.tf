@@ -80,6 +80,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_one" {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -177,6 +217,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_two" {
     precondition {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
     }
   }
 }
@@ -276,6 +356,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_three"
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -373,6 +493,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_four" 
     precondition {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
     }
   }
 }
@@ -472,6 +632,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_five" 
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -570,6 +770,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_six" {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
@@ -667,6 +907,46 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_eight_to_this_seven"
     precondition {
       condition     = local.six_tgw_provider_account_id_check.condition
       error_message = local.six_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_region_check.condition
+      error_message = local.seven_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.seven_tgw_provider_account_id_check.condition
+      error_message = local.seven_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_region_check.condition
+      error_message = local.eight_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.eight_tgw_provider_account_id_check.condition
+      error_message = local.eight_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_region_check.condition
+      error_message = local.nine_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.nine_tgw_provider_account_id_check.condition
+      error_message = local.nine_tgw_provider_account_id_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_region_check.condition
+      error_message = local.ten_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.ten_tgw_provider_account_id_check.condition
+      error_message = local.ten_tgw_provider_account_id_check.error_message
     }
   }
 }
