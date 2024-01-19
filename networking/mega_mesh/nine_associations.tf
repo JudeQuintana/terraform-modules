@@ -55,3 +55,10 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_nine_to_this_ei
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_nine_to_this_eight.id
 }
 
+resource "aws_ec2_transit_gateway_route_table_association" "this_nine_to_this_ten" {
+  provider = aws.nine
+
+  transit_gateway_route_table_id = local.nine_tgw.route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.this_ten_to_this_nine.id
+}
+

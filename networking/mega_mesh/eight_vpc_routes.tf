@@ -191,3 +191,27 @@ resource "aws_route" "this_eight_vpc_routes_to_nine_tgw_vpcs" {
   destination_cidr_block = each.value.destination_cidr_block
 }
 
+locals {
+  # build new eight vpc routes to ten tgw vpcs
+  eight_vpc_routes_to_ten_tgw_vpcs = [
+    for route_table_id_and_network_cidr in setproduct(local.eight_tgw_vpc_routes_route_table_ids, local.ten_tgw_vpc_network_cidrs) : {
+      route_table_id         = route_table_id_and_network_cidr[0]
+      destination_cidr_block = route_table_id_and_network_cidr[1]
+  }]
+
+  eight_tgw_new_vpc_routes_to_ten_tgw_vpcs = {
+    for this in local.eight_vpc_routes_to_ten_tgw_vpcs :
+    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+  }
+}
+
+resource "aws_route" "this_eight_vpc_routes_to_ten_tgw_vpcs" {
+  provider = aws.eight
+
+  for_each = local.eight_tgw_new_vpc_routes_to_ten_tgw_vpcs
+
+  transit_gateway_id     = local.eight_tgw.id
+  route_table_id         = each.value.route_table_id
+  destination_cidr_block = each.value.destination_cidr_block
+}
+
