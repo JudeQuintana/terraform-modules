@@ -14,7 +14,7 @@ Super Router is composed of two TGWs instead of one TGW (one for each region).
 Example:
 ```
 module "super_router_usw2_to_use1" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router?ref=v1.7.4"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router?ref=v1.7.5"
 
   providers = {
     aws.local = aws.usw2 # local super router tgw will be built in the aws.local provider region
