@@ -35,8 +35,10 @@ output "vpc" {
   # makes it easier to see when troubleshooting many vpc routes
   # otherwise it can just be [for this in aws_route.this_vpc_routes_to_other_vpcs : this]
   value = {
-    names         = [for this in var.centralized_router.vpcs : this.name]
-    network_cidrs = [for this in var.centralized_router.vpcs : this.network_cidr]
+    names                   = [for this in var.centralized_router.vpcs : this.name]
+    network_cidrs           = [for this in var.centralized_router.vpcs : this.network_cidr]
+    private_route_table_ids = flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids])
+    public_route_table_ids  = flatten([for this in var.centralized_router.vpcs : this.public_route_table_ids])
     routes = [
       for this in aws_route.this_vpc_routes_to_other_vpcs : {
         route_table_id         = this.route_table_id
