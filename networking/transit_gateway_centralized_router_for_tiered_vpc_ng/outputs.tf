@@ -32,7 +32,7 @@ output "route_table_id" {
 
 output "vpc" {
   # vpc.routes list of objects will only have 3 attributes (per object) instead of all attributes from the route
-  # makes it easier to see when troubleshooting many vpc routes
+  # makes it easier to see when troubleshooting many vpc routes and is used for super router
   # otherwise it can just be [for this in aws_route.this_vpc_routes_to_other_vpcs : this]
   value = {
     names                   = [for this in var.centralized_router.vpcs : this.name]
