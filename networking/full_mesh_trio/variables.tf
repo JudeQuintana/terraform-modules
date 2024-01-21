@@ -16,13 +16,10 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpc = object({
-          names         = list(string)
-          network_cidrs = list(string)
-          routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-            transit_gateway_id     = string
-          }))
+          names                   = list(string)
+          network_cidrs           = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         })
       })
     })
@@ -36,13 +33,10 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpc = object({
-          names         = list(string)
-          network_cidrs = list(string)
-          routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-            transit_gateway_id     = string
-          }))
+          names                   = list(string)
+          network_cidrs           = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         })
       })
     })
@@ -56,13 +50,10 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpc = object({
-          names         = list(string)
-          network_cidrs = list(string)
-          routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-            transit_gateway_id     = string
-          }))
+          names                   = list(string)
+          network_cidrs           = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         })
       })
     })

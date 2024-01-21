@@ -8,7 +8,7 @@
 *
 * ```
 * module "full_mesh_trio" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.7.4"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.7.5"
 *
 *   providers = {
 *     aws.one   = aws.use1

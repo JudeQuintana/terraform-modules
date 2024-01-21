@@ -117,6 +117,16 @@ resource "aws_ec2_transit_gateway_peering_attachment" "this_two_to_this_three" {
       condition     = local.two_tgw_provider_account_id_check.condition
       error_message = local.two_tgw_provider_account_id_check.error_message
     }
+
+    precondition {
+      condition     = local.three_tgw_provider_region_check.condition
+      error_message = local.three_tgw_provider_region_check.error_message
+    }
+
+    precondition {
+      condition     = local.three_tgw_provider_account_id_check.condition
+      error_message = local.three_tgw_provider_account_id_check.error_message
+    }
   }
 }
 
