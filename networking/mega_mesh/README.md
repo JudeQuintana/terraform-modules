@@ -1,4 +1,9 @@
 # Mega Mesh
+Mega Mesh == (Full Mesh Trio)² + 1
+Full Mesh Transit Gateway across 10 regions.
+[Demo](https://github.com/JudeQuintana/terraform-main/tree/main/mega_mesh_demo)
+
+![mega-mesh](https://jq1-io.s3.amazonaws.com/mega-mesh/ten-full-mesh-tgw.png)
 
 ```
 module "mega_mesh" {
