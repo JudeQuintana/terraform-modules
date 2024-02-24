@@ -13,7 +13,7 @@ variable "tiered_vpc" {
   type = object({
     name              = string
     network_cidr      = string
-    ipv6_network_cidr = string
+    ipv6_network_cidr = optional(string)
     tenancy           = optional(string, "default")
     azs = map(object({
       enable_natgw = optional(bool, false)
