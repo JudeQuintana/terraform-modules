@@ -11,41 +11,25 @@ variable "region_az_labels" {
 variable "tiered_vpc" {
   description = "Tiered VPC configuration"
   type = object({
-    name         = string
-    network_cidr = string
-    tenancy      = optional(string, "default")
+    name              = string
+    network_cidr      = string
+    ipv6_network_cidr = string
+    tenancy           = optional(string, "default")
     azs = map(object({
       enable_natgw = optional(bool, false)
       private_subnets = optional(list(object({
-        name = string
-        cidr = string
+        name      = string
+        cidr      = string
+        ipv6_cidr = optional(string)
       })), [])
       public_subnets = list(object({
-        name    = string
-        cidr    = string
-        special = optional(bool, false)
+        name      = string
+        cidr      = string
+        ipv6_cidr = optional(string)
+        special   = optional(bool, false)
       }))
     }))
   })
-
-  # This is an example of validating CIDR notation
-  # I don't think its really needed because the provider
-  # will provide subnet errors if there is invalid cidrs
-  # the aws provider will error on validate cidr subnets too.
-  # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
-  validation {
-    condition = can(regex(
-      "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
-      var.tiered_vpc.network_cidr)) && alltrue(flatten([
-        for this in var.tiered_vpc.azs : [
-          for subnet_cidr in concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr) :
-          can(regex(
-            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$",
-            subnet_cidr
-        ))]
-    ]))
-    error_message = "The VPC network CIDR and subnet CDIRs must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
-  }
 
   validation {
     condition     = alltrue([for this in keys(var.tiered_vpc.azs) : contains(["a", "b", "c", "d", "e", "f"], this)])
@@ -54,7 +38,7 @@ variable "tiered_vpc" {
 
   validation {
     condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in this.public_subnets : subnet.special if subnet.special]) == 1])
-    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a Tierd VPC."
+    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a Tiered VPC."
   }
 
   validation {
