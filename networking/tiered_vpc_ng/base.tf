@@ -32,6 +32,7 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
+  ipv6_cidr_block      = var.tiered_vpc.ipv6_network_cidr
   instance_tenancy     = var.tiered_vpc.tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true

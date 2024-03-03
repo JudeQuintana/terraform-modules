@@ -11,10 +11,11 @@
 ############################################################################################################
 
 locals {
-  private_label                      = "private"
-  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
-  private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
-  private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+  private_label                           = "private"
+  private_az_to_subnet_cidrs              = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
+  private_subnet_cidr_to_az               = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
+  private_subnet_cidr_to_subnet_name      = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+  private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
 }
 
 resource "aws_subnet" "this_private" {
@@ -23,6 +24,7 @@ resource "aws_subnet" "this_private" {
   vpc_id                  = aws_vpc.this.id
   availability_zone       = format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key))
   cidr_block              = each.key
+  ipv6_cidr_block         = lookup(local.private_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = false
   tags = merge(
     local.default_tags,
