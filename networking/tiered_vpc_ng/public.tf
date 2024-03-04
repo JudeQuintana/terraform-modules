@@ -91,7 +91,7 @@ resource "aws_route" "this_public_ipv6_route_out" {
 
   destination_cidr_block = local.route_any_ipv6_cidr
   route_table_id         = aws_route_table.this_public.id
-  gateway_id             = aws_egress_only_internet_gateway.this.id
+  gateway_id             = aws_internet_gateway.this.id # ipv6 should go out IGW for public subnets
 }
 
 # associate each ipv6 public subnet to the shared route table
