@@ -55,7 +55,7 @@ locals {
   enable_egress_only_internet_gateway = anytrue(flatten([
     for this in var.tiered_vpc.azs : [
       for ipv6_cdir in this.public_subnets[*].ipv6_cidr :
-      ipv6_cidr if ipv6_cidr != null
+      ipv6_cidr != null
   ]]))
   egress_only_internet_gateway = { for this in [local.enable_egress_only_internet_gateway] : this => this if local.enable_egress_only_internet_gateway }
 }
