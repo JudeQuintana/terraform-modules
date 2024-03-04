@@ -85,13 +85,14 @@ locals {
   ipv6_route_out = { for this in [local.is_any_public_ipv6_cidr_in_use] : this => this if local.is_any_public_ipv6_cidr_in_use }
 }
 
-# one public route out through IGW for all public ipv4 subnets across azs
+# one public route out through IGW for all public ipv6 subnets across azs
+# ipv6 should go out IGW for public subnets
 resource "aws_route" "this_public_ipv6_route_out" {
   for-each = local.ipv6_route_out
 
   destination_cidr_block = local.route_any_ipv6_cidr
   route_table_id         = aws_route_table.this_public.id
-  gateway_id             = aws_internet_gateway.this.id # ipv6 should go out IGW for public subnets
+  gateway_id             = aws_internet_gateway.this.id
 }
 
 # associate each ipv6 public subnet to the shared route table
