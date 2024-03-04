@@ -49,3 +49,24 @@ resource "aws_internet_gateway" "this" {
     { Name = local.vpc_name }
   )
 }
+
+locals {
+  # create egress only igw if any public ipv6 subnet is defined
+  enable_egress_only_internet_gateway = anytrue(flatten([
+    for this in var.tiered_vpc.azs : [
+      for ipv6_cdir in this.public_subnets[*].ipv6_cidr :
+      ipv6_cidr if ipv6_cidr != null
+  ]]))
+  egress_only_internet_gateway = { for this in [local.enable_egress_only_internet_gateway] : this => this if local.enable_egress_only_internet_gateway }
+}
+
+resource "aws_egress_only_internet_gateway" "this" {
+  for_each = local.egress_only_internet_gateway
+
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    local.default_tags,
+    { Name = local.vpc_name }
+  )
+}
