@@ -17,13 +17,14 @@
 ############################################################################################################
 
 locals {
-  public_label                           = "public"
-  public_az_to_subnet_cidrs              = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
-  public_subnet_cidr_to_az               = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
-  public_subnet_cidr_to_subnet_name      = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
-  public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
-  public_az_to_special_subnet_cidr       = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
-  public_natgw_az_to_special_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_special_subnet_cidr, az) if this.enable_natgw }
+  public_label                             = "public"
+  public_az_to_subnet_cidrs                = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
+  public_subnet_cidr_to_az                 = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
+  public_subnet_cidr_to_subnet_name        = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
+  public_subnet_cidr_to_ipv6_subnet_cidr   = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
+  public_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].ipv6_cidr, this.public_subnets[*].cidr)]...)
+  public_az_to_special_subnet_cidr         = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
+  public_natgw_az_to_special_subnet_cidr   = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_special_subnet_cidr, az) if this.enable_natgw }
 }
 
 resource "aws_subnet" "this_public" {
@@ -65,7 +66,7 @@ resource "aws_route_table" "this_public" {
   })
 }
 
-# one public route out through IGW for all public subnets across azs
+# one public route out through IGW for all public ipv4 subnets across azs
 resource "aws_route" "public_route_out" {
   destination_cidr_block = local.route_any_cidr
   route_table_id         = aws_route_table.this_public.id
@@ -77,6 +78,27 @@ resource "aws_route_table_association" "this_public" {
   for_each = local.public_subnet_cidr_to_subnet_name
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
+  route_table_id = aws_route_table.this_public.id
+}
+
+locals {
+  ipv6_route_out = { for this in [local.is_any_public_ipv6_cidr_in_use] : this => this if local.is_any_public_ipv6_cidr_in_use }
+}
+
+# one public route out through IGW for all public ipv4 subnets across azs
+resource "aws_route" "this_public_ipv6_route_out" {
+  for-each = local.ipv6_route_out
+
+  destination_cidr_block = local.route_any_ipv6_cidr
+  route_table_id         = aws_route_table.this_public.id
+  gateway_id             = aws_egress_only_internet_gateway.this.id
+}
+
+# associate each ipv6 public subnet to the shared route table
+resource "aws_route_table_association" "this_public_ipv6" {
+  for_each = local.public_ipv6_subnet_cidrs_to_subnet_cidrs
+
+  subnet_id      = lookup(aws_subnet.this_public, each.value).id
   route_table_id = aws_route_table.this_public.id
 }
 

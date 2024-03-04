@@ -5,11 +5,12 @@ data "aws_caller_identity" "this" {}
 data "aws_region" "this" {}
 
 locals {
-  account_id       = data.aws_caller_identity.this.account_id
-  region_name      = data.aws_region.this.name
-  region_label     = lookup(var.region_az_labels, local.region_name)
-  route_any_cidr   = "0.0.0.0/0"
-  upper_env_prefix = upper(var.env_prefix)
+  account_id          = data.aws_caller_identity.this.account_id
+  region_name         = data.aws_region.this.name
+  region_label        = lookup(var.region_az_labels, local.region_name)
+  route_any_cidr      = "0.0.0.0/0"
+  route_any_ipv6_cidr = "::/0"
+  upper_env_prefix    = upper(var.env_prefix)
 
   # Set Environment tag since we have have var.env_prefix
   # add or override with var.tags
@@ -52,12 +53,12 @@ resource "aws_internet_gateway" "this" {
 
 locals {
   # create egress only igw if any public ipv6 subnet is defined across AZs
-  enable_egress_only_internet_gateway = anytrue(flatten([
+  is_any_public_ipv6_cidr_in_use = anytrue(flatten([
     for this in var.tiered_vpc.azs : [
       for ipv6_cdir in this.public_subnets[*].ipv6_cidr :
       ipv6_cidr != null
   ]]))
-  egress_only_internet_gateway = { for this in [local.enable_egress_only_internet_gateway] : this => this if local.enable_egress_only_internet_gateway }
+  egress_only_internet_gateway = { for this in [local.is_any_public_ipv6_cidr_in_use] : this => this if local.is_any_public_ipv6_cidr_in_use }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {
