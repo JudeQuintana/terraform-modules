@@ -51,7 +51,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  # create egress only igw if any public ipv6 subnet is defined
+  # create egress only igw if any public ipv6 subnet is defined across AZs
   enable_egress_only_internet_gateway = anytrue(flatten([
     for this in var.tiered_vpc.azs : [
       for ipv6_cdir in this.public_subnets[*].ipv6_cidr :
