@@ -52,13 +52,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  # create egress only igw if any public ipv6 subnet is defined across AZs
-  is_any_public_ipv6_cidr_in_use = anytrue(flatten([
-    for this in var.tiered_vpc.azs : [
-      for ipv6_cdir in this.public_subnets[*].ipv6_cidr :
-      ipv6_cidr != null
-  ]]))
-  egress_only_internet_gateway = { for this in [local.is_any_public_ipv6_cidr_in_use] : this => this if local.is_any_public_ipv6_cidr_in_use }
+  egress_only_internet_gateway = { for this in [var.enable_egress_only_igw] : this => this if var.enable_egress_only_igw }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {

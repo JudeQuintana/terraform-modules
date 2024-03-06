@@ -11,12 +11,19 @@
 ############################################################################################################
 
 locals {
-  private_label                             = "private"
-  private_az_to_subnet_cidrs                = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
-  private_subnet_cidr_to_az                 = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
-  private_subnet_cidr_to_subnet_name        = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+  private_label                      = "private"
+  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
+  private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
+  private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+
+  #ipv6
+  any_private_ipv6_subnets_configured = anytrue(flatten([
+    for this in var.tiered_vpc.azs : [
+      for ipv6_cdir in this.private_subnets[*].ipv6_cidr :
+      ipv6_cidr != null
+  ]]))
   private_subnet_cidr_to_ipv6_subnet_cidr   = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].ipv6_cidr, this.private_subnets[*].cidr)]...)
+  private_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].ipv6_cidr, this.private_subnets[*].cidr) if local.any_private_ipv6_subnets_configured && var.enable_egress_only_igw]...)
 }
 
 resource "aws_subnet" "this_private" {
@@ -88,7 +95,7 @@ resource "aws_route" "this_private_ipv6_route_out" {
 }
 
 # associate each private ipv6 subnet to its respective AZ's route table
-resource "aws_route_table_association" "this_private" {
+resource "aws_route_table_association" "this_private_ipv6" {
   for_each = local.private_ipv6_subnet_cidrs_to_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_private, each.value).id
