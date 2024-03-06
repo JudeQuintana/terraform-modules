@@ -23,7 +23,7 @@ locals {
       ipv6_cidr != null
   ]]))
   private_subnet_cidr_to_ipv6_subnet_cidr   = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].ipv6_cidr, this.private_subnets[*].cidr) if local.any_private_ipv6_subnets_configured && var.enable_egress_only_igw]...)
+  private_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].ipv6_cidr, this.private_subnets[*].cidr) if local.any_private_ipv6_subnets_configured && var.tiered_vpc.enable_egress_only_igw]...)
 }
 
 resource "aws_subnet" "this_private" {
