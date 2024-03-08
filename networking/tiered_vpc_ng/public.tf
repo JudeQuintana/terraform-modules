@@ -28,8 +28,8 @@ locals {
   public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
   any_public_ipv6_subnets_configured     = length(local.public_ipv6_subnet_cidrs) > 0
   public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
-  public_ipv6_subnet_cidr_to_subnet_cidr = zipmap(local.public_ipv6_subnet_cidrs, keys(local.public_subnet_cidr_to_subnet_name))
-  public_ipv6_route_out                  = { for this in [local.any_public_ipv6_subnets_configured] : this => this if local.any_public_ipv6_subnets_configured }
+  #public_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.public_subnets : subnet.ipv6_cdir => subnet.cidr if lookup(local.public_subnet_cidr_to_ipv6_subnet_cidr, subnet.cidr) != null }]...)
+  public_ipv6_route_out = { for this in [local.any_public_ipv6_subnets_configured] : this => this if local.any_public_ipv6_subnets_configured }
 }
 
 resource "aws_subnet" "this_public" {
@@ -154,10 +154,10 @@ resource "aws_route" "this_public_ipv6_route_out" {
 }
 
 # associate each ipv6 public subnet to the shared route table
-resource "aws_route_table_association" "this_public_ipv6" {
-  for_each = local.public_ipv6_subnet_cidrs_to_subnet_cidr
+#resource "aws_route_table_association" "this_public_ipv6" {
+#for_each = local.public_ipv6_subnet_cidrs_to_subnet_cidr
 
-  subnet_id      = lookup(aws_subnet.this_public, each.value).id
-  route_table_id = aws_route_table.this_public.id
-}
+#subnet_id      = lookup(aws_subnet.this_public, each.value).id
+#route_table_id = aws_route_table.this_public.id
+#}
 
