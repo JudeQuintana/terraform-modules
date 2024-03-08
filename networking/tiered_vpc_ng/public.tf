@@ -26,9 +26,9 @@ locals {
 
   #ipv6
   public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
-  any_public_ipv6_subnets_configured     = length(local.public_ipv6_subnet_cidrs) > 0
+  any_public_ipv6_subnet_configured      = length(local.public_ipv6_subnet_cidrs) > 0
   public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
-  public_ipv6_route_out                  = { for this in [local.any_public_ipv6_subnets_configured] : this => this if local.any_public_ipv6_subnets_configured }
+  public_ipv6_route_out                  = { for this in [local.any_public_ipv6_subnet_configured] : this => this if local.any_public_ipv6_subnet_configured }
 }
 
 resource "aws_subnet" "this_public" {
