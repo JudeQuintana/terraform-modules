@@ -36,7 +36,7 @@ output "private_subnet_cidrs" {
 }
 
 output "private_ipv6_subnet_cidrs" {
-  value = local.private_ipv6_subnets
+  value = local.private_ipv6_subnet_cidrs
 }
 
 output "private_subnet_name_to_subnet_id" {
@@ -52,7 +52,7 @@ output "public_subnet_cidrs" {
 }
 
 output "public_ipv6_subnet_cidrs" {
-  value = local.public_ipv6_subnets
+  value = local.public_ipv6_subnet_cidrs
 }
 
 output "public_special_subnet_ids" {
