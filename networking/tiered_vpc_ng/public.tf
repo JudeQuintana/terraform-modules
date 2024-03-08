@@ -145,7 +145,6 @@ resource "aws_nat_gateway" "this_public" {
 
 # ipv6
 # one public route out through IGW for all public ipv6 subnets across azs
-# public ipv6 subnets should go out IGW for public subnets
 resource "aws_route" "this_public_ipv6_route_out" {
   for_each = local.public_ipv6_route_out
 

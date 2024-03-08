@@ -83,7 +83,8 @@ resource "aws_route_table_association" "this_private" {
   route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id
 }
 
-# private ipv6 route out through egress only internet gateway
+# ipv6
+# private ipv6 subnets route out through egress only internet gateway if egress only igw is enabled
 resource "aws_route" "this_private_ipv6_route_out" {
   for_each = local.private_route_out_ipv6_subnet_cidr_to_subnet_cidr
 
