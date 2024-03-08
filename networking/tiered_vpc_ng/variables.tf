@@ -11,11 +11,11 @@ variable "region_az_labels" {
 variable "tiered_vpc" {
   description = "Tiered VPC configuration"
   type = object({
-    name                   = string
-    network_cidr           = string
-    ipv6_network_cidr      = optional(string)
-    enable_egress_only_igw = optional(bool, false)
-    tenancy                = optional(string, "default")
+    name              = string
+    network_cidr      = string
+    ipv6_network_cidr = optional(string)
+    enable_eigw       = optional(bool, false)
+    tenancy           = optional(string, "default")
     azs = map(object({
       enable_natgw = optional(bool, false)
       private_subnets = optional(list(object({

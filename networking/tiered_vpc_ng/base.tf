@@ -52,7 +52,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  egress_only_internet_gateway = { for this in [var.tiered_vpc.enable_egress_only_igw] : this => this if var.tiered_vpc.enable_egress_only_igw }
+  egress_only_internet_gateway = { for this in [var.tiered_vpc.enable_eigw] : this => this if var.tiered_vpc.enable_eigw }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {
