@@ -36,7 +36,7 @@ output "private_subnet_cidrs" {
 }
 
 output "private_ipv6_subnet_cidrs" {
-  value = flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].ipv6_cidr])
+  value = local.private_ipv6_subnets
 }
 
 output "private_subnet_name_to_subnet_id" {
@@ -52,7 +52,7 @@ output "public_subnet_cidrs" {
 }
 
 output "public_ipv6_subnet_cidrs" {
-  value = flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].ipv6_cidr])
+  value = local.public_ipv6_subnets
 }
 
 output "public_special_subnet_ids" {
