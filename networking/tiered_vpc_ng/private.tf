@@ -85,6 +85,7 @@ resource "aws_route_table_association" "this_private" {
 
 # ipv6
 # private ipv6 subnets route out through egress only internet gateway if egress only igw is enabled
+# subnet id is already associated to the shared public route table via aws_subnet.this_private
 resource "aws_route" "this_private_ipv6_route_out" {
   for_each = local.private_route_out_ipv6_subnet_cidr_to_subnet_cidr
 
@@ -93,10 +94,3 @@ resource "aws_route" "this_private_ipv6_route_out" {
   egress_only_gateway_id = lookup(aws_egress_only_internet_gateway.this, "true").id
 }
 
-# associate each private ipv6 subnet to its respective AZ's route table
-#resource "aws_route_table_association" "this_private_ipv6" {
-#for_each = local.private_ipv6_subnet_cidrs_to_subnet_cidrs
-
-#subnet_id      = lookup(aws_subnet.this_private, each.value).id
-#route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.value)).id
-#}
