@@ -59,7 +59,6 @@ resource "aws_egress_only_internet_gateway" "this" {
   for_each = local.egress_only_internet_gateway
 
   vpc_id = aws_vpc.this.id
-
   tags = merge(
     local.default_tags,
     { Name = local.vpc_name }

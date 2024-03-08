@@ -17,13 +17,11 @@ locals {
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
 
   #ipv6
-  any_private_ipv6_subnets_configured = anytrue(flatten([
-    for this in var.tiered_vpc.azs : [
-      for ipv6_cdir in this.private_subnets[*].ipv6_cidr :
-      ipv6_cidr != null
-  ]]))
-  private_subnet_cidr_to_ipv6_subnet_cidr   = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidrs_to_subnet_cidrs = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].ipv6_cidr, this.private_subnets[*].cidr) if local.any_private_ipv6_subnets_configured && var.tiered_vpc.enable_egress_only_igw]...)
+  private_ipv6_subnets                              = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.private_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
+  any_private_ipv6_subnets_configured               = length(local.private_ipv6_subnets) > 0
+  private_subnet_cidr_to_ipv6_subnet_cidr           = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
+  private_ipv6_subnet_cidr_to_subnet_cidrs          = zipmap(local.private_ipv6_subnets, keys(local.private_subnet_cidr_to_subnet_name))
+  private_route_out_ipv6_subnet_cidr_to_subnet_cidr = { for ipv6_subnet_cidr, subnet_cidr in local.private_ipv6_subnet_cidr_to_subnet_cidr : ipv6_subnet_cidr => subnet_cidr if local.any_private_ipv6_subnets_configured && var.tiered_vpc.tiered_vpc.enable_egress_only_igw }
 }
 
 resource "aws_subnet" "this_private" {
@@ -87,7 +85,7 @@ resource "aws_route_table_association" "this_private" {
 
 # private ipv6 route out through egress only internet gateway
 resource "aws_route" "this_private_ipv6_route_out" {
-  for_each = local.private_ipv6_subnet_cidrs_to_subnet_cidrs
+  for_each = local.private_route_out_ipv6_subnet_cidr_to_subnet_cidr
 
   destination_cidr_block = local.route_any_ipv6_cidr
   route_table_id         = lookup(aws_route_table.this_private, each.value).id
