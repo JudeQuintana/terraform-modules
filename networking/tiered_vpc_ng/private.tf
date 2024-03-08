@@ -17,10 +17,10 @@ locals {
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
 
   #ipv6
-  private_ipv6_subnets                              = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.private_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
-  any_private_ipv6_subnets_configured               = length(local.private_ipv6_subnets) > 0
+  private_ipv6_subnet_cidrs                         = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.private_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
+  any_private_ipv6_subnets_configured               = length(local.private_ipv6_subnet_cidrs) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr           = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidr_to_subnet_cidrs          = zipmap(local.private_ipv6_subnets, keys(local.private_subnet_cidr_to_subnet_name))
+  private_ipv6_subnet_cidr_to_subnet_cidrs          = zipmap(local.private_ipv6_subnet_cidrs, keys(local.private_subnet_cidr_to_subnet_name))
   private_route_out_ipv6_subnet_cidr_to_subnet_cidr = { for ipv6_subnet_cidr, subnet_cidr in local.private_ipv6_subnet_cidr_to_subnet_cidr : ipv6_subnet_cidr => subnet_cidr if local.any_private_ipv6_subnets_configured && var.tiered_vpc.tiered_vpc.enable_egress_only_igw }
 }
 
