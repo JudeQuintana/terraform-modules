@@ -23,6 +23,12 @@ locals {
   public_subnet_cidr_to_subnet_name      = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
   public_az_to_special_subnet_cidr       = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
   public_natgw_az_to_special_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_special_subnet_cidr, az) if this.enable_natgw }
+
+  # ipv6 dual stack
+  public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
+  public_any_ipv6_subnet_configured      = length(local.public_ipv6_subnet_cidrs) > 0
+  public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
+  public_ipv6_route_out                  = { for this in [local.public_any_ipv6_subnet_configured] : this => this if local.public_any_ipv6_subnet_configured }
 }
 
 resource "aws_subnet" "this_public" {
@@ -31,6 +37,7 @@ resource "aws_subnet" "this_public" {
   vpc_id                  = aws_vpc.this.id
   availability_zone       = format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))
   cidr_block              = each.key
+  ipv6_cidr_block         = lookup(local.public_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = true
   tags = merge(
     local.default_tags,
@@ -63,7 +70,7 @@ resource "aws_route_table" "this_public" {
   })
 }
 
-# one public route out through IGW for all public subnets across azs
+# one public route out through IGW for all public ipv4 subnets across azs
 resource "aws_route" "public_route_out" {
   destination_cidr_block = local.route_any_cidr
   route_table_id         = aws_route_table.this_public.id
@@ -134,3 +141,15 @@ resource "aws_nat_gateway" "this_public" {
 
   depends_on = [aws_internet_gateway.this]
 }
+
+# ipv6 dual stack
+# one public route out through IGW for all public ipv6 subnets across azs
+# subnet id is already associated to the shared public route table via aws_subnet.this_public
+resource "aws_route" "this_public_ipv6_route_out" {
+  for_each = local.public_ipv6_route_out
+
+  destination_cidr_block = local.route_any_ipv6_cidr
+  route_table_id         = aws_route_table.this_public.id
+  gateway_id             = aws_internet_gateway.this.id
+}
+

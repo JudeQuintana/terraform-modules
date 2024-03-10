@@ -35,6 +35,10 @@ output "private_subnet_cidrs" {
   value = flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr])
 }
 
+output "private_ipv6_subnet_cidrs" {
+  value = local.private_ipv6_subnet_cidrs
+}
+
 output "private_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_private : lookup(local.private_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
@@ -45,6 +49,10 @@ output "public_route_table_ids" {
 
 output "public_subnet_cidrs" {
   value = flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr])
+}
+
+output "public_ipv6_subnet_cidrs" {
+  value = local.public_ipv6_subnet_cidrs
 }
 
 output "public_special_subnet_ids" {

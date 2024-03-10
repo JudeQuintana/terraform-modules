@@ -5,11 +5,12 @@ data "aws_caller_identity" "this" {}
 data "aws_region" "this" {}
 
 locals {
-  account_id       = data.aws_caller_identity.this.account_id
-  region_name      = data.aws_region.this.name
-  region_label     = lookup(var.region_az_labels, local.region_name)
-  route_any_cidr   = "0.0.0.0/0"
-  upper_env_prefix = upper(var.env_prefix)
+  account_id          = data.aws_caller_identity.this.account_id
+  region_name         = data.aws_region.this.name
+  region_label        = lookup(var.region_az_labels, local.region_name)
+  route_any_cidr      = "0.0.0.0/0"
+  route_any_ipv6_cidr = "::/0"
+  upper_env_prefix    = upper(var.env_prefix)
 
   # Set Environment tag since we have have var.env_prefix
   # add or override with var.tags
@@ -32,6 +33,7 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
+  ipv6_cidr_block      = var.tiered_vpc.ipv6_network_cidr
   instance_tenancy     = var.tiered_vpc.tenancy
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -42,6 +44,20 @@ resource "aws_vpc" "this" {
 }
 
 resource "aws_internet_gateway" "this" {
+  vpc_id = aws_vpc.this.id
+  tags = merge(
+    local.default_tags,
+    { Name = local.vpc_name }
+  )
+}
+
+locals {
+  egress_only_internet_gateway = { for this in [var.tiered_vpc.enable_eigw] : this => this if var.tiered_vpc.enable_eigw }
+}
+
+resource "aws_egress_only_internet_gateway" "this" {
+  for_each = local.egress_only_internet_gateway
+
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
