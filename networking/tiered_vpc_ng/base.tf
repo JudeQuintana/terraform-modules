@@ -41,7 +41,14 @@ resource "aws_vpc" "this" {
   )
 }
 
+locals {
+  enable_igw = anytrue([for this in var.tiered_vpc.azs : length(this.public_subnets) > 0])
+  igw        = { for this in [local.enable_igw] : this => this if local.enable_igw }
+}
+
 resource "aws_internet_gateway" "this" {
+  for_each = local.igw
+
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
