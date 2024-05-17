@@ -21,8 +21,9 @@ locals {
   public_az_to_subnet_cidrs              = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
   public_subnet_cidr_to_az               = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name      = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
+  public_subnet_name_to_subnet_cidr      = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].name, this.public_subnets[*].cidr)]...)
   public_az_to_special_subnet_cidr       = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
-  public_natgw_az_to_special_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_az_to_special_subnet_cidr, az) if this.enable_natgw }
+  public_natgw_az_to_special_subnet_cidr = { for az, this in var.tiered_vpc.azs : az => lookup(local.public_subnet_name_to_subnet_cidr, this.natgw_in) if this.natgw_in != null }
 }
 
 resource "aws_subnet" "this_public" {
@@ -89,7 +90,7 @@ resource "aws_route_table_association" "this_public" {
 resource "aws_eip" "this_public" {
   for_each = local.public_natgw_az_to_special_subnet_cidr
 
-  vpc = true
+  domain = "vpc"
   tags = merge(
     local.default_tags,
     {

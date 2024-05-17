@@ -15,8 +15,7 @@ variable "tiered_vpc" {
     network_cidr = string
     tenancy      = optional(string, "default")
     azs = map(object({
-      #enable_natgw    = optional(bool, false)
-      natgw_in = optinal(string)
+      natgw_in = optional(string)
       private_subnets = optional(list(object({
         name    = string
         cidr    = string
@@ -56,7 +55,7 @@ variable "tiered_vpc" {
 
   validation {
     condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1])
-    error_message = "There must be either 1 private subnet or 1 public subnet with a special attribute set to true per AZ in a Tierd VPC."
+    error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ in a Tiered VPC."
   }
 
   validation {
@@ -78,8 +77,8 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = true
-    error_message = "var.natgw_in must be a public subnet name that currently exists."
+    condition     = alltrue([for this in var.tiered_vpc.azs : contains(this.public_subnets[*].name, this.natgw_in) if this.natgw_in != null])
+    error_message = "The natgw_in AZ attribute must be a public subnet name that currently exists in the same AZ."
   }
 }
 

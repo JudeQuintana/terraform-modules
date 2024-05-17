@@ -29,13 +29,8 @@ variable "centralized_router" {
   })
 
   validation {
-    condition     = true
-    error_message = "If var.centralized_router.private_special_subnet_ids is populated then var.centralized_router.public_special_subnet_ids must be empty."
-  }
-
-  validation {
-    condition     = true
-    error_message = "If var.centralized_router.public_special_subnet_ids is populated then var.centralized_router.private_special_subnet_ids must be empty."
+    condition     = alltrue([for this in var.centralized_route.vpcs : length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1])
+    error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ for all VPCs."
   }
 
   validation {
