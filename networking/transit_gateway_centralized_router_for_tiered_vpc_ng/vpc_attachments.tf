@@ -1,13 +1,13 @@
 locals {
   vpc_attachment_format = "%s <-> %s"
-  vpc_id_to_vpc         = { for this in var.centralized_router.vpcs : this.id => this }
+  vpc_id_to_vpc         = { for this in var.centralized_router.vpcs : this.id => concat(this.private_special_subnet_ids, this.public_special_subnet_ids) }
 }
 
 # VPC attachments will use either a private subnet or public subnet tagged as speciale from each AZ to route traffic.
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   for_each = local.vpc_id_to_vpc
 
-  subnet_ids                                      = concat(each.value.private_special_subnet_ids, each.value.public_special_subnet_ids)
+  subnet_ids                                      = each.value
   transit_gateway_id                              = aws_ec2_transit_gateway.this.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
