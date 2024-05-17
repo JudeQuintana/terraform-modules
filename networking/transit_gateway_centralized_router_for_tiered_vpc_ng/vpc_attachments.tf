@@ -3,15 +3,11 @@ locals {
   vpc_id_to_vpc         = { for this in var.centralized_router.vpcs : this.id => this }
 }
 
-# Use the special public subnet ids for each az per tiered vpc to be used for each vpc attachment because they will always exist for a tiered vpc.
-# This means VPC attachments will use one public subnet from each AZ to route traffic.
-# This enables traffic to reach resources in every subnet in that AZ.
-# The public subnet that it will use will be only one with the special attibute set to true per AZ ie `special = true`.
-# I'm not sure about security implications of this pattern but I dont think it matters.
+# VPC attachments will use either a private subnet or public subnet tagged as speciale from each AZ to route traffic.
 resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   for_each = local.vpc_id_to_vpc
 
-  subnet_ids                                      = each.value.public_special_subnet_ids
+  subnet_ids                                      = concat(each.value.private_special_subnet_ids, each.value.public_special_subnet_ids)
   transit_gateway_id                              = aws_ec2_transit_gateway.this.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false

@@ -51,6 +51,10 @@ output "public_special_subnet_ids" {
   value = [for this in local.public_az_to_special_subnet_cidr : lookup(aws_subnet.this_public, this).id]
 }
 
+output "private_special_subnet_ids" {
+  value = [for this in local.private_az_to_special_subnet_cidr : lookup(aws_subnet.this_private, this).id]
+}
+
 output "public_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }

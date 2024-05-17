@@ -15,16 +15,18 @@ variable "tiered_vpc" {
     network_cidr = string
     tenancy      = optional(string, "default")
     azs = map(object({
-      enable_natgw = optional(bool, false)
+      #enable_natgw    = optional(bool, false)
+      natgw_in = optinal(string)
       private_subnets = optional(list(object({
-        name = string
-        cidr = string
-      })), [])
-      public_subnets = list(object({
         name    = string
         cidr    = string
         special = optional(bool, false)
-      }))
+      })), [])
+      public_subnets = optional(list(object({
+        name    = string
+        cidr    = string
+        special = optional(bool, false)
+      })), [])
     }))
   })
 
@@ -53,8 +55,8 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in this.public_subnets : subnet.special if subnet.special]) == 1])
-    error_message = "There must be 1 public subnet with a special attribute set to true per AZ in a Tierd VPC."
+    condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1])
+    error_message = "There must be either 1 private subnet or 1 public subnet with a special attribute set to true per AZ in a Tierd VPC."
   }
 
   validation {
@@ -73,6 +75,11 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
     ]))
     error_message = "Each subnet CDIR must be unique across all AZs in a Tiered VPC."
+  }
+
+  validation {
+    condition     = true
+    error_message = "var.natgw_in must be a public subnet name that currently exists."
   }
 }
 

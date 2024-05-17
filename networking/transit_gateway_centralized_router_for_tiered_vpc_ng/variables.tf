@@ -15,17 +15,28 @@ variable "centralized_router" {
     amazon_side_asn = number
     blackhole_cidrs = optional(list(string), [])
     vpcs = optional(map(object({
-      account_id                = string
-      full_name                 = string
-      id                        = string
-      name                      = string
-      network_cidr              = string
-      private_route_table_ids   = list(string)
-      public_route_table_ids    = list(string)
-      public_special_subnet_ids = list(string)
-      region                    = string
+      account_id                 = string
+      full_name                  = string
+      id                         = string
+      name                       = string
+      network_cidr               = string
+      private_route_table_ids    = list(string)
+      public_route_table_ids     = list(string)
+      private_special_subnet_ids = list(string)
+      public_special_subnet_ids  = list(string)
+      region                     = string
     })), {})
   })
+
+  validation {
+    condition     = true
+    error_message = "If var.centralized_router.private_special_subnet_ids is populated then var.centralized_router.public_special_subnet_ids must be empty."
+  }
+
+  validation {
+    condition     = true
+    error_message = "If var.centralized_router.public_special_subnet_ids is populated then var.centralized_router.private_special_subnet_ids must be empty."
+  }
 
   validation {
     condition = length(distinct([
