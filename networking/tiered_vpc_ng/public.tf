@@ -63,11 +63,14 @@ resource "aws_route_table" "this_public" {
   })
 }
 
-# one public route out through IGW for all public subnets across azs
+# one public route out through IGW for all public subnets across azs if an igw exists
+# igw will exists if public subnets are populated
 resource "aws_route" "public_route_out" {
+  for_each = local.igw
+
   destination_cidr_block = local.route_any_cidr
   route_table_id         = aws_route_table.this_public.id
-  gateway_id             = aws_internet_gateway.this.id
+  gateway_id             = lookup(aws_internet_gateway.this, each.key).id
 }
 
 # associate each public subnet to the shared route table
