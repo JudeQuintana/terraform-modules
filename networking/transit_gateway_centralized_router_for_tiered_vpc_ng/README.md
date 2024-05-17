@@ -34,13 +34,13 @@ Main:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >=4.20 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.31 |
 
 ## Modules
 
@@ -66,7 +66,7 @@ Main:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                = string<br>      full_name                 = string<br>      id                        = string<br>      name                      = string<br>      network_cidr              = string<br>      private_route_table_ids   = list(string)<br>      public_route_table_ids    = list(string)<br>      public_special_subnet_ids = list(string)<br>      region                    = string<br>    })), {})<br>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                 = string<br>      full_name                  = string<br>      id                         = string<br>      name                       = string<br>      network_cidr               = string<br>      private_route_table_ids    = list(string)<br>      public_route_table_ids     = list(string)<br>      private_special_subnet_ids = list(string)<br>      public_special_subnet_ids  = list(string)<br>      region                     = string<br>    })), {})<br>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |

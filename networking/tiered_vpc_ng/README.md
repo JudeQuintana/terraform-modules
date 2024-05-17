@@ -115,13 +115,13 @@ Main:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.20 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.20 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.31 |
 
 ## Modules
 
@@ -154,7 +154,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = map(object({<br>      enable_natgw = optional(bool, false)<br>      private_subnets = optional(list(object({<br>        name = string<br>        cidr = string<br>      })), [])<br>      public_subnets = list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      }))<br>    }))<br>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = map(object({<br>      natgw_in = optional(string)<br>      private_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>      public_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>    }))<br>  })</pre> | n/a | yes |
 
 ## Outputs
 
@@ -168,6 +168,7 @@ No modules.
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | n/a |
 | <a name="output_private_route_table_ids"></a> [private\_route\_table\_ids](#output\_private\_route\_table\_ids) | n/a |
+| <a name="output_private_special_subnet_ids"></a> [private\_special\_subnet\_ids](#output\_private\_special\_subnet\_ids) | n/a |
 | <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | n/a |
 | <a name="output_private_subnet_name_to_subnet_id"></a> [private\_subnet\_name\_to\_subnet\_id](#output\_private\_subnet\_name\_to\_subnet\_id) | n/a |
 | <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | n/a |
