@@ -61,7 +61,7 @@ resource "aws_route_table" "this_private" {
 # uses a map from public.tf but the route is a
 # private conext
 resource "aws_route" "this_private_route_out" {
-  for_each = local.public_natgw_to_subnet_cidr
+  for_each = local.public_natgw_az_to_subnet_cidr
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.this_private, each.key).id
