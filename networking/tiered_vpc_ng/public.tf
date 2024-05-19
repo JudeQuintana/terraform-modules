@@ -42,7 +42,7 @@ resource "aws_subnet" "this_public" {
         upper(var.env_prefix),
         var.tiered_vpc.name,
         local.public_label,
-        each.value,
+        lookup(local.public_subnet_cidr_to_subnet_name, each.key),
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key)))
       )
   })

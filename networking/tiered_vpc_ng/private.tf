@@ -34,7 +34,7 @@ resource "aws_subnet" "this_private" {
         local.upper_env_prefix,
         var.tiered_vpc.name,
         local.private_label,
-        each.value,
+        lookup(local.private_subnet_cidr_to_subnet_name, each.key),
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key)))
       )
   })
