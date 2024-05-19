@@ -18,7 +18,9 @@
 
 locals {
   public_label                      = "public"
-  public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr }
+  public_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
+  public_any_subnet_exists          = length(local.public_subnet_cidrs) > 0
+  public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr if local.public_any_subnet_exists }
   public_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
   public_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
@@ -26,7 +28,8 @@ locals {
 }
 
 resource "aws_subnet" "this_public" {
-  for_each = local.public_subnet_cidr_to_subnet_name
+  #for_each = local.public_subnet_cidr_to_subnet_name
+  for_each = local.public_subnet_cidrs
 
   vpc_id                  = aws_vpc.this.id
   availability_zone       = format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))
@@ -48,6 +51,8 @@ resource "aws_subnet" "this_public" {
 
 # one public route table for all public subnets across azs
 resource "aws_route_table" "this_public" {
+  for_each = local.igw
+
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
@@ -64,21 +69,22 @@ resource "aws_route_table" "this_public" {
 }
 
 # one public route out through IGW for all public subnets across azs if an igw exists
-# igw will exists if public subnets are populated
+# igw will exists if public subnet exists
 resource "aws_route" "public_route_out" {
   for_each = local.igw
 
   destination_cidr_block = local.route_any_cidr
-  route_table_id         = aws_route_table.this_public.id
+  route_table_id         = lookup(aws_route_table.this_public, "true").id
   gateway_id             = lookup(aws_internet_gateway.this, each.key).id
 }
 
 # associate each public subnet to the shared route table
 resource "aws_route_table_association" "this_public" {
-  for_each = local.public_subnet_cidr_to_subnet_name
+  #for_each = local.public_subnet_cidr_to_subnet_name
+  for_each = local.public_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
-  route_table_id = aws_route_table.this_public.id
+  route_table_id = lookup(aws_route_table.this_public, "true").id
 }
 
 #######################################################

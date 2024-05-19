@@ -14,7 +14,7 @@ variable "tiered_vpc" {
     name         = string
     network_cidr = string
     tenancy      = optional(string, "default")
-    azs = map(object({
+    azs = optional(map(object({
       private_subnets = optional(list(object({
         name    = string
         cidr    = string
@@ -26,7 +26,7 @@ variable "tiered_vpc" {
         special = optional(bool, false)
         natgw   = optional(bool, false)
       })), [])
-    }))
+    })), {})
   })
 
   # This is an example of validating CIDR notation
@@ -54,16 +54,28 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1])
-    error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ in a Tiered VPC."
+    #condition     = alltrue([for this in var.tiered_vpc.azs : length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1])
+    condition = alltrue([
+      for this in var.tiered_vpc.azs :
+      anytrue(this.public_subnets[*].special) ? length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1 : true
+    ])
+    error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ."
   }
 
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      length([for natgw in this.public_subnets[*].natgw : natgw if natgw]) > 0 ? length([for subnet in this.public_subnets : subnet.natgw if subnet.natgw]) == 1 : true
+      anytrue(this.public_subnets[*].natgw) ? length([for subnet in this.public_subnets : subnet.natgw if subnet.natgw]) == 1 : true
     ])
-    error_message = "There can be only be 1 public subnet with a NATGW per AZ in a Tiered VPC if a NAT is defined."
+    error_message = "There can be only be 1 public subnet with a NATGW per AZ."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.tiered_vpc.azs :
+      anytrue(this.public_subnets[*].natgw) ? length(this.private_subnets) > 0 : true
+    ])
+    error_message = "At least 1 private subnet must exist if a NATGW is defined for a public subnet in the same AZ."
   }
 
   validation {
@@ -72,7 +84,7 @@ variable "tiered_vpc" {
       ]))) == length(flatten([
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
     ]))
-    error_message = "Each subnet name must be unique across all AZs in a Tiered VPC."
+    error_message = "Each subnet name must be unique across all AZs."
   }
 
   validation {
@@ -81,7 +93,7 @@ variable "tiered_vpc" {
       ]))) == length(flatten([
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
     ]))
-    error_message = "Each subnet CDIR must be unique across all AZs in a Tiered VPC."
+    error_message = "Each subnet CDIR must be unique across all AZs."
   }
 }
 

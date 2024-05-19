@@ -32,7 +32,8 @@ output "private_route_table_ids" {
 }
 
 output "private_subnet_cidrs" {
-  value = flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr])
+  #value = flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr])
+  value = local.private_subnet_cidrs
 }
 
 output "private_subnet_name_to_subnet_id" {
@@ -40,11 +41,12 @@ output "private_subnet_name_to_subnet_id" {
 }
 
 output "public_route_table_ids" {
-  value = [aws_route_table.this_public.id] # Each public subnet across AZs shares the same route table
+  value = [for this in aws_route_table.this_public : this.id] # Each public subnet across AZs shares the same route table
 }
 
 output "public_subnet_cidrs" {
-  value = flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr])
+  #value = flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr])
+  value = local.public_subnet_cidrs
 }
 
 output "public_special_subnet_ids" {

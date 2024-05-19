@@ -114,7 +114,7 @@ Main:
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.4 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
 
 ## Providers
@@ -154,7 +154,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = map(object({<br>      private_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>      public_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>        natgw   = optional(bool, false)<br>      })), [])<br>    }))<br>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = optional(map(object({<br>      private_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>      public_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>        natgw   = optional(bool, false)<br>      })), [])<br>    })), {})<br>  })</pre> | n/a | yes |
 
 ## Outputs
 

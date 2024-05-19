@@ -42,8 +42,7 @@ resource "aws_vpc" "this" {
 }
 
 locals {
-  enable_igw = anytrue([for this in var.tiered_vpc.azs : length(this.public_subnets) > 0])
-  igw        = { for this in [local.enable_igw] : this => this if local.enable_igw }
+  igw = { for this in [true] : this => this if local.public_any_subnet_exists }
 }
 
 resource "aws_internet_gateway" "this" {
