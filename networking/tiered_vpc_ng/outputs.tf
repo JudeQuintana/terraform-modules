@@ -32,7 +32,6 @@ output "private_route_table_ids" {
 }
 
 output "private_subnet_cidrs" {
-  #value = flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr])
   value = local.private_subnet_cidrs
 }
 
@@ -45,7 +44,6 @@ output "public_route_table_ids" {
 }
 
 output "public_subnet_cidrs" {
-  #value = flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr])
   value = local.public_subnet_cidrs
 }
 

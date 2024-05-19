@@ -28,7 +28,6 @@ locals {
 }
 
 resource "aws_subnet" "this_public" {
-  #for_each = local.public_subnet_cidr_to_subnet_name
   for_each = local.public_subnet_cidrs
 
   vpc_id                  = aws_vpc.this.id
@@ -80,7 +79,6 @@ resource "aws_route" "public_route_out" {
 
 # associate each public subnet to the shared route table
 resource "aws_route_table_association" "this_public" {
-  #for_each = local.public_subnet_cidr_to_subnet_name
   for_each = local.public_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
