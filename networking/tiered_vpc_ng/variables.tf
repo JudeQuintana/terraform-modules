@@ -55,7 +55,7 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue(this.public_subnets[*].special) ? length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1 : true
+      length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1
     ])
     error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ."
   }

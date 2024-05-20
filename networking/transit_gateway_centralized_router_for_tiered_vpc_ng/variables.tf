@@ -28,11 +28,6 @@ variable "centralized_router" {
     })), {})
   })
 
-  #validation {
-  #condition     = alltrue([for this in var.centralized_router.vpcs : length(concat(this.private_special_subnet_ids, this.public_special_subnet_ids)])
-  #error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ for all VPCs when passed to Centralized Router."
-  #}
-
   validation {
     condition = length(distinct([
       for this in var.centralized_router.vpcs : this.name
