@@ -40,7 +40,7 @@ output "vpc" {
     private_route_table_ids = flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids])
     public_route_table_ids  = flatten([for this in var.centralized_router.vpcs : this.public_route_table_ids])
     routes = [
-      for this in aws_route.this_vpc_routes_to_other_vpcs : {
+      for this in aws_route.this : {
         route_table_id         = this.route_table_id
         destination_cidr_block = this.destination_cidr_block
         transit_gateway_id     = this.transit_gateway_id

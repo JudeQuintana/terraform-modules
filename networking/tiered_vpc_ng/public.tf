@@ -68,7 +68,7 @@ resource "aws_route_table" "this_public" {
 
 # one public route out through IGW for all public subnets across azs if an igw exists
 # igw will exists if public subnet exists
-resource "aws_route" "public_route_out" {
+resource "aws_route" "this_public_route_out" {
   for_each = local.igw
 
   destination_cidr_block = local.route_any_cidr

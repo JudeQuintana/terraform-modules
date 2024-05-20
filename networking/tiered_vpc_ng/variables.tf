@@ -13,7 +13,6 @@ variable "tiered_vpc" {
   type = object({
     name         = string
     network_cidr = string
-    tenancy      = optional(string, "default")
     azs = optional(map(object({
       private_subnets = optional(list(object({
         name    = string

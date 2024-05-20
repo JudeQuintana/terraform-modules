@@ -134,8 +134,8 @@ No modules.
 | [aws_eip.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_nat_gateway.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
-| [aws_route.public_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_private_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_public_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route_table.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
@@ -154,7 +154,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    tenancy      = optional(string, "default")<br>    azs = optional(map(object({<br>      private_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>      public_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>        natgw   = optional(bool, false)<br>      })), [])<br>    })), {})<br>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br>    name         = string<br>    network_cidr = string<br>    azs = optional(map(object({<br>      private_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>      })), [])<br>      public_subnets = optional(list(object({<br>        name    = string<br>        cidr    = string<br>        special = optional(bool, false)<br>        natgw   = optional(bool, false)<br>      })), [])<br>    })), {})<br>  })</pre> | n/a | yes |
 
 ## Outputs
 
