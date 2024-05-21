@@ -42,7 +42,7 @@ resource "aws_vpc" "this" {
 
 locals {
   any_public_subnet_exists = length(local.public_subnet_cidrs) > 0
-  igw                      = { for this in [true] : this => this if local.any_public_subnet_exists }
+  igw                      = { for this in [local.any_public_subnet_exists] : this => this if local.any_public_subnet_exists }
 }
 
 resource "aws_internet_gateway" "this" {
