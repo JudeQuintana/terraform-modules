@@ -13,7 +13,7 @@ variable "tiered_vpc" {
   type = object({
     name         = string
     network_cidr = string
-    azs = optional(map(object({
+    azs = map(object({
       private_subnets = optional(list(object({
         name    = string
         cidr    = string
@@ -25,7 +25,7 @@ variable "tiered_vpc" {
         special = optional(bool, false)
         natgw   = optional(bool, false)
       })), [])
-    })), {})
+    }))
   })
 
   # This is an example of validating CIDR notation
