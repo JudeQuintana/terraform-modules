@@ -72,7 +72,7 @@ resource "aws_route" "this_public_route_out" {
   for_each = local.igw
 
   destination_cidr_block = local.route_any_cidr
-  route_table_id         = lookup(aws_route_table.this_public, "true").id
+  route_table_id         = lookup(aws_route_table.this_public, each.key).id
   gateway_id             = lookup(aws_internet_gateway.this, each.key).id
 }
 
