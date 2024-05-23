@@ -1,7 +1,18 @@
 /*
 * # Tiered VPC-NG Description
-* Baseline Tiered VPC-NG features (same as prototype):
+* `v1.0.1`
+* - Private subnets now have a `special` attribute option.
+*   - Now AZs can have private subnets only, public subnets only or both!
+*   - Only 1 subnet, private or public can have `special = true` for VPC attachments per AZ when passed to Centralized Router `v1.0.1`.
+* - Public subnets now have a `natgw` attribute insted of having `enable_natwgw`
+*   - Tag any public subnet with `natgw = true` to build the NATGW for all private subnets within the same AZ.
+* - IGW now auto toggles if any public subnets are defined.
+* - Set required `aws` provider version to >=5.31 and Terraform version >=1.4
+* - Update deprecated `aws_eip` attribute
+* - Not ideal to migrate to `v1.0.0` since there are many resource naming changes.
+*   - Recommend starting fresh at `v1.0.1`
 *
+* `v1.0.0`
 * - Create VPC tiers
 *   - Thinking about VPCs as tiers helps narrow down the context (ie app, db, general) and maximize the use of smaller network size when needed.
 *   - You can still have 3 tiered networking (ie lbs, dbs for an app) internally to the VPC.
@@ -17,10 +28,10 @@
 * - Can access subnet id by subnet name map via output.
 * - Can rename public and private subnets directly without forcing a new subnet resource.
 * - Public subnets now have a special attribute option.
-*   - Only one can have `special = true` which enables 3 things:
+*   - Only one can have `special = true`
 *   - Associate a NAT Gateway if `enable_natgw = true`.
-*   - Use for associating VPC attatchments when Tiered VPC is passed to a Centralized Router (one in each AZ).
-*   - Existing public subnets can be rearranged in any order in their repective subnet list without forcing new resources.
+*     - Use for associating VPC attatchments when Tiered VPC is passed to a Centralized Router (one in each AZ).
+*      - Existing public subnets can be rearranged in any order in their repective subnet list without forcing new resources.
 *   - The trade off is always having to allocate one public subnet per AZ, even if you don’t need to use it (ie using private subnets only).
 * - Important:
 *   - All VPC names should be unique across regions (validation enforced).
@@ -31,7 +42,7 @@
 *   - all vpc names and network cidrs should be unique across regions
 *   - the routers will enforce uniqueness along with other validations
 *
-* Example:
+* `v1.0.0` example:
 * ```
 * locals {
 *   tiered_vpcs = [
