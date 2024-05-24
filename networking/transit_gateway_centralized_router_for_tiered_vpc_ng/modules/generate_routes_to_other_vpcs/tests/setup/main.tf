@@ -44,7 +44,6 @@ output "one_tiered_vpc" {
       ]
       public_route_table_ids = [
         "rtb-06b216fb818494594",
-        "rtb-06b216fb818494594"
       ]
     }
   }
