@@ -13,7 +13,7 @@ locals {
   }
 }
 
-resource "aws_route" "this_routes_to_other_vpcs" {
+resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   for_each = local.vpc_routes_to_other_vpcs
 
   route_table_id         = each.value.route_table_id
