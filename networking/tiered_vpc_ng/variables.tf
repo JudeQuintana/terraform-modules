@@ -26,8 +26,8 @@ variable "tiered_vpc" {
         natgw   = optional(bool, false)
       })), [])
     }))
-    enabled_dns_support   = optional(bool, true)
-    enabled_dns_hostnames = optional(bool, true)
+    enable_dns_support   = optional(bool, true)
+    enable_dns_hostnames = optional(bool, true)
   })
 
   # This is an example of validating CIDR notation
