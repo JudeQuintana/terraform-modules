@@ -26,6 +26,8 @@ variable "tiered_vpc" {
         natgw   = optional(bool, false)
       })), [])
     }))
+    enabled_dns_support   = optional(bool, true)
+    enabled_dns_hostnames = optional(bool, true)
   })
 
   # This is an example of validating CIDR notation
@@ -73,7 +75,7 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs :
       anytrue(this.public_subnets[*].natgw) ? length(this.private_subnets) > 0 : true
     ])
-    error_message = "At least 1 private subnet must exist if a NATGW is defined for a public subnet in the same AZ."
+    error_message = "At least 1 private subnet must exist if a NATGW is enabled for a public subnet in the same AZ."
   }
 
   validation {

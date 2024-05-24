@@ -32,8 +32,8 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  enable_dns_support   = var.vpc.enable_dns_support
+  enable_dns_hostnames = var.vpc.enable_dns_hostnames
   tags = merge(
     local.default_tags,
     { Name = local.vpc_name }
