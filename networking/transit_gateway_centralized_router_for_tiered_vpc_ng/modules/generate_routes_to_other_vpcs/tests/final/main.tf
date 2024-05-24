@@ -1,4 +1,3 @@
-
 output "set_of_route_objects_to_other_vpcs" {
   value = toset([
     {
