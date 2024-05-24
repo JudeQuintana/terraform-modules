@@ -1,5 +1,4 @@
 # Generate Routes to Other VPCs Description
-See [Building a generate routes function using Terraform test](https://jq1.io/posts/generating_routes) blog post.
 
 This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects with [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng).
 
@@ -12,7 +11,7 @@ A list of route objects makes it easier to handle when passing to other route re
 ```hcl
 # snippet
 module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
+  source = "./modules/generate_routes_to_other_vpcs"
 
   vpcs = var.vpcs
 }
@@ -36,34 +35,6 @@ resource "aws_route" "this" {
 }
 ```
 
-Example future use in [TGW Centralized Router](https://github.com/JudeQuintana/terraform-modules/blob/3be85f2cbd590fbb02dc9190213e0b9296388c56/networking/transit_gateway_centralized_router_for_tiered_vpc_ng/main.tf#L83-L113):
-
-You can still get the legacy map of routes with the `call_legacy` output.
-
-But I don’t think generating a map of routes with unique keys for the caller is not a shortcut worth taking becuase of it’s inflexibility when needing different transforms.
-
-The `call_legacy` output is `{ "rtb-id|route" => "route", ... }`. It has been deprecated in favor of `call`
-
-```hcl
-# snippet
-module "generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs?ref=v1.4.16"
-
-  vpcs = var.vpcs
-}
-
-resource "aws_route" "this" {
-  for_each = module.generate_routes_to_other_vpcs.call_legacy
-
-  destination_cidr_block = each.value
-  route_table_id         = split("|", each.key)[0]
-  transit_gateway_id     = aws_ec2_transit_gateway.this.id
-
-  # make sure the tgw route table is available first before the setting routes routes on the vpcs
-  depends_on = [aws_ec2_transit_gateway_route_table.this]
-}
-```
-
 Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to run the test suite.
 
 The test suite will help when refactoring is needed.
@@ -72,7 +43,7 @@ The test suite will help when refactoring is needed.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.7.5 |
 
 ## Providers
 
@@ -97,4 +68,3 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_call"></a> [call](#output\_call) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
-| <a name="output_call_legacy"></a> [call\_legacy](#output\_call\_legacy) | deprecated { "route-table-id\|route" => "route", ... } |
