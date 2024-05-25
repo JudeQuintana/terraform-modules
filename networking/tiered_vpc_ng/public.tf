@@ -19,6 +19,7 @@
 locals {
   public_label                      = "public"
   public_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
+  public_any_subnet_exists          = length(local.public_subnet_cidrs) > 0
   public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr if length(this.public_subnets[*].cidr) > 0 }
   public_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
@@ -81,7 +82,7 @@ resource "aws_route_table_association" "this_public" {
   for_each = local.public_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
-  route_table_id = lookup(aws_route_table.this_public, "true").id
+  route_table_id = lookup(aws_route_table.this_public, local.public_any_subnet_exists).id
 }
 
 #######################################################
