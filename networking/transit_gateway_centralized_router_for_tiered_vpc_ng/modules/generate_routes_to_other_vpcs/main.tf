@@ -36,7 +36,18 @@
 * }
 * ```
 *
-* Run `terraform test` in the `./utils/generate_routes_to_other_vpcs` directory to run the test suite.
+* Run the test suites with `terraform test` in the `./modules/generate_routes_to_other_vpcs` directory.
+* ```
+* tests/generate_routes.tftest.hcl... in progress
+*   run "setup"... pass
+*   run "final"... pass
+*   run "call_with_n_greater_than_one"... pass
+*   run "call_with_n_equal_to_one"... pass
+*   run "call_with_n_equal_to_zero"... pass
+*   run "cidr_validation"... pass
+* tests/generate_routes.tftest.hcl... tearing down
+* tests/generate_routes.tftest.hcl... pass
+* ```
 *
 * The test suite will help when refactoring is needed.
 */
