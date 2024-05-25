@@ -10,7 +10,7 @@ run "final" {
   }
 }
 
-run "generate_routes_to_other_vpcs_call_with_n_greater_than_one" {
+run "call_with_n_greater_than_one" {
   variables {
     vpcs = run.setup.tiered_vpcs
   }
@@ -21,7 +21,7 @@ run "generate_routes_to_other_vpcs_call_with_n_greater_than_one" {
   }
 }
 
-run "generate_routes_to_other_vpcs_call_with_n_equal_to_one" {
+run "call_with_n_equal_to_one" {
   variables {
     vpcs = run.setup.one_tiered_vpc
   }
@@ -32,7 +32,7 @@ run "generate_routes_to_other_vpcs_call_with_n_equal_to_one" {
   }
 }
 
-run "generate_routes_to_other_vpcs_call_with_n_equal_to_zero" {
+run "call_with_n_equal_to_zero" {
   variables {
     vpcs = {}
   }
@@ -41,5 +41,15 @@ run "generate_routes_to_other_vpcs_call_with_n_equal_to_zero" {
     condition     = output.call == toset([])
     error_message = "Not an empty set."
   }
+}
+
+run "cidr_validation" {
+  command = plan
+
+  variables {
+    vpcs = run.setup.one_tiered_vpc_with_invalid_cidr
+  }
+
+  expect_failures = [ var.vpcs ]
 }
 

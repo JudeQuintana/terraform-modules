@@ -49,3 +49,13 @@ output "one_tiered_vpc" {
   }
 }
 
+output "one_tiered_vpc_with_invalid_cidr" {
+  value = {
+    app = {
+      network_cidr            = "10.0.0.546/20"
+      private_route_table_ids = []
+      public_route_table_ids  = []
+    }
+  }
+}
+
