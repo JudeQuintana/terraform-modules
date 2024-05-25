@@ -8,10 +8,10 @@
 - IGW now auto toggles if any public subnets are defined.
 - Set required `aws` provider version to >=5.31 and Terraform version >=1.4
 - Update deprecated `aws_eip` attribute
-- Not ideal to migrate to `v1.0.0` since there are many resource naming changes.
-  - Recommend starting fresh at `v1.0.1`
+- Not ideal to migrate to `v1.8.0` since there are many resource naming changes.
+  - Recommend starting fresh at `v1.8.1`
 
-`v1.0.1` example:
+`v1.8.0` example:
 ```
 locals {
   tiered_vpcs = [

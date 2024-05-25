@@ -1,18 +1,18 @@
 # Transit Gateway Centralized Router Description
 - Creates hub and spoke topology from VPCs.
 
-`v1.0.1`
+`v1.8.1`
 - Now supports VPC attachments for private subnets.
   - Will use the subnet id for a subnet tagged with `special = true` from either a private or a public subnet per AZ in Tiered VPC-NG for `v1.0.1`
 
-`v1.0.0`
+`v1.8.0`
 - This Transit Gateway Centralized Router module will create a hub spoke and topology from existing Tiered VPCs.
 - Will use the special public subnet in each AZ when a Tiered VPC is passed to it.
 - All attachments will be associated and routes propagated to one TGW Route Table.
 - Each Tiered VPC will have all their route tables updated in each VPC with a route to all other VPC networks via the TGW.
 - Will generate and add routes in each VPC to all other networks.
 
-`v1.0.1` and `v1.0.0` Example:
+`v1.8.1` and `v1.8.0` Example:
 ```
 module "centralized_router" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.7.5"
@@ -40,7 +40,7 @@ Main:
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.4 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
 
 ## Providers
@@ -65,7 +65,7 @@ Main:
 | [aws_ec2_transit_gateway_route_table_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_propagation.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_propagation) | resource |
 | [aws_ec2_transit_gateway_vpc_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment) | resource |
-| [aws_route.this_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
