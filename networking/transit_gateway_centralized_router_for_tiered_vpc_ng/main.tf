@@ -1,5 +1,5 @@
 /*
-* # Transit Gateway Centralized Router Description
+* # Transit Gateway Centralized Router
 * - Creates hub and spoke topology from VPCs.
 *
 * `v1.8.1`

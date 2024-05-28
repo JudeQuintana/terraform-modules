@@ -1,4 +1,4 @@
-# Tiered VPC-NG Description
+# Tiered VPC-NG
 `v1.8.1`
 - Private subnets now have a `special` attribute option like the public subnets.
   - Now AZs can have private subnets only, public subnets only or both!
