@@ -10,9 +10,10 @@
 * - Set required `aws` provider version to >=5.31 and Terraform version >=1.4
 * - Update deprecated `aws_eip` attribute
 * - Not ideal to migrate to `v1.8.0` since there are many resource naming changes.
+*   - No time to figure out a move block migration.
 *   - Recommend starting fresh at `v1.8.1`
 *
-* `v1.8.0` example:
+* `v1.8.1` example:
 * ```
 * locals {
 *   tiered_vpcs = [
@@ -64,7 +65,7 @@
 * }
 *
 * module "vpcs" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.8.0"
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.8.1"
 *
 *   for_each = { for t in local.tiered_vpcs : t.name => t }
 *
@@ -74,7 +75,7 @@
 * }
 * ```
 *
-* `v1.0.0`
+* `v1.8.0`
 * - Create VPC tiers
 *   - Thinking about VPCs as tiers helps narrow down the context (ie app, db, general) and maximize the use of smaller network size when needed.
 *   - You can still have 3 tiered networking (ie lbs, dbs for an app) internally to the VPC.
@@ -104,7 +105,7 @@
 *   - all vpc names and network cidrs should be unique across regions
 *   - the routers will enforce uniqueness along with other validations
 *
-* `v1.0.0` example:
+* `v1.8.0` example:
 * ```
 * locals {
 *   tiered_vpcs = [
