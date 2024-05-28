@@ -3,7 +3,7 @@
 * `v1.8.1`
 * - Private subnets now have a `special` attribute option like the public subnets.
 *   - Now AZs can have private subnets only, public subnets only or both!
-*   - Only 1 subnet, private or public can have `special = true` for VPC attachments per AZ when passed to Centralized Router `v1.0.1`.
+*   - Only 1 subnet, private or public can have `special = true` for VPC attachments per AZ when passed to Centralized Router `v1.8.1`.
 * - Public subnets now have a `natgw` attribute insted of having `enable_natwgw`
 *   - Tag any public subnet with `natgw = true` to build the NATGW for all private subnets within the same AZ.
 * - IGW now auto toggles if any public subnets are defined.
