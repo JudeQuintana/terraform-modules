@@ -1,6 +1,6 @@
 # Tiered VPC-NG Description
-`v1.0.1`
-- Private subnets now have a `special` attribute option.
+`v1.8.1`
+- Private subnets now have a `special` attribute option like the public subnets.
   - Now AZs can have private subnets only, public subnets only or both!
   - Only 1 subnet, private or public can have `special = true` for VPC attachments per AZ when passed to Centralized Router `v1.0.1`.
 - Public subnets now have a `natgw` attribute insted of having `enable_natwgw`
@@ -63,8 +63,7 @@ locals {
 }
 
 module "vpcs" {
-  source  = "JudeQuintana/tiered-vpc-ng/aws"
-  version = "1.0.1"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.8.0"
 
   for_each = { for t in local.tiered_vpcs : t.name => t }
 
@@ -166,7 +165,7 @@ locals {
 }
 
 module "vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.7.5"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tiered_vpc_ng?ref=v1.8.0"
 
   for_each = { for t in local.tiered_vpcs : t.name => t }
 
