@@ -3,8 +3,11 @@
 - Private subnets now have a `special` attribute option like the public subnets.
   - Now AZs can have private subnets only, public subnets only or both!
   - Only 1 subnet, private or public can have `special = true` for VPC attachments per AZ when passed to Centralized Router `v1.8.1`.
+
 - Public subnets now have a `natgw` attribute insted of having `enable_natwgw`
   - Tag any public subnet with `natgw = true` to build the NATGW for all private subnets within the same AZ.
+  - `special` and `natgw` attributes can also be enabled together on a public subnet
+
 - IGW now auto toggles if any public subnets are defined.
 - Set required `aws` provider version to >=5.31 and Terraform version >=1.4
 - Update deprecated `aws_eip` attribute
@@ -44,7 +47,8 @@ locals {
             { name = "jenkins1", cidr = "172.16.5.0/24" }
           ]
           public_subnets = [
-            { name = "natgw", cidr = "172.16.8.0/28", special = true, natgw = true },
+            { name = "other", cidr = "172.16.8.0/28", special = true },
+            { name = "natgw", cidr = "172.16.8.16/28", natgw = true }
           ]
         }
       }

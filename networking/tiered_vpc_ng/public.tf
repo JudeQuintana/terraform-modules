@@ -1,12 +1,12 @@
 ############################################################################################################
 #
-# Public Subnets:
-# - It's required to have at least 1 public subnet with specail = true in a tiered vpc
-# - Public Route Table and Route for all subnets
-# - Route out IGW
+# - Public Subnets can have a special = true attribute set
+#   - for vpc attachment use when this module is passed to Centralized Router
+# - One Public Route Table shared by all public subnets
+# - IGW which now auto toggles based on if any public subnet exists
 #
 # If NATGWs are enabled for an AZ:
-# - NATGW is created in the public subnet with special = true for each AZ
+# - NATGW is created in the public subnet with natgw = true for each AZ
 # - EIP is created and associated to the NATGW
 #
 # Note:

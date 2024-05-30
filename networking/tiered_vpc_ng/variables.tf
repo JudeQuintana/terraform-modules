@@ -30,11 +30,7 @@ variable "tiered_vpc" {
     enable_dns_hostnames = optional(bool, true)
   })
 
-  # This is an example of validating CIDR notation
-  # I don't think its really needed because the provider
-  # will provide subnet errors if there is invalid cidrs
-  # the aws provider will error on validate cidr subnets too.
-  # https://blog.markhatton.co.uk/2011/03/15/regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
+  # using ipv4 validation via cidrnetmask function instead of regex until ipv6 is added
   validation {
     condition = can(cidrnetmask(var.tiered_vpc.network_cidr)) && alltrue(flatten([
       for this in var.tiered_vpc.azs : [
@@ -42,7 +38,7 @@ variable "tiered_vpc" {
         can(cidrnetmask(subnet_cidr))
       ]
     ]))
-    error_message = "The VPC network CIDR and subnet CDIRs must be in valid CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    error_message = "The VPC network CIDR and subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
