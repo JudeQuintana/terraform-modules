@@ -98,6 +98,6 @@ resource "aws_route" "this_private_ipv6_route_out" {
 
   destination_cidr_block = local.route_any_ipv6_cidr
   route_table_id         = lookup(aws_route_table.this_private, each.value).id
-  egress_only_gateway_id = lookup(aws_egress_only_internet_gateway.this, "true").id
+  egress_only_gateway_id = lookup(aws_egress_only_internet_gateway.this, local.public_any_ipv6_subnet_exists).id
 }
 
