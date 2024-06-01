@@ -14,22 +14,21 @@ variable "tiered_vpc" {
     name              = string
     network_cidr      = string
     ipv6_network_cidr = optional(string)
-    enable_eigw       = optional(bool, false)
-    name         = string
-    network_cidr = string
+    name              = string
+    network_cidr      = string
     azs = map(object({
       private_subnets = optional(list(object({
-        name    = string
-        cidr    = string
+        name      = string
+        cidr      = string
         ipv6_cidr = optional(string)
-        special = optional(bool, false)
+        special   = optional(bool, false)
       })), [])
       public_subnets = optional(list(object({
-        name    = string
-        cidr    = string
+        name      = string
+        cidr      = string
         ipv6_cidr = optional(string)
-        special = optional(bool, false)
-        natgw   = optional(bool, false)
+        special   = optional(bool, false)
+        natgw     = optional(bool, false)
       })), [])
     }))
     enable_dns_support   = optional(bool, true)

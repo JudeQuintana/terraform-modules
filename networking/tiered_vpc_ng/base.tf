@@ -57,11 +57,11 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  egress_only_internet_gateway = { for this in [var.tiered_vpc.enable_eigw] : this => this if var.tiered_vpc.enable_eigw }
+  eigw = { for this in [local.public_any_ipv6_subnet_exists] : this => this if local.public_any_ipv6_subnet_exists }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {
-  for_each = local.egress_only_internet_gateway
+  for_each = local.eigw
 
   vpc_id = aws_vpc.this.id
   tags = merge(
