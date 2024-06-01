@@ -35,7 +35,6 @@ variable "tiered_vpc" {
     enable_dns_hostnames = optional(bool, true)
   })
 
-
   # using ipv4 validation via cidrnetmask function instead of regex until ipv6 is added
   validation {
     condition = can(cidrnetmask(var.tiered_vpc.network_cidr)) && alltrue(flatten([
@@ -46,7 +45,6 @@ variable "tiered_vpc" {
     ]))
     error_message = "The VPC network CIDR and subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
-
 
   validation {
     condition     = alltrue([for this in keys(var.tiered_vpc.azs) : contains(["a", "b", "c", "d", "e", "f"], this)])
