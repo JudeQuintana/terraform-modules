@@ -23,11 +23,12 @@ locals {
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 
   #ipv6 dual stack
-  private_ipv6_subnet_cidrs                         = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.private_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
-  private_any_ipv6_subnet_configured                = length(local.private_ipv6_subnet_cidrs) > 0
-  private_subnet_cidr_to_ipv6_subnet_cidr           = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidr_to_subnet_cidr           = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cdir => subnet.cidr if subnet.ipv6 != null }]...)
-  private_route_out_ipv6_subnet_cidr_to_subnet_cidr = { for ipv6_subnet_cidr, subnet_cidr in local.private_ipv6_subnet_cidr_to_subnet_cidr : ipv6_subnet_cidr => subnet_cidr if local.private_any_ipv6_subnet_configured && var.tiered_vpc.enable_eigw }
+  private_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.private_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
+  private_any_ipv6_subnet_exits           = length(local.private_ipv6_subnet_cidrs) > 0
+  private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
+  private_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cdir => subnet.cidr if subnet.ipv6 != null }]...)
+  #private_route_out_ipv6_subnet_cidr_to_subnet_cidr = { for ipv6_subnet_cidr, subnet_cidr in local.private_ipv6_subnet_cidr_to_subnet_cidr : ipv6_subnet_cidr => subnet_cidr if local.private_any_ipv6_subnet_exits && local.public_any_ipv6_subnet_exists }
+  private_route_out_ipv6_subnet_cidr_to_subnet_cidr = { for ipv6_subnet_cidr, subnet_cidr in local.private_ipv6_subnet_cidr_to_subnet_cidr : ipv6_subnet_cidr => subnet_cidr if local.public_any_ipv6_subnet_exists }
 }
 
 resource "aws_subnet" "this_private" {

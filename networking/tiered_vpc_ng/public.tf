@@ -30,7 +30,6 @@ locals {
   public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
   public_any_ipv6_subnet_exists          = length(local.public_ipv6_subnet_cidrs) > 0
   public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
-  public_ipv6_route_out                  = { for this in [local.public_any_ipv6_subnet_exists] : this => this if local.public_any_ipv6_subnet_exists }
 }
 
 resource "aws_subnet" "this_public" {
@@ -154,7 +153,7 @@ resource "aws_nat_gateway" "this_public" {
 # one public route out through IGW for all public ipv6 subnets across azs
 # subnet id is already associated to the shared public route table via aws_subnet.this_public
 resource "aws_route" "this_public_ipv6_route_out" {
-  for_each = local.public_ipv6_route_out
+  for_each = local.eigw
 
   destination_cidr_block = local.route_any_ipv6_cidr
   route_table_id         = aws_route_table.this_public.id
