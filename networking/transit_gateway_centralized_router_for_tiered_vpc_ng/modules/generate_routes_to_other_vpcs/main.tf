@@ -1,0 +1,53 @@
+/*
+* # Generate Routes to Other VPCs Description
+*
+* This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects with [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng).
+*
+* It will create a map of routes to other VPC networks (execept itself) which will then be consumed by route resources.
+*
+* The `call` output is `toset([{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }, ...])`.
+*
+* A list of route objects makes it easier to handle when passing to other route resource types (ie vpc, tgw) than a map of routes.
+*
+* ```hcl
+* # snippet
+* module "generate_routes_to_other_vpcs" {
+*   source = "./modules/generate_routes_to_other_vpcs"
+*
+*   vpcs = var.vpcs
+* }
+*
+* locals {
+*   vpc_routes_to_other_vpcs = {
+*     for this in module.generate_routes_to_other_vpcs.call :
+*     format("|", this.route_table_id, this.destination_cidr_block) => this
+*   }
+* }
+*
+* resource "aws_route" "this" {
+*   for_each = local.vpc_routes_to_other_vpcs
+*
+*   destination_cidr_block = each.value.destination_cidr_block
+*   route_table_id         = each.value.route_table_id
+*   transit_gateway_id     = aws_ec2_transit_gateway.this.id
+*
+*   # make sure the tgw route table is available first before the setting routes routes on the vpcs
+*   depends_on = [aws_ec2_transit_gateway_route_table.this]
+* }
+* ```
+*
+* Run the test suites with `terraform test` in the `./modules/generate_routes_to_other_vpcs` directory.
+* ```
+* tests/generate_routes.tftest.hcl... in progress
+*   run "setup"... pass
+*   run "final"... pass
+*   run "call_with_n_greater_than_one"... pass
+*   run "call_with_n_equal_to_one"... pass
+*   run "call_with_n_equal_to_zero"... pass
+*   run "cidr_validation"... pass
+* tests/generate_routes.tftest.hcl... tearing down
+* tests/generate_routes.tftest.hcl... pass
+* ```
+*
+* The test suite will help when refactoring is needed.
+*/

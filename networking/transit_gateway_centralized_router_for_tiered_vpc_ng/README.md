@@ -1,14 +1,38 @@
-# Transit Gateway Centralized Router Description
-- This Transit Gateway Centralized Router module will create a hub spoke topology from existing Tiered VPCs.
+# Transit Gateway Centralized Router
+- Creates hub and spoke topology from VPCs.
+
+`v1.8.1`
+- Now supports VPC attachments for private subnets.
+  - Uses the subnet id for a subnet tagged with `special = true` from either a private or a public subnet per AZ in Tiered VPC-NG for `v1.8.1`
+  - Will continue work with Super Router, Full Mesh Trio and Mega Mesh at `v1.8.0`.
+
+`v1.8.1` Example (same as before but with source change):
+```
+module "centralized_router" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.8.1"
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  centralized_router = {
+    name            = "bishop"
+    amazon_side_asn = 64512
+    blackhole_cidrs = ["172.16.8.0/24"]
+    vpcs            = module.vpcs
+  }
+}
+```
+
+`v1.8.0`
+- This Transit Gateway Centralized Router module will create a hub spoke and topology from existing Tiered VPCs.
 - Will use the special public subnet in each AZ when a Tiered VPC is passed to it.
 - All attachments will be associated and routes propagated to one TGW Route Table.
 - Each Tiered VPC will have all their route tables updated in each VPC with a route to all other VPC networks via the TGW.
 - Will generate and add routes in each VPC to all other networks.
 
-Example:
+`v1.8.0` Example:
 ```
 module "centralized_router" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.7.5"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.8.0"
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
@@ -27,26 +51,26 @@ Blog Post:
 
 Main:
 - [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-- See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
+  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >=4.20 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.31 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//utils/generate_routes_to_other_vpcs | v1.7.4 |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | ./modules/generate_routes_to_other_vpcs | n/a |
 
 ## Resources
 
@@ -66,7 +90,7 @@ Main:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                = string<br>      full_name                 = string<br>      id                        = string<br>      name                      = string<br>      network_cidr              = string<br>      private_route_table_ids   = list(string)<br>      public_route_table_ids    = list(string)<br>      public_special_subnet_ids = list(string)<br>      region                    = string<br>    })), {})<br>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                 = string<br>      full_name                  = string<br>      id                         = string<br>      name                       = string<br>      network_cidr               = string<br>      private_route_table_ids    = list(string)<br>      public_route_table_ids     = list(string)<br>      private_special_subnet_ids = list(string)<br>      public_special_subnet_ids  = list(string)<br>      region                     = string<br>    })), {})<br>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |

@@ -1,7 +1,11 @@
 ############################################################################################################
 #
+# - Private Subnets can have a special = true attribute set
+#   - for vpc attachment use when this module is passed to Centralized Router
+# - Private Route Tables are per AZ
+#
 # If NATGWs are enabled for an AZ:
-# - Private Route Tables are updated to route out the NATGW to the internet
+#   - are updated to route out the NATGW to the internet
 #
 # Note:
 #   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_azs, each.value)))
@@ -12,13 +16,15 @@
 
 locals {
   private_label                      = "private"
-  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr }
+  private_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
+  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr if length(this.private_subnets[*].cidr) > 0 }
   private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+  private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 }
 
 resource "aws_subnet" "this_private" {
-  for_each = local.private_subnet_cidr_to_subnet_name
+  for_each = local.private_subnet_cidrs
 
   vpc_id                  = aws_vpc.this.id
   availability_zone       = format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key))
@@ -32,7 +38,7 @@ resource "aws_subnet" "this_private" {
         local.upper_env_prefix,
         var.tiered_vpc.name,
         local.private_label,
-        each.value,
+        lookup(local.private_subnet_cidr_to_subnet_name, each.key),
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key)))
       )
   })
@@ -60,7 +66,7 @@ resource "aws_route_table" "this_private" {
 # uses a map from public.tf but the route is a
 # private conext
 resource "aws_route" "this_private_route_out" {
-  for_each = local.public_natgw_az_to_special_subnet_cidr
+  for_each = local.public_natgw_az_to_subnet_cidr
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.this_private, each.key).id
@@ -69,7 +75,7 @@ resource "aws_route" "this_private_route_out" {
 
 # associate each private subnet to its respective AZ's route table
 resource "aws_route_table_association" "this_private" {
-  for_each = local.private_subnet_cidr_to_subnet_name
+  for_each = local.private_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
   route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id

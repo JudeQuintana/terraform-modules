@@ -32,16 +32,21 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
-  instance_tenancy     = var.tiered_vpc.tenancy
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  enable_dns_support   = var.tiered_vpc.enable_dns_support
+  enable_dns_hostnames = var.tiered_vpc.enable_dns_hostnames
   tags = merge(
     local.default_tags,
     { Name = local.vpc_name }
   )
 }
 
+locals {
+  igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
+}
+
 resource "aws_internet_gateway" "this" {
+  for_each = local.igw
+
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
