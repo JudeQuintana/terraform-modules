@@ -73,7 +73,8 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue(this.public_subnets[*].natgw) ? length([for subnet in this.public_subnets : subnet.natgw if subnet.natgw]) == 1 : true
+      #anytrue(this.public_subnets[*].natgw) ? length([for subnet in this.public_subnets : subnet.natgw if subnet.natgw]) == 1 : true
+      anytrue(this.public_subnets[*].natgw) ? length(compact(this.public_subnets)) == 1 : true
     ])
     error_message = "There can be only be 1 public subnet with a NATGW enabled per AZ."
   }
