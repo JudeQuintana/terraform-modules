@@ -13,7 +13,7 @@ variable "tiered_vpc" {
   type = object({
     name                    = string
     network_cidr            = string
-    secondary_network_cidrs = optional(list(string))
+    secondary_network_cidrs = optional(list(string), [])
     ipv6_network_cidr       = optional(string)
     name                    = string
     network_cidr            = string
@@ -45,6 +45,16 @@ variable "tiered_vpc" {
       ]
     ]))
     error_message = "The VPC network CIDR and subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for this in var.tiered_vpc.azs : [
+        for subnet_cidr in var.tiered_vpc.secondary_cidr_blocks :
+        can(cidrnetmask(subnet_cidr))
+      ]
+    ]))
+    error_message = "Each Secondary VPC network CIDR valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
