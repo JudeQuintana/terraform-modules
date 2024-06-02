@@ -50,7 +50,7 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue(flatten([
       for this in var.tiered_vpc.azs : [
-        for subnet_cidr in var.tiered_vpc.secondary_cidr_blocks :
+        for subnet_cidr in var.tiered_vpc.secondary_network_cidrs :
         can(cidrnetmask(subnet_cidr))
       ]
     ]))
