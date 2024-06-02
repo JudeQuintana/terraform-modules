@@ -57,7 +57,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  eigw = { for this in [local.public_any_ipv6_subnet_exists] : this => this if local.public_any_ipv6_subnet_exists }
+  eigw = { for this in [local.private_any_ipv6_subnet_exists] : this => this if local.private_any_ipv6_subnet_exists }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {

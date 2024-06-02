@@ -27,8 +27,8 @@ locals {
   public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw }]...)
 
   # ipv6 dual stack
-  public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
-  public_any_ipv6_subnet_exists          = length(local.public_ipv6_subnet_cidrs) > 0
+  #public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : [for ipv6_cidr in this.public_subnets[*].ipv6_cidr : ipv6_cidr if ipv6_cidr != null]])
+  public_ipv6_subnet_cidrs               = flatten([for this in var.tiered_vpc.azs : compact(this.public_subnets[*].ipv6_cidr)])
   public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
 }
 
