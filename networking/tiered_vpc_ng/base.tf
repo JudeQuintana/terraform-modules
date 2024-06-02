@@ -42,6 +42,14 @@ resource "aws_vpc" "this" {
   )
 }
 
+# secondary network cidrs
+resource "aws_vpc_ipv4_cidr_block_association" "this" {
+  for_each = var.secondary_network_cidr
+
+  vpc_id     = aws_vpc.this.id
+  cidr_block = each.key
+}
+
 locals {
   igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
 }

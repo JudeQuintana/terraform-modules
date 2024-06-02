@@ -23,8 +23,11 @@ output "name" {
 }
 
 output "network_cidr" {
-  # pass thru what is known pre-apply
   value = var.tiered_vpc.network_cidr
+}
+
+output "secondary_network_cidrs" {
+  value = var.tiered_vpc.secondary_network_cidrs
 }
 
 output "private_route_table_ids" {

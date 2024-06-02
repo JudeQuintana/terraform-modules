@@ -11,11 +11,12 @@ variable "region_az_labels" {
 variable "tiered_vpc" {
   description = "Tiered VPC configuration"
   type = object({
-    name              = string
-    network_cidr      = string
-    ipv6_network_cidr = optional(string)
-    name              = string
-    network_cidr      = string
+    name                    = string
+    network_cidr            = string
+    secondary_network_cidrs = optional(list(string))
+    ipv6_network_cidr       = optional(string)
+    name                    = string
+    network_cidr            = string
     azs = map(object({
       private_subnets = optional(list(object({
         name      = string
