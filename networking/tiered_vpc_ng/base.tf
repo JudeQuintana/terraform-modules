@@ -42,9 +42,13 @@ resource "aws_vpc" "this" {
   )
 }
 
+locals {
+  secondary_network_cidrs = toset(var.tierd_vpc.secondary_network_cidrs)
+}
+
 # secondary network cidrs
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
-  for_each = var.tierd_vpc.secondary_network_cidrs
+  for_each = loocal.secondary_network_cidrs
 
   vpc_id     = aws_vpc.this.id
   cidr_block = each.key
