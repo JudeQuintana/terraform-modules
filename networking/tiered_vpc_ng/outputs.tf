@@ -30,6 +30,10 @@ output "secondary_network_cidrs" {
   value = var.tiered_vpc.secondary_network_cidrs
 }
 
+output "ipv6_network_cidr" {
+  value = var.tiered_vpc.ipv6_network_cidr
+}
+
 output "private_route_table_ids" {
   value = [for this in aws_route_table.this_private : this.id]
 }
