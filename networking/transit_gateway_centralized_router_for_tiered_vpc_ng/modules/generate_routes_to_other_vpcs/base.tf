@@ -1,4 +1,4 @@
-# generate routes to other VPC network_cidrs in private and public route tables for each VPC
+# generate routes to other VPC network_cidrs, secondary_cidrs and ipv6_newtork_cidrs in private and public route tables for each VPC
 locals {
   # { vpc-1-network_cidr => [ "vpc-1-private-rtb-id-1", "vpc-1-public-rtb-id-1", ... ], ...}
   vpc_network_cidr_to_route_table_ids = {

@@ -21,9 +21,7 @@ variable "centralized_router" {
       name                       = string
       network_cidr               = string
       secondary_network_cidrs    = optional(list(string), [])
-      ipv6_network_cidr          = string
-      private_ipv6_subnet_cidrs  = optional(list(string), [])
-      public_ipv6_subnet_cidrs   = optional(list(string), [])
+      ipv6_network_cidr          = optional(string)
       private_route_table_ids    = list(string)
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
