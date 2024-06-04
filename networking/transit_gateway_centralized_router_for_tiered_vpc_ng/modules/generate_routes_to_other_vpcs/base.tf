@@ -12,7 +12,7 @@ locals {
     for this in local.network_cidrs_with_route_table_ids : [
       for route_table_id in this.route_table_ids : {
         route_table_id      = route_table_id
-        other_network_cidrs = [for n in local.network_cidrs_with_route_table_ids[*].network_cidrs : n if !contains(this.network_cidrs, n)]
+        other_network_cidrs = [for n in flatten(local.network_cidrs_with_route_table_ids[*].network_cidrs) : n if !contains(this.network_cidrs, n)]
   }]])
 
   # the better way to serve routes like hotcakes
