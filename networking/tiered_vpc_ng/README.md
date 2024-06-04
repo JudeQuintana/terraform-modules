@@ -249,6 +249,7 @@ No modules.
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 | <a name="output_intra_vpc_security_group_id"></a> [intra\_vpc\_security\_group\_id](#output\_intra\_vpc\_security\_group\_id) | n/a |
+| <a name="output_ipv6_network_cidr"></a> [ipv6\_network\_cidr](#output\_ipv6\_network\_cidr) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | n/a |
 | <a name="output_private_ipv6_subnet_cidrs"></a> [private\_ipv6\_subnet\_cidrs](#output\_private\_ipv6\_subnet\_cidrs) | n/a |
