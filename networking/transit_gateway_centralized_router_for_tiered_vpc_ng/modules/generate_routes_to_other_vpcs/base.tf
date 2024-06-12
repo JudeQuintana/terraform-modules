@@ -17,7 +17,7 @@ locals {
 
   # the better way to serve routes like hotcakes
   # { route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }
-  # need extra toset because there will be duplicates per AZ after the flatten call
+  # need extra toset in case there's duplicates per AZ after the flatten call
   routes = toset(flatten([
     for this in local.associated_route_table_ids_with_other_network_cidrs : [
       for route_table_id_and_network_cidr in setproduct([this.route_table_id], this.other_network_cidrs) : {

@@ -47,10 +47,10 @@ locals {
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
-  for_each = loocal.secondary_network_cidrs
+  for_each = local.secondary_network_cidrs
 
-  vpc_id     = aws_vpc.this.id
   cidr_block = each.key
+  vpc_id     = aws_vpc.this.id
 }
 
 locals {
