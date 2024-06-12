@@ -36,7 +36,7 @@ variable "tiered_vpc" {
     enable_dns_hostnames = optional(bool, true)
   })
 
-  # using ipv4 validation via cidrnetmask function instead of regex until ipv6 is added
+  # using ipv4 validation via cidrnetmask function instead of regex for ipv4
   validation {
     condition = can(cidrnetmask(var.tiered_vpc.network_cidr)) && alltrue(flatten([
       for this in var.tiered_vpc.azs : [
@@ -84,6 +84,22 @@ variable "tiered_vpc" {
       anytrue(this.public_subnets[*].natgw) ? length(this.private_subnets) > 0 : true
     ])
     error_message = "At least 1 private subnet must exist if a NATGW is enabled for a public subnet in the same AZ."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.tiered_vpc.azs :
+      anytrue(this.private_subnets[*].ipv6_cidr) ? length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) : true
+    ])
+    error_message = "An IPv4 CIDR must be assigned to a private subnet if an IPv6 CIDR is configured in a dual stack configuration (no IPv6 only)."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.tiered_vpc.azs :
+      anytrue(this.public_subnets[*].ipv6_cidr) ? length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr) : true
+    ])
+    error_message = "An IPv4 CIDR must be assigned to a public subnet if an IPv6 CIDR is configured in a dual stack configuration (no IPv6 only)."
   }
 
   validation {
