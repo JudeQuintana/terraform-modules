@@ -64,7 +64,8 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      length(compact(concat(this.private_subnets, this.public_subnets)[*].special)) == 1
+      #length(compact(concat(this.private_subnets, this.public_subnets)[*].special)) == 1
+      length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1
     ])
     error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ."
   }
@@ -72,7 +73,8 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue(this.public_subnets[*].natgw) ? length(compact(this.public_subnets[*].natgw)) == 1 : true
+      #anytrue(this.public_subnets[*].natgw) ? length(compact(this.public_subnets[*].natgw)) == 1 : true
+      anytrue(this.public_subnets[*].natgw) ? length([for subnet in this.public_subnets : subnet.natgw if subnet.natgw]) == 1 : true
     ])
     error_message = "There can be only be 1 public subnet with a NATGW enabled per AZ."
   }
