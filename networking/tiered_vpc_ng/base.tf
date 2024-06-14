@@ -34,6 +34,7 @@ locals {
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
   ipv6_cidr_block      = var.tiered_vpc.ipv6_network_cidr
+  ipv6_ipam_pool_id    = var.tiered_vpc.ipv6_ipam_pool_id
   enable_dns_support   = var.tiered_vpc.enable_dns_support
   enable_dns_hostnames = var.tiered_vpc.enable_dns_hostnames
   tags = merge(

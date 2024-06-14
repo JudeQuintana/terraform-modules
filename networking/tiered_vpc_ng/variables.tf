@@ -15,6 +15,7 @@ variable "tiered_vpc" {
     network_cidr            = string
     secondary_network_cidrs = optional(list(string), [])
     ipv6_network_cidr       = optional(string)
+    ipv6_ipam_pool_id       = optional(string)
     azs = map(object({
       private_subnets = optional(list(object({
         name      = string
