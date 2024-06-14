@@ -94,8 +94,8 @@ resource "aws_route_table_association" "this_private" {
 resource "aws_route" "this_private_ipv6_route_out" {
   for_each = local.private_ipv6_subnet_cidr_to_subnet_cidr
 
-  destination_cidr_block = local.route_any_ipv6_cidr
-  route_table_id         = lookup(aws_route_table.this_private, each.value).id
-  egress_only_gateway_id = lookup(aws_egress_only_internet_gateway.this, local.private_any_ipv6_subnet_exists).id
+  destination_ipv6_cidr_block = local.route_any_ipv6_cidr
+  route_table_id              = lookup(aws_route_table.this_private, each.value).id
+  egress_only_gateway_id      = lookup(aws_egress_only_internet_gateway.this, local.private_any_ipv6_subnet_exists).id
 }
 

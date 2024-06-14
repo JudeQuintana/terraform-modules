@@ -151,10 +151,10 @@ resource "aws_nat_gateway" "this_public" {
 # one public route out through IGW for all public ipv6 subnets across azs
 # subnet id is already associated to the shared public route table via aws_subnet.this_public
 resource "aws_route" "this_public_ipv6_route_out" {
-  for_each = local.eigw
+  for_each = local.igw
 
-  destination_cidr_block = local.route_any_ipv6_cidr
-  route_table_id         = lookup(aws_route_table.this_public, local.private_any_ipv6_subnet_exists).id
-  gateway_id             = lookup(aws_internet_gateway.this, local.public_any_subnet_exists).id
+  destination_ipv6_cidr_block = local.route_any_ipv6_cidr
+  route_table_id              = lookup(aws_route_table.this_public, each.key).id
+  gateway_id                  = lookup(aws_internet_gateway.this, each.key).id
 }
 
