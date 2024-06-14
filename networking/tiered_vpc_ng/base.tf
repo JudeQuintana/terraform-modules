@@ -43,7 +43,7 @@ resource "aws_vpc" "this" {
 }
 
 locals {
-  secondary_network_cidrs = toset(var.tierd_vpc.secondary_network_cidrs)
+  secondary_network_cidrs = toset(var.tiered_vpc.secondary_network_cidrs)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
