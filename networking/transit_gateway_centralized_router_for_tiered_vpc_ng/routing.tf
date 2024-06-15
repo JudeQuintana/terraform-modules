@@ -28,7 +28,7 @@ resource "aws_route" "this_vpc_routes_to_other_vpcs" {
 locals {
   ipv6_vpc_routes_to_other_vpcs = {
     for this in module.this_generate_routes_to_other_vpcs.call_ipv6 :
-    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
+    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
   }
 }
 
