@@ -94,7 +94,7 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue(this.private_subnets[*].ipv6_cidr) ? length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) : true
+      anytrue(compact(this.private_subnets[*].ipv6_cidr)) ? length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) : true
     ])
     error_message = "An IPv4 CIDR must be assigned to a private subnet if an IPv6 CIDR is configured in a dual stack configuration (no IPv6 only)."
   }
@@ -102,7 +102,7 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue(this.public_subnets[*].ipv6_cidr) ? length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr) : true
+      anytrue(compact(this.public_subnets[*].ipv6_cidr)) ? length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr) : true
     ])
     error_message = "An IPv4 CIDR must be assigned to a public subnet if an IPv6 CIDR is configured in a dual stack configuration (no IPv6 only)."
   }
