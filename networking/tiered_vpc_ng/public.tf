@@ -90,13 +90,6 @@ resource "aws_route_table_association" "this_public" {
   route_table_id = lookup(aws_route_table.this_public, local.public_any_subnet_exists).id
 }
 
-#######################################################
-##
-## EIPs:
-## - Used for NAT Gateway's Public IP
-##
-#######################################################
-
 # one eip per natgw (one per az)
 resource "aws_eip" "this_public" {
   for_each = local.public_natgw_az_to_subnet_cidr
@@ -115,18 +108,7 @@ resource "aws_eip" "this_public" {
   })
 }
 
-#######################################################
-##
-## NAT Gatways:
-## - For routing the respective private AZ traffic and
-##   is built in a public subnet
-## - depends_on is required because NAT GW needs an IGW
-##   to route through but there is not an implicit
-##   dependency via it's attributes so we must be
-##   explicit.
-##
-#######################################################
-
+# only one natgw per AZ if enabled
 resource "aws_nat_gateway" "this_public" {
   for_each = local.public_natgw_az_to_subnet_cidr
 
