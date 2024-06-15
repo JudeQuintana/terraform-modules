@@ -4,3 +4,7 @@
 output "call" {
   value = local.routes
 }
+
+output "call_ipv6" {
+  value = local.ipv6_routes
+}
