@@ -37,13 +37,17 @@ variable "tiered_vpc" {
 
   # using ipv4 validation via cidrnetmask function instead of regex for ipv4
   validation {
-    condition = can(cidrnetmask(var.tiered_vpc.network_cidr)) && alltrue(flatten([
+    condition     = can(cidrnetmask(var.tiered_vpc.network_cidr))
+    error_message = "The VPC network CIDR must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+  }
+
+  validation {
+    condition = alltrue(flatten([
       for this in var.tiered_vpc.azs : [
         for subnet_cidr in concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr) :
         can(cidrnetmask(subnet_cidr))
-      ]
-    ]))
-    error_message = "The VPC network CIDR and subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    ]]))
+    error_message = "The VPC private and public subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
