@@ -32,7 +32,7 @@ variable "centralized_router" {
   })
 
   validation {
-    condition     = alltrue([for this in var.centralized_router.blackhold_cidrs : can(cidrnetmask(this))])
+    condition     = alltrue([for this in var.centralized_router.blackhole_cidrs : can(cidrnetmask(this))])
     error_message = "The blackhole network CIDRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
