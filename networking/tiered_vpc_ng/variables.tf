@@ -16,6 +16,7 @@ variable "tiered_vpc" {
     secondary_network_cidrs = optional(list(string), [])
     ipv6 = optional(object({
       network_cidr = optional(string)
+      #netmask_length = optional(number)
       ipam_pool_id = optional(string)
     }), {})
     azs = map(object({
@@ -98,6 +99,14 @@ variable "tiered_vpc" {
     ])
     error_message = "The var.tiered_vpc.ipv6.network_cidr and var.tiered_ipv6.ipam_pool_id must be assigned to the VPC if a private subnet or public subnet with an IPv6 CIDR is configured in a dual stack configuration."
   }
+
+  #validation {
+  #condition = alltrue([
+  #for this in var.tiered_vpc.azs :
+  #anytrue([for ipv6_cidr in compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr)) : true]) ? var.tiered_vpc.ipv6.netmask_length != null && var.tiered_vpc.ipv6.ipam_pool_id != null : true
+  #])
+  #error_message = "The var.tiered_vpc.ipv6.netmask_length and var.tiered_ipv6.ipam_pool_id must be assigned to the VPC if a private subnet or public subnet with an IPv6 CIDR is configured in a dual stack configuration."
+  #}
 
   validation {
     condition = length(distinct(flatten([
