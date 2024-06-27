@@ -32,7 +32,6 @@ output "secondary_network_cidrs" {
 
 output "ipv6_network_cidr" {
   value = var.tiered_vpc.ipv6.network_cidr
-  #value = aws_vpc.this.ipv6_cidr_block
 }
 
 output "private_route_table_ids" {
