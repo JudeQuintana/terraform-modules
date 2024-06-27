@@ -26,7 +26,7 @@ locals {
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
   private_any_ipv6_subnet_exists          = length(local.private_ipv6_subnet_cidrs) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cdir => subnet.cidr if subnet.ipv6_cidr != null }]...)
+  private_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cidr => subnet.cidr if subnet.ipv6_cidr != null }]...)
 }
 
 resource "aws_subnet" "this_private" {
