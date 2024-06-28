@@ -1,9 +1,9 @@
 locals {
-  blackhole_cidrs = toset(concat(var.centralized_router.blackhole_cidrs, var.centralized_router.blackhole_ipv6_cidrs))
+  blackhole_all_cidrs = toset(concat(var.centralized_router.blackhole_cidrs, var.centralized_router.blackhole_ipv6_cidrs))
 }
 
 resource "aws_ec2_transit_gateway_route" "this_blackholes" {
-  for_each = local.blackhole_cidrs
+  for_each = local.blackhole_all_cidrs
 
   # destination_cidr_block can be ipv4 or ipv6 (no separate attribute or resource)
   destination_cidr_block         = each.value

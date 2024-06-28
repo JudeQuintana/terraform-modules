@@ -103,6 +103,7 @@ Main:
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | n/a |
 | <a name="output_amazon_side_asn"></a> [amazon\_side\_asn](#output\_amazon\_side\_asn) | n/a |
 | <a name="output_blackhole_cidrs"></a> [blackhole\_cidrs](#output\_blackhole\_cidrs) | n/a |
+| <a name="output_blackhole_ipv6_cidrs"></a> [blackhole\_ipv6\_cidrs](#output\_blackhole\_ipv6\_cidrs) | n/a |
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
