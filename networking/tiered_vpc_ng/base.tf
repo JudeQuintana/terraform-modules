@@ -60,7 +60,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "this" {
 }
 
 locals {
-  igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
+  igw = { for this in [local.public_any_subnet_cidr_exists] : this => this if local.public_any_subnet_cidr_exists }
 }
 
 resource "aws_internet_gateway" "this" {
@@ -74,7 +74,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 locals {
-  eigw = { for this in [var.tiered_vpc.ipv6.eigw] : this => this if var.tiered_vpc.ipv6.eigw }
+  eigw = { for this in [local.private_ipv6_any_eigw_enabled] : this => this if local.private_ipv6_any_eigw_enabled }
 }
 
 resource "aws_egress_only_internet_gateway" "this" {
