@@ -24,8 +24,8 @@ locals {
 
   #ipv6 dual stack
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
+  private_ipv6_any_eigw_enabled           = length([for this in var.tiered_vpc.azs : this.eigw if this.eigw]) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
-  private_ipv6_any_eigw_enabled           = length({ for az, this in var.tiered_vpc.azs : az => this.eigw if this.eigw }) > 0
   private_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cidr => subnet.cidr if subnet.ipv6_cidr != null && this.eigw }]...)
 }
 
