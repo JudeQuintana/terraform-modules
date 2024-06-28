@@ -42,3 +42,4 @@ resource "aws_route" "this_ipv6_vpc_routes_to_other_vpcs" {
   # make sure the tgw route table is available first before the setting routes on the vpcs
   depends_on = [aws_ec2_transit_gateway_route_table.this]
 }
+
