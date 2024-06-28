@@ -138,6 +138,15 @@ variable "tiered_vpc" {
     ]))
     error_message = "Each subnet CDIR must be unique across all AZs."
   }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
+      ]))) == length(flatten([
+      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
+    ]))
+    error_message = "Each subnet IPv6 CDIR must be unique across all AZs."
+  }
 }
 
 variable "tags" {
