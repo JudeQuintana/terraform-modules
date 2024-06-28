@@ -107,12 +107,6 @@ variable "tiered_vpc" {
     error_message = "If var.tiered_vpc.ipv6.network_cidr is configured for the VPC then all private subnets and/or public subnets that are set must also be configured with IPv6 CIDR in a dual stack configuration."
   }
 
-  #validation {
-  #condition = var.tiered_vpc.ipv6.eigw ? var.tiered_vpc.ipv6.network_cidr != null && var.tiered_vpc.ipv6.ipam_pool_id != null && anytrue([
-  #length(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)])) > 0]) : true
-  #error_message = "If var.tiered_vpc.ipv6.eigw is true then at least 1 private IPv6 subnet (any AZ) must be configured, var.tiered_vpc.ipv6.network_cidr must be configured, and var.tiered_vpc.ipv6.ipam_pool_id must be configured in a dual stack configuration."
-  #}
-
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
