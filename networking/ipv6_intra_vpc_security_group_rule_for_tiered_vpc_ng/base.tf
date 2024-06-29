@@ -52,12 +52,12 @@ resource "aws_security_group_rule" "this" {
     # preconditions are evaluated on apply only.
     precondition {
       condition     = alltrue([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : contains([local.account_id], this.account_id)])
-      error_message = "All VPC account IDs must match the aws provider account ID for Intra VPC Security Group Rules."
+      error_message = "All VPC account IDs must match the aws provider account ID for IPv6 Intra VPC Security Group Rules."
     }
 
     precondition {
       condition     = alltrue([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : contains([local.region_name], this.region)])
-      error_message = "All VPC regions must match the aws provider region for Intra VPC Security Group Rules."
+      error_message = "All VPC regions must match the aws provider region for IPv6 Intra VPC Security Group Rules."
     }
   }
 }
