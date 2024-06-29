@@ -8,7 +8,7 @@ variable "region_az_labels" {
   type        = map(string)
 }
 
-variable "intra_vpc_security_group_rule" {
+variable "ipv6_intra_vpc_security_group_rule" {
   description = "intra vpc security group rule configuration"
   type = object({
     # security rule object to allow inbound across vpcs intra-vpc security group
@@ -29,36 +29,43 @@ variable "intra_vpc_security_group_rule" {
     }))
   })
 
+
   validation {
-    condition     = length(distinct([for this in var.intra_vpc_security_group_rule.vpcs : this.account_id])) <= 1
+    condition = length([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr]) == length(
+    compact([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr]))
+    error_message = "All VPC ipv6_network_cidr must not be null."
+  }
+
+  validation {
+    condition     = length(distinct([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.account_id])) <= 1
     error_message = "All VPCs must have the same account id as each other."
   }
 
   validation {
-    condition     = length(distinct([for this in var.intra_vpc_security_group_rule.vpcs : this.region])) <= 1
+    condition     = length(distinct([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.region])) <= 1
     error_message = "All VPCs must have the same region as each other."
   }
 
   validation {
     condition = length(distinct([
-      for this in var.intra_vpc_security_group_rule.vpcs : this.name
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.name
       ])) == length([
-      for this in var.intra_vpc_security_group_rule.vpcs : this.name
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.name
     ])
     error_message = "All VPCs must have unique names."
   }
 
   validation {
     condition = length(distinct([
-      for this in var.intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr
       ])) == length([
-      for this in var.intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr
     ])
     error_message = "All VPCs must have unique IPv6 network CIDRs."
   }
 
   validation {
-    condition     = length(var.intra_vpc_security_group_rule.vpcs) > 1
+    condition     = length(var.ipv6_intra_vpc_security_group_rule.vpcs) > 1
     error_message = "There must be at least 2 VPCs."
   }
 }

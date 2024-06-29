@@ -14,7 +14,7 @@ locals {
 # Each VPC id should have an inbound rule from all other VPC networks except itself.
 # ipv6
 locals {
-  vpc_id_to_ipv6_network_cidr = { for this in var.intra_vpc_security_group_rule.vpcs : this.id => this.ipv6_network_cidr if this.ipv6_network_cidr != null }
+  vpc_id_to_ipv6_network_cidr = { for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.id => this.ipv6_network_cidr if this.ipv6_network_cidr != null }
 
   vpc_id_to_inbound_ipv6_network_cidrs = {
     for vpc_id_and_ipv6_network_cidr in setproduct(keys(local.vpc_id_to_ipv6_network_cidr), values(local.vpc_id_to_ipv6_network_cidr)) :
@@ -23,8 +23,8 @@ locals {
   }
 
   vpc_id_to_intra_vpc_ipv6_security_group_rule = {
-    for this in var.intra_vpc_security_group_rule.vpcs :
-    this.id => merge(var.intra_vpc_security_group_rule.rule, {
+    for this in var.ipv6_intra_vpc_security_group_rule.vpcs :
+    this.id => merge(var.ipv6_intra_vpc_security_group_rule.rule, {
       intra_vpc_security_group_id = this.intra_vpc_security_group_id
       ipv6_network_cidrs          = lookup(local.vpc_id_to_inbound_ipv6_network_cidrs, this.id)
       type                        = local.rule_type
@@ -51,12 +51,12 @@ resource "aws_security_group_rule" "this" {
   lifecycle {
     # preconditions are evaluated on apply only.
     precondition {
-      condition     = alltrue([for this in var.intra_vpc_security_group_rule.vpcs : contains([local.account_id], this.account_id)])
+      condition     = alltrue([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : contains([local.account_id], this.account_id)])
       error_message = "All VPC account IDs must match the aws provider account ID for Intra VPC Security Group Rules."
     }
 
     precondition {
-      condition     = alltrue([for this in var.intra_vpc_security_group_rule.vpcs : contains([local.region_name], this.region)])
+      condition     = alltrue([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : contains([local.region_name], this.region)])
       error_message = "All VPC regions must match the aws provider region for Intra VPC Security Group Rules."
     }
   }

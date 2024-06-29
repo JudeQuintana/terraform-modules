@@ -1,12 +1,11 @@
 # Intra VPC Security Group Rule Description
 This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
 
-Allowing SSH and ping communication across all VPCs example:
+Allowing IPv6 SSH and ping communication across all VPCs example:
 ```
-# This will create a sg rule for each vpc allowing inbound-only ports from all other vpc networks (excluding itself).
-# Basically allowing ssh and ping communication across all VPCs.
+
 locals {
-  intra_vpc_security_group_rules = [
+  ipv6_intra_vpc_security_group_rules = [
     {
       label     = "ssh"
       protocol  = "tcp"
@@ -14,35 +13,27 @@ locals {
       to_port   = 22
     },
     {
-      label     = "ping"
-      protocol  = "icmp"
-      from_port = 8
-      to_port   = 0
+      label     = "ping6"
+      protocol  = "icmpv6"
+      from_port = -1
+      to_port   = -1
     }
   ]
 }
 
-module "intra_vpc_security_group_rules" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.7.5"
+module "ipv6_intra_vpc_security_group_rules" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=ipv6-for-tiered-vpc-ng"
 
-  for_each = { for r in local.intra_vpc_security_group_rules : r.label => r }
+  for_each = { for r in local.ipv6_intra_vpc_security_group_rules : r.label => r }
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
-  intra_vpc_security_group_rule = {
+  ipv6_intra_vpc_security_group_rule = {
     rule = each.value
     vpcs = module.vpcs
   }
 }
 ```
-
-# Networking Trifecta Demo
-Blog Post:
-[Terraform Networking Trifecta ](https://jq1.io/posts/tnt/)
-
-Main:
-- [Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/networking_trifecta_demo)
-  - See [Trifecta Demo Time](https://jq1.io/posts/tnt/#trifecta-demo-time) for instructions.
 
 ## Requirements
 
@@ -65,7 +56,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_security_group_rule.this_ipv6](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
@@ -74,7 +65,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
-| <a name="input_intra_vpc_security_group_rule"></a> [intra\_vpc\_security\_group\_rule](#input\_intra\_vpc\_security\_group\_rule) | intra vpc security group rule configuration | <pre>object({<br>    # security rule object to allow inbound across vpcs intra-vpc security group<br>    rule = object({<br>      label     = string<br>      protocol  = string<br>      from_port = number<br>      to_port   = number<br>    })<br>    # map of tiered_vpc_ng objects<br>    vpcs = map(object({<br>      id                          = string<br>      intra_vpc_security_group_id = string<br>      name                        = string<br>      ipv6_network_cidr           = string<br>      region                      = string<br>      account_id                  = string<br>    }))<br>  })</pre> | n/a | yes |
+| <a name="input_ipv6_intra_vpc_security_group_rule"></a> [ipv6\_intra\_vpc\_security\_group\_rule](#input\_ipv6\_intra\_vpc\_security\_group\_rule) | intra vpc security group rule configuration | <pre>object({<br>    # security rule object to allow inbound across vpcs intra-vpc security group<br>    rule = object({<br>      label     = string<br>      protocol  = string<br>      from_port = number<br>      to_port   = number<br>    })<br>    # map of tiered_vpc_ng objects<br>    vpcs = map(object({<br>      id                          = string<br>      intra_vpc_security_group_id = string<br>      name                        = string<br>      ipv6_network_cidr           = string<br>      region                      = string<br>      account_id                  = string<br>    }))<br>  })</pre> | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 
 ## Outputs

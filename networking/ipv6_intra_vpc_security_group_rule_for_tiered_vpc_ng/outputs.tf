@@ -7,9 +7,9 @@ output "region" {
 }
 
 output "rule" {
-  value = var.intra_vpc_security_group_rule.rule
+  value = var.ipv6_intra_vpc_security_group_rule.rule
 }
 
 output "vpcs" {
-  value = var.intra_vpc_security_group_rule.vpcs
+  value = var.ipv6_intra_vpc_security_group_rule.vpcs
 }
