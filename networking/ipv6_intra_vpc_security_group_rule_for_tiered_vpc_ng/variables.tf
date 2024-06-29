@@ -29,13 +29,6 @@ variable "ipv6_intra_vpc_security_group_rule" {
     }))
   })
 
-
-  validation {
-    condition = length([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr]) == length(
-    compact([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_network_cidr]))
-    error_message = "All VPC ipv6_network_cidr must not be null."
-  }
-
   validation {
     condition     = length(distinct([for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.account_id])) <= 1
     error_message = "All VPCs must have the same account id as each other."
