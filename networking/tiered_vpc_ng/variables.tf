@@ -60,7 +60,7 @@ variable "tiered_vpc" {
         can(cidrnetmask(subnet_cidr))
       ]
     ]))
-    error_message = "Each Secondary VPC network CIDR valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    error_message = "Each Secondary VPC network CIDR must have valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
