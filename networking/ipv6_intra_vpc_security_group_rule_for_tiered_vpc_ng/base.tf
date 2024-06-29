@@ -31,7 +31,7 @@ locals {
   }) }
 }
 
-resource "aws_security_group_rule" "this_ipv6" {
+resource "aws_security_group_rule" "this" {
   for_each = local.vpc_id_to_intra_vpc_ipv6_security_group_rule
 
   security_group_id = each.value.intra_vpc_security_group_id
