@@ -4,7 +4,6 @@
 *
 * Allowing IPv6 SSH and ping communication across all VPCs example:
 * ```
-*
 * locals {
 *   ipv6_intra_vpc_security_group_rules = [
 *     {
