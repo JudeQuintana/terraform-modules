@@ -45,6 +45,8 @@ output "vpc" {
     ipv6_network_cidrs      = [for this in var.centralized_router.vpcs : this.ipv6_network_cidr]
     private_route_table_ids = flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids])
     public_route_table_ids  = flatten([for this in var.centralized_router.vpcs : this.public_route_table_ids])
+    # outputing routes is legacy, easier to construct routes from route table ids and network cidrs when
+    # passed to another module like full mesh trio but is still used with super router until it's refactored.
     routes = [
       for this in aws_route.this_vpc_routes_to_other_vpcs : {
         route_table_id         = this.route_table_id
