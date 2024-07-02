@@ -82,6 +82,7 @@ Main:
 | [aws_ec2_transit_gateway_route_table_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_propagation.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_propagation) | resource |
 | [aws_ec2_transit_gateway_vpc_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment) | resource |
+| [aws_route.this_ipv6_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
@@ -90,7 +91,7 @@ Main:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                 = string<br>      full_name                  = string<br>      id                         = string<br>      name                       = string<br>      network_cidr               = string<br>      private_route_table_ids    = list(string)<br>      public_route_table_ids     = list(string)<br>      private_special_subnet_ids = list(string)<br>      public_special_subnet_ids  = list(string)<br>      region                     = string<br>    })), {})<br>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name                 = string<br>    amazon_side_asn      = number<br>    blackhole_cidrs      = optional(list(string), [])<br>    blackhole_ipv6_cidrs = optional(list(string), [])<br>    vpcs = optional(map(object({<br>      account_id                 = string<br>      full_name                  = string<br>      id                         = string<br>      name                       = string<br>      network_cidr               = string<br>      secondary_network_cidrs    = optional(list(string), [])<br>      ipv6_network_cidr          = optional(string)<br>      private_route_table_ids    = list(string)<br>      public_route_table_ids     = list(string)<br>      private_special_subnet_ids = list(string)<br>      public_special_subnet_ids  = list(string)<br>      region                     = string<br>    })), {})<br>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
@@ -102,6 +103,7 @@ Main:
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | n/a |
 | <a name="output_amazon_side_asn"></a> [amazon\_side\_asn](#output\_amazon\_side\_asn) | n/a |
 | <a name="output_blackhole_cidrs"></a> [blackhole\_cidrs](#output\_blackhole\_cidrs) | n/a |
+| <a name="output_blackhole_ipv6_cidrs"></a> [blackhole\_ipv6\_cidrs](#output\_blackhole\_ipv6\_cidrs) | n/a |
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |

@@ -5,11 +5,12 @@ data "aws_caller_identity" "this" {}
 data "aws_region" "this" {}
 
 locals {
-  account_id       = data.aws_caller_identity.this.account_id
-  region_name      = data.aws_region.this.name
-  region_label     = lookup(var.region_az_labels, local.region_name)
-  route_any_cidr   = "0.0.0.0/0"
-  upper_env_prefix = upper(var.env_prefix)
+  account_id          = data.aws_caller_identity.this.account_id
+  region_name         = data.aws_region.this.name
+  region_label        = lookup(var.region_az_labels, local.region_name)
+  route_any_cidr      = "0.0.0.0/0"
+  route_any_ipv6_cidr = "::/0"
+  upper_env_prefix    = upper(var.env_prefix)
 
   # Set Environment tag since we have have var.env_prefix
   # add or override with var.tags
@@ -32,8 +33,40 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.network_cidr
+  ipv6_cidr_block      = var.tiered_vpc.ipv6.network_cidr
+  ipv6_ipam_pool_id    = var.tiered_vpc.ipv6.ipam_pool_id
   enable_dns_support   = var.tiered_vpc.enable_dns_support
   enable_dns_hostnames = var.tiered_vpc.enable_dns_hostnames
+  tags = merge(
+    local.default_tags,
+    { Name = local.vpc_name }
+  )
+
+  # temporary hack?
+  lifecycle {
+    ignore_changes = [ipv6_netmask_length]
+  }
+}
+
+locals {
+  secondary_network_cidrs = toset(var.tiered_vpc.secondary_network_cidrs)
+}
+
+resource "aws_vpc_ipv4_cidr_block_association" "this" {
+  for_each = local.secondary_network_cidrs
+
+  cidr_block = each.key
+  vpc_id     = aws_vpc.this.id
+}
+
+locals {
+  igw = { for this in [local.public_any_subnet_cidr_exists] : this => this if local.public_any_subnet_cidr_exists }
+}
+
+resource "aws_internet_gateway" "this" {
+  for_each = local.igw
+
+  vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
     { Name = local.vpc_name }
@@ -41,11 +74,11 @@ resource "aws_vpc" "this" {
 }
 
 locals {
-  igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
+  eigw = { for this in [local.private_ipv6_any_eigw_enabled] : this => this if local.private_ipv6_any_eigw_enabled }
 }
 
-resource "aws_internet_gateway" "this" {
-  for_each = local.igw
+resource "aws_egress_only_internet_gateway" "this" {
+  for_each = local.eigw
 
   vpc_id = aws_vpc.this.id
   tags = merge(

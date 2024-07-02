@@ -72,10 +72,11 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr            = string<br>    private_route_table_ids = list(string)<br>    public_route_table_ids  = list(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr            = string<br>    secondary_network_cidrs = optional(list(string), [])<br>    ipv6_network_cidr       = optional(string)<br>    private_route_table_ids = list(string)<br>    public_route_table_ids  = list(string)<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_call"></a> [call](#output\_call) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
+| <a name="output_call_ipv6"></a> [call\_ipv6](#output\_call\_ipv6) | n/a |
