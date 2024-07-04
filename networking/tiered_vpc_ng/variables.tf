@@ -11,10 +11,15 @@ variable "region_az_labels" {
 variable "tiered_vpc" {
   description = "Tiered VPC configuration"
   type = object({
-    name                    = string
-    network_cidr            = string
-    secondary_network_cidrs = optional(list(string), [])
+    name = string
+    ipv4 = object({
+      # ipv4 can be with or without ipam
+      network_cidr            = string
+      ipam_pool_id            = optional(string)
+      secondary_network_cidrs = optional(list(string), [])
+    })
     ipv6 = optional(object({
+      # ipam is required for ipv6
       network_cidr = optional(string)
       ipam_pool_id = optional(string)
     }), {})
@@ -40,7 +45,7 @@ variable "tiered_vpc" {
 
   # using ipv4 validation via cidrnetmask function instead of regex for ipv4
   validation {
-    condition     = can(cidrnetmask(var.tiered_vpc.network_cidr))
+    condition     = can(cidrnetmask(var.tiered_vpc.ipv4.network_cidr))
     error_message = "The VPC network CIDR must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
@@ -56,7 +61,7 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue(flatten([
       for this in var.tiered_vpc.azs : [
-        for subnet_cidr in var.tiered_vpc.secondary_network_cidrs :
+        for subnet_cidr in var.tiered_vpc.ipv4.secondary_network_cidrs :
         can(cidrnetmask(subnet_cidr))
       ]
     ]))

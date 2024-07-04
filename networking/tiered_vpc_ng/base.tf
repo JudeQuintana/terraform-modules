@@ -32,7 +32,8 @@ locals {
 ######################################################
 
 resource "aws_vpc" "this" {
-  cidr_block           = var.tiered_vpc.network_cidr
+  cidr_block           = var.tiered_vpc.ipv4.network_cidr
+  ipv4_ipam_pool_id    = var.tiered_vpc.ipv4.ipam_pool_id
   ipv6_cidr_block      = var.tiered_vpc.ipv6.network_cidr
   ipv6_ipam_pool_id    = var.tiered_vpc.ipv6.ipam_pool_id
   enable_dns_support   = var.tiered_vpc.enable_dns_support
@@ -44,12 +45,12 @@ resource "aws_vpc" "this" {
 
   # temporary hack?
   lifecycle {
-    ignore_changes = [ipv6_netmask_length]
+    ignore_changes = [ipv4_netmask_length, ipv6_netmask_length]
   }
 }
 
 locals {
-  secondary_network_cidrs = toset(var.tiered_vpc.secondary_network_cidrs)
+  secondary_network_cidrs = toset(var.tiered_vpc.ipv4.secondary_network_cidrs)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
@@ -60,7 +61,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "this" {
 }
 
 locals {
-  igw = { for this in [local.public_any_subnet_cidr_exists] : this => this if local.public_any_subnet_cidr_exists }
+  igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
 }
 
 resource "aws_internet_gateway" "this" {
