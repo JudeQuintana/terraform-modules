@@ -78,5 +78,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_call"></a> [call](#output\_call) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
-| <a name="output_call_ipv6"></a> [call\_ipv6](#output\_call\_ipv6) | n/a |
+| <a name="output_ipv4"></a> [ipv4](#output\_ipv4) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
+| <a name="output_ipv6"></a> [ipv6](#output\_ipv6) | n/a |
