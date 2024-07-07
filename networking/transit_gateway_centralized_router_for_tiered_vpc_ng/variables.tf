@@ -14,8 +14,8 @@ variable "centralized_router" {
     name            = string
     amazon_side_asn = number
     blackhole = optional(object({
-      cidrs      = list(string, [])
-      ipv6_cidrs = list(string, [])
+      cidrs      = optonal(list(string), [])
+      ipv6_cidrs = optional(list(string), [])
     }), {})
     vpcs = optional(map(object({
       account_id                 = string
