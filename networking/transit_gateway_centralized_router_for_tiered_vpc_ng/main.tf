@@ -17,8 +17,11 @@
 *   centralized_router = {
 *     name            = "bishop"
 *     amazon_side_asn = 64512
-*     blackhole_cidrs = ["172.16.8.0/24"]
 *     vpcs            = module.vpcs
+*     blackhole = {
+*       ipv4_cidrs = ["172.16.8.0/24"]
+*       ipv6_cidrs = ["2600:1f24:66:c109::/64"]
+*     }
 *   }
 * }
 * ```

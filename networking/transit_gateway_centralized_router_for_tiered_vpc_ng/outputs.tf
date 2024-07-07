@@ -7,11 +7,11 @@ output "amazon_side_asn" {
 }
 
 output "blackhole_cidrs" {
-  value = var.centralized_router.blackhole_cidrs
+  value = var.centralized_router.blackhole.cidrs
 }
 
 output "blackhole_ipv6_cidrs" {
-  value = var.centralized_router.blackhole_ipv6_cidrs
+  value = var.centralized_router.blackhole.ipv6_cidrs
 }
 
 output "full_name" {
