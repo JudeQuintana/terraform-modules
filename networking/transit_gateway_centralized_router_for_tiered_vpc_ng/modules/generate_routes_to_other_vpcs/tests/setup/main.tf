@@ -72,7 +72,7 @@ output "ipv4_with_secondary_cidrs_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-06836f9bc939ebbce"
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "10.1.0.0/20",
         "10.2.0.0/20"
       ]
@@ -85,7 +85,7 @@ output "ipv4_with_secondary_cidrs_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-0094331bdafb627f3"
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "172.17.0.0/20"
       ]
     }
@@ -97,7 +97,7 @@ output "ipv4_with_secondary_cidrs_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-0989090af3edb78b1"
       ]
-      secondary_network_cidrs = []
+      secondary_cidrs = []
     }
   }
 }
@@ -113,7 +113,7 @@ output "ipv4_with_secondary_cidrs_one_tiered_vpc" {
       public_route_table_ids = [
         "rtb-06b216fb818494594",
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "10.1.0.0/20",
         "10.2.0.0/20"
       ]
@@ -134,7 +134,7 @@ output "ipv6_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-06836f9bc939ebbce"
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "10.1.0.0/20",
         "10.2.0.0/20"
       ]
@@ -148,7 +148,7 @@ output "ipv6_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-0094331bdafb627f3"
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "172.17.0.0/20"
       ]
     }
@@ -161,7 +161,7 @@ output "ipv6_tiered_vpcs" {
       public_route_table_ids = [
         "rtb-0989090af3edb78b1"
       ]
-      secondary_network_cidrs = []
+      secondary_cidrs = []
     }
   }
 }
@@ -178,7 +178,7 @@ output "ipv6_one_tiered_vpc" {
       public_route_table_ids = [
         "rtb-06836f9bc939ebbce"
       ]
-      secondary_network_cidrs = [
+      secondary_cidrs = [
         "10.1.0.0/20",
         "10.2.0.0/20"
       ]
