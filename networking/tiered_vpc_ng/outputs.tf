@@ -26,8 +26,8 @@ output "network_cidr" {
   value = var.tiered_vpc.ipv4.network_cidr
 }
 
-output "secondary_network_cidrs" {
-  value = var.tiered_vpc.ipv4.secondary_network_cidrs
+output "secondary_cidrs" {
+  value = var.tiered_vpc.ipv4.secondary_cidrs
 }
 
 output "ipv6_network_cidr" {

@@ -33,9 +33,9 @@ locals {
 
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.ipv4.network_cidr
-  ipv4_ipam_pool_id    = var.tiered_vpc.ipv4.ipam_pool_id
+  ipv4_ipam_pool_id    = var.tiered_vpc.ipv4.ipam_pool.id
   ipv6_cidr_block      = var.tiered_vpc.ipv6.network_cidr
-  ipv6_ipam_pool_id    = var.tiered_vpc.ipv6.ipam_pool_id
+  ipv6_ipam_pool_id    = var.tiered_vpc.ipv6.ipam_pool.id
   enable_dns_support   = var.tiered_vpc.enable_dns_support
   enable_dns_hostnames = var.tiered_vpc.enable_dns_hostnames
   tags = merge(
@@ -43,18 +43,18 @@ resource "aws_vpc" "this" {
     { Name = local.vpc_name }
   )
 
-  # temporary hack?
+  # only  using cidrs
   lifecycle {
     ignore_changes = [ipv4_netmask_length, ipv6_netmask_length]
   }
 }
 
 locals {
-  secondary_network_cidrs = toset(var.tiered_vpc.ipv4.secondary_network_cidrs)
+  secondary_cidrs = toset(var.tiered_vpc.ipv4.secondary_cidrs)
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
-  for_each = local.secondary_network_cidrs
+  for_each = local.secondary_cidrs
 
   cidr_block = each.key
   vpc_id     = aws_vpc.this.id

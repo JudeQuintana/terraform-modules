@@ -2,7 +2,7 @@
 locals {
   network_cidrs_with_route_table_ids = [
     for this in var.vpcs : {
-      network_cidrs      = concat([this.network_cidr], this.secondary_network_cidrs)
+      network_cidrs      = concat([this.network_cidr], this.secondary_cidrs)
       ipv6_network_cidrs = compact([this.ipv6_network_cidr])
       route_table_ids    = concat(this.private_route_table_ids, this.public_route_table_ids)
     }

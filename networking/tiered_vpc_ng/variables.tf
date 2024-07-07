@@ -14,14 +14,18 @@ variable "tiered_vpc" {
     name = string
     ipv4 = object({
       # ipv4 can be with or without ipam
-      network_cidr            = string
-      ipam_pool_id            = optional(string)
-      secondary_network_cidrs = optional(list(string), [])
+      network_cidr = string
+      ipam_pool = optional(object({
+        id = optional(string)
+      }), {})
+      secondary_cidrs = optional(list(string), [])
     })
     ipv6 = optional(object({
       # ipam is required for ipv6
       network_cidr = optional(string)
-      ipam_pool_id = optional(string)
+      ipam_pool = optional(object({
+        id = optional(string)
+      }), {})
     }), {})
     azs = map(object({
       eigw = optional(bool, false)
@@ -61,11 +65,11 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue(flatten([
       for this in var.tiered_vpc.azs : [
-        for subnet_cidr in var.tiered_vpc.ipv4.secondary_network_cidrs :
+        for subnet_cidr in var.tiered_vpc.ipv4.secondary_cidrs :
         can(cidrnetmask(subnet_cidr))
       ]
     ]))
-    error_message = "Each Secondary VPC network CIDR must have valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    error_message = "Each Secondary VPC CIDR must have valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
@@ -100,24 +104,34 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue([for ipv6_cidr in compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr)) : true]) ? var.tiered_vpc.ipv6.network_cidr != null && var.tiered_vpc.ipv6.ipam_pool_id != null : true
+      anytrue([for ipv6_cidr in compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr)) : true]) ? var.tiered_vpc.ipv6.network_cidr != null : true
     ])
-    error_message = "The var.tiered_vpc.ipv6.network_cidr and var.tiered_ipv6.ipam_pool_id must be assigned to the VPC if a private subnet or public subnet with an IPv6 CIDR is configured in a dual stack configuration."
+    error_message = "The var.tiered_vpc.ipv6.network_cidr must be assigned to the VPC if a private subnet or public subnet with an IPv6 CIDR is configured in a dual stack configuration."
   }
 
   validation {
     condition = var.tiered_vpc.ipv6.network_cidr != null ? alltrue([
       for this in var.tiered_vpc.azs :
     length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) && length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr)]) : true
-    error_message = "If var.tiered_vpc.ipv6.network_cidr is configured for the VPC then all private subnets and/or public subnets that are set must also be configured with IPv6 CIDR in a dual stack configuration."
+    error_message = "If var.tiered_vpc.ipv6.network_cidr is configured for the VPC then all private subnets and/or public subnets that are set must also be configured with a IPv6 CIDR in a dual stack configuration."
   }
 
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
       this.eigw ? length([for subnet in this.private_subnets : subnet.ipv6_cidr if subnet.ipv6_cidr != null]) > 0 : true
-    ]) && var.tiered_vpc.ipv6.network_cidr != null && var.tiered_vpc.ipv6.ipam_pool_id != null
-    error_message = "If eigw is true for an AZ then at least one private IPv6 dual stack subnet must be configured in the same AZ, var.tiered_vpc.ipv6.network_cidr must be defined, and var.tiered_vpc.ipv6.ipam_pool_id must be defined."
+    ])
+    error_message = "If eigw is true for an AZ then at least one private IPv6 dual stack subnet must be configured in the same AZ."
+  }
+
+  validation {
+    condition     = var.tiered_vpc.ipv6.network_cidr != null ? var.tiered_vpc.ipv6.ipam_pool != null : true
+    error_message = "If var.tiered_vpc.ipv6.network_cidr is defined, then var.tiered_vpc.ipv6.ipam_pool must be defined."
+  }
+
+  validation {
+    condition     = var.tiered_vpc.ipv6.ipam_pool != null ? var.tiered_vpc.ipv6.network_cidr != null : true
+    error_message = "If var.tiered_vpc.ipv6.ipam_pool is defined, then var.tiered_vpc.ipv6.network_cidr must be defined."
   }
 
   validation {

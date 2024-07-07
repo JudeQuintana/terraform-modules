@@ -2,7 +2,7 @@ variable "vpcs" {
   description = "map of tiered_vpc_ng objects"
   type = map(object({
     network_cidr            = string
-    secondary_network_cidrs = optional(list(string), [])
+    secondary_cidrs         = optional(list(string), [])
     ipv6_network_cidr       = optional(string)
     private_route_table_ids = list(string)
     public_route_table_ids  = list(string)
@@ -17,9 +17,9 @@ variable "vpcs" {
   validation {
     condition = alltrue(flatten([
       for this in var.vpcs : [
-        for secondary_network_cidr in this.secondary_network_cidrs :
-        can(cidrnetmask(secondary_network_cidr))
+        for secondary_cidr in this.secondary_cidrs :
+        can(cidrnetmask(secondary_cidr))
     ]]))
-    error_message = "Each Secondary VPC network CIDR valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    error_message = "Each Secondary VPC CIDR valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 }
