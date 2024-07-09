@@ -43,7 +43,7 @@ resource "aws_vpc" "this" {
     { Name = local.vpc_name }
   )
 
-  # only  using cidrs
+  # only using cidrs
   lifecycle {
     ignore_changes = [ipv4_netmask_length, ipv6_netmask_length]
   }
@@ -56,8 +56,15 @@ locals {
 resource "aws_vpc_ipv4_cidr_block_association" "this" {
   for_each = local.secondary_cidrs
 
-  cidr_block = each.key
-  vpc_id     = aws_vpc.this.id
+  cidr_block        = each.key
+  vpc_id            = aws_vpc.this.id
+  ipv4_ipam_pool_id = var.tiered_vpc.ipv4.ipam_pool.id
+
+  # only using cidrs
+  lifecycle {
+    ignore_changes = [ipv4_netmask_length]
+  }
+
 }
 
 locals {
