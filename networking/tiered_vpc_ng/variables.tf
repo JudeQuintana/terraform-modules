@@ -17,11 +17,11 @@ variable "tiered_vpc" {
       network_cidr    = string
       secondary_cidrs = optional(list(string), [])
       ipam_pool = object({
-        id = optional(string)
+        id = string
       })
     })
     ipv6 = optional(object({
-      # ipam is required for ipv6
+      # ipam requires ipam
       network_cidr = optional(string)
       ipam_pool = optional(object({
         id = optional(string)
