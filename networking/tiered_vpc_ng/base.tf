@@ -27,14 +27,6 @@ locals {
   vpc_name = format("%s-tiered-vpc-%s-%s", local.upper_env_prefix, var.tiered_vpc.name, local.region_label)
 }
 
-######################################################
-#
-# Base VPC Setup:
-# - VPC
-# - IGW
-#
-######################################################
-
 resource "aws_vpc" "this" {
   cidr_block           = var.tiered_vpc.ipv4.network_cidr
   ipv4_ipam_pool_id    = var.tiered_vpc.ipv4.ipam_pool.id
