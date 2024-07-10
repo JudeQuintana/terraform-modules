@@ -1,3 +1,7 @@
+# Note from AWS:
+# Some AWS services use the 172.17.0.0/16 CIDR range. To avoid future conflicts, don’t use this range when creating your VPC.
+# ^will not explicitly block this cidr via variable validation but important to know.
+
 # Pull caller identity data from provider
 data "aws_caller_identity" "this" {}
 
@@ -64,7 +68,6 @@ resource "aws_vpc_ipv4_cidr_block_association" "this" {
   lifecycle {
     ignore_changes = [ipv4_netmask_length]
   }
-
 }
 
 locals {

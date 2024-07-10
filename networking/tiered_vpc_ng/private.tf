@@ -49,6 +49,9 @@ resource "aws_subnet" "this_private" {
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_cidr_to_az, each.key)))
       )
   })
+
+  # private subnet could be a secondary cidr so need to wait for secondary network cidr
+  depends_on = [aws_vpc_ipv4_cidr_block_association.this]
 }
 
 # one private route table per az

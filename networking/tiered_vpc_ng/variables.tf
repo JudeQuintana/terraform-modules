@@ -12,16 +12,16 @@ variable "tiered_vpc" {
   description = "Tiered VPC configuration"
   type = object({
     name = string
+    # ipv4 requires ipam
     ipv4 = object({
-      # ipv4 requires ipam
       network_cidr    = string
       secondary_cidrs = optional(list(string), [])
       ipam_pool = object({
         id = string
       })
     })
+    # ipv6 requires ipam
     ipv6 = optional(object({
-      # ipam requires ipam
       network_cidr = optional(string)
       ipam_pool = optional(object({
         id = optional(string)
