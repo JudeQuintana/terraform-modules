@@ -125,13 +125,13 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition     = var.tiered_vpc.ipv6.network_cidr != null ? var.tiered_vpc.ipv6.ipam_pool != null : true
-    error_message = "If var.tiered_vpc.ipv6.network_cidr is defined, then var.tiered_vpc.ipv6.ipam_pool must be defined."
+    condition     = var.tiered_vpc.ipv6.network_cidr != null ? var.tiered_vpc.ipv6.ipam_pool.id != null : true
+    error_message = "If var.tiered_vpc.ipv6.network_cidr is defined, then var.tiered_vpc.ipv6.ipam_pool.id must be defined."
   }
 
   validation {
-    condition     = var.tiered_vpc.ipv6.ipam_pool != null ? var.tiered_vpc.ipv6.network_cidr != null : true
-    error_message = "If var.tiered_vpc.ipv6.ipam_pool is defined, then var.tiered_vpc.ipv6.network_cidr must be defined."
+    condition     = var.tiered_vpc.ipv6.ipam_pool.id != null ? var.tiered_vpc.ipv6.network_cidr != null : true
+    error_message = "If var.tiered_vpc.ipv6.ipam_pool.id is defined, then var.tiered_vpc.ipv6.network_cidr must be defined."
   }
 
   validation {
