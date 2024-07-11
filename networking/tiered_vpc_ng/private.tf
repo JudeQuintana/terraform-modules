@@ -24,7 +24,8 @@ locals {
 
   #ipv6 dual stack
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
-  private_ipv6_any_eigw_enabled           = anytrue([for this in var.tiered_vpc.azs : this.eigw])
+  private_az_to_eigw                      = { for az, this in var.tiered_vpc.azs : az => this.eigw if this.eigw }
+  private_ipv6_any_eigw_enabled           = length(local.private_az_to_eigw) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
   private_ipv6_subnet_cidr_to_subnet_cidr = merge([for this in var.tiered_vpc.azs : { for subnet in this.private_subnets : subnet.ipv6_cidr => subnet.cidr if subnet.ipv6_cidr != null && this.eigw }]...)
 }
@@ -95,10 +96,10 @@ resource "aws_route_table_association" "this_private" {
 # private ipv6 subnets route out through egress only internet gateway
 # subnet id is already associated to the shared public route table via aws_subnet.this_private
 resource "aws_route" "this_private_ipv6_route_out" {
-  for_each = local.private_ipv6_subnet_cidr_to_subnet_cidr
+  for_each = local.private_az_to_eigw
 
   destination_ipv6_cidr_block = local.route_any_ipv6_cidr
-  route_table_id              = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.value)).id
+  route_table_id              = lookup(aws_route_table.this_private, each.key).id
   egress_only_gateway_id      = lookup(aws_egress_only_internet_gateway.this, local.private_ipv6_any_eigw_enabled).id
 }
 
