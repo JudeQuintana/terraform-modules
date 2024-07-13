@@ -7,8 +7,8 @@
 *   - can start with IPv4 only then add IPv6 at a later time, or start with both.
 * - EIGW is similar to NATGW but for IPv6 subnets but there can only be EIGW per VPC so any AZ with `eigw = true` is opt-in.
 *   for private IPv6 subnets per AZ to route to the internet.
-* - IGW continues t auto toggle if public subnets (ipv4 or ipv6) are defined.
-* - `special = true` can be assigned to a secondary subnet cidr (public or private IPv4).
+* - IGW continues to auto toggle if public subnets (ipv4 or ipv6) are defined.
+* - `special = true` can be assigned to a secondary subnet cidr (public or private).
 *   - Can be used as a vpc attachemnt when passed to centralized router.
 *
 * `v1.8.2` example:
