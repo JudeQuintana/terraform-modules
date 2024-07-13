@@ -1,7 +1,30 @@
 # Intra VPC Security Group Rule Description
 This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
 
-Allowing SSH and ping communication across all VPCs example:
+`v1.8.2`
+- Same declaration as before but now supports VPC IPv4 Secondary CIDRs
+
+`v1.8.2` example:
+```
+module "intra_vpc_security_group_rules" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.8.2"
+
+  for_each = { for r in local.intra_vpc_security_group_rules : r.label => r }
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  intra_vpc_security_group_rule = {
+    rule = each.value
+    vpcs = module.vpcs
+  }
+}
+```
+
+`v1.8.1`:
+- Creates SG rules for IPv4 VPC network cidrs across VPCs
+- Allowing SSH and ping communication across VPCs
+
+`v1.8.1` example:
 ```
 # This will create a sg rule for each vpc allowing inbound-only ports from all other vpc networks (excluding itself).
 # Basically allowing ssh and ping communication across all VPCs.
@@ -23,7 +46,7 @@ locals {
 }
 
 module "intra_vpc_security_group_rules" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.7.5"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=v1.8.1"
 
   for_each = { for r in local.intra_vpc_security_group_rules : r.label => r }
 

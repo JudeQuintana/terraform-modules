@@ -88,9 +88,7 @@ run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero" {
   }
 }
 
-
 # ipv6
-
 run "ipv6_call_with_n_greater_than_one" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
