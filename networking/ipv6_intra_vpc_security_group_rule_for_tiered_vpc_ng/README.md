@@ -3,7 +3,6 @@ This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC all
 
 Allowing IPv6 SSH and ping communication across all VPCs example:
 ```
-
 locals {
   ipv6_intra_vpc_security_group_rules = [
     {
