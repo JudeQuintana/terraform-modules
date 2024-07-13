@@ -1,6 +1,25 @@
 # Transit Gateway Centralized Router
 - Creates hub and spoke topology from VPCs.
 
+`v1.8.2`
+- Supports auto routing IPv4 secondary cidrs and IPv6 cidrs in addtion to IPv4 network cidrs
+  - Can blackhole IPv6 cidrs
+module "centralized\_router" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit\_gateway\_centralized\_router\_for\_tiered\_vpc\_ng?ref=v1.8.2"
+
+  env\_prefix       = var.env\_prefix
+  region\_az\_labels = var.region\_az\_labels
+  centralized\_router = {
+    name            = "gambit"
+    amazon\_side\_asn = 64512
+    vpcs            = module.vpcs
+    blackhole = {
+      cidrs      = ["172.16.8.0/24"]
+      ipv6\_cidrs = ["2600:1f24:66:c109::/64"]
+    }
+  }
+}
+
 `v1.8.1`
 - Now supports VPC attachments for private subnets.
   - Uses the subnet id for a subnet tagged with `special = true` from either a private or a public subnet per AZ in Tiered VPC-NG for `v1.8.1`
@@ -17,10 +36,7 @@ module "centralized_router" {
     name            = "bishop"
     amazon_side_asn = 64512
     vpcs            = module.vpcs
-    blackhole = {
-      ipv4_cidrs = ["172.16.8.0/24"]
-      ipv6_cidrs = ["2600:1f24:66:c109::/64"]
-    }
+    blackhole_cidrs = ["172.16.8.0/24"]
   }
 }
 ```
