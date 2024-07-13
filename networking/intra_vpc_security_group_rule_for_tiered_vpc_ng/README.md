@@ -2,6 +2,7 @@
 This Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
 
 `v1.8.2`
+- New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
 - Same declaration as before but now supports VPC IPv4 Secondary CIDRs
 
 `v1.8.2` example:

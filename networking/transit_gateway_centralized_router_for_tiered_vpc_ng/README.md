@@ -2,6 +2,7 @@
 - Creates hub and spoke topology from VPCs.
 
 `v1.8.2`
+- New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
 - Supports auto routing IPv4 secondary cidrs and IPv6 cidrs in addtion to IPv4 network cidrs
   - Can blackhole IPv6 cidrs
 module "centralized\_router" {

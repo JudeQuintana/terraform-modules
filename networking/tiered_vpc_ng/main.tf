@@ -2,6 +2,8 @@
 * # Tiered VPC-NG
 *
 * `v1.8.2`
+* - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
+
 * - Requires IPAM Pools for both IPv4 and IPv6 cidrs.
 *   - Advanced Tier recommended.
 *   - can start with IPv4 only then add IPv6 at a later time, or start with both.
