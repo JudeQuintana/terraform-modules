@@ -11,6 +11,7 @@
 - IGW continues to auto toggle if public subnets (ipv4 or ipv6) are defined.
 - `special = true` can be assigned to a secondary subnet cidr (public or private).
   - Can be used as a vpc attachemnt when passed to centralized router.
+- EIPs dont use a public pool and will continue to be AWS owned public IPv4 cidrs
 
 `v1.8.2` example:
 ```
