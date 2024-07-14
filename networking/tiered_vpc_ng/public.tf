@@ -20,11 +20,15 @@ locals {
   public_label                      = "public"
   public_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
   public_any_subnet_exists          = length(local.public_subnet_cidrs) > 0
-  public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr if length(this.public_subnets[*].cidr) > 0 }
+  public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr if length(this.public_subnets) > 0 }
   public_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
   public_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
   public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw }]...)
+
+  # ipv6 dual stack
+  public_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.public_subnets[*].ipv6_cidr)]))
+  public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
 }
 
 resource "aws_subnet" "this_public" {
@@ -33,6 +37,7 @@ resource "aws_subnet" "this_public" {
   vpc_id                  = aws_vpc.this.id
   availability_zone       = format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key))
   cidr_block              = each.key
+  ipv6_cidr_block         = lookup(local.public_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = true
   tags = merge(
     local.default_tags,
@@ -46,6 +51,9 @@ resource "aws_subnet" "this_public" {
         lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_cidr_to_az, each.key)))
       )
   })
+
+  # public subnet could be a secondary cidr so need to wait for secondary network cidr
+  depends_on = [aws_vpc_ipv4_cidr_block_association.this]
 }
 
 # one public route table for all public subnets across azs
@@ -85,13 +93,6 @@ resource "aws_route_table_association" "this_public" {
   route_table_id = lookup(aws_route_table.this_public, local.public_any_subnet_exists).id
 }
 
-#######################################################
-##
-## EIPs:
-## - Used for NAT Gateway's Public IP
-##
-#######################################################
-
 # one eip per natgw (one per az)
 resource "aws_eip" "this_public" {
   for_each = local.public_natgw_az_to_subnet_cidr
@@ -110,18 +111,7 @@ resource "aws_eip" "this_public" {
   })
 }
 
-#######################################################
-##
-## NAT Gatways:
-## - For routing the respective private AZ traffic and
-##   is built in a public subnet
-## - depends_on is required because NAT GW needs an IGW
-##   to route through but there is not an implicit
-##   dependency via it's attributes so we must be
-##   explicit.
-##
-#######################################################
-
+# only one natgw per AZ if enabled
 resource "aws_nat_gateway" "this_public" {
   for_each = local.public_natgw_az_to_subnet_cidr
 
@@ -141,3 +131,15 @@ resource "aws_nat_gateway" "this_public" {
 
   depends_on = [aws_internet_gateway.this]
 }
+
+# ipv6 dual stack
+# one public route out through IGW for all public ipv6 subnets across azs
+# subnet id is already associated to the shared public route table via aws_subnet.this_public
+resource "aws_route" "this_public_ipv6_route_out" {
+  for_each = local.igw
+
+  destination_ipv6_cidr_block = local.route_any_ipv6_cidr
+  route_table_id              = lookup(aws_route_table.this_public, each.key).id
+  gateway_id                  = lookup(aws_internet_gateway.this, each.key).id
+}
+

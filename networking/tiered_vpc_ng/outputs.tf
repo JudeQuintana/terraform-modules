@@ -23,8 +23,15 @@ output "name" {
 }
 
 output "network_cidr" {
-  # pass thru what is known pre-apply
-  value = var.tiered_vpc.network_cidr
+  value = var.tiered_vpc.ipv4.network_cidr
+}
+
+output "secondary_cidrs" {
+  value = var.tiered_vpc.ipv4.secondary_cidrs
+}
+
+output "ipv6_network_cidr" {
+  value = var.tiered_vpc.ipv6.network_cidr
 }
 
 output "private_route_table_ids" {
@@ -33,6 +40,10 @@ output "private_route_table_ids" {
 
 output "private_subnet_cidrs" {
   value = local.private_subnet_cidrs
+}
+
+output "private_ipv6_subnet_cidrs" {
+  value = local.private_ipv6_subnet_cidrs
 }
 
 output "private_subnet_name_to_subnet_id" {
@@ -45,6 +56,10 @@ output "public_route_table_ids" {
 
 output "public_subnet_cidrs" {
   value = local.public_subnet_cidrs
+}
+
+output "public_ipv6_subnet_cidrs" {
+  value = local.public_ipv6_subnet_cidrs
 }
 
 output "public_special_subnet_ids" {

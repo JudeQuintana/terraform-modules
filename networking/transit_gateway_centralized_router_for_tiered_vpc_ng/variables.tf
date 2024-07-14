@@ -13,13 +13,18 @@ variable "centralized_router" {
   type = object({
     name            = string
     amazon_side_asn = number
-    blackhole_cidrs = optional(list(string), [])
+    blackhole = optional(object({
+      cidrs      = optional(list(string), [])
+      ipv6_cidrs = optional(list(string), [])
+    }), {})
     vpcs = optional(map(object({
       account_id                 = string
       full_name                  = string
       id                         = string
       name                       = string
       network_cidr               = string
+      secondary_cidrs            = optional(list(string), [])
+      ipv6_network_cidr          = optional(string)
       private_route_table_ids    = list(string)
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
@@ -27,6 +32,11 @@ variable "centralized_router" {
       region                     = string
     })), {})
   })
+
+  validation {
+    condition     = alltrue([for this in var.centralized_router.blackhole.cidrs : can(cidrnetmask(this))])
+    error_message = "The blackhole network CIDRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+  }
 
   validation {
     condition = length(distinct([

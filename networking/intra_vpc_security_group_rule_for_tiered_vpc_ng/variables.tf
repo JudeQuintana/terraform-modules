@@ -24,6 +24,7 @@ variable "intra_vpc_security_group_rule" {
       intra_vpc_security_group_id = string
       name                        = string
       network_cidr                = string
+      secondary_cidrs             = optional(list(string), [])
       region                      = string
       account_id                  = string
     }))
@@ -55,6 +56,22 @@ variable "intra_vpc_security_group_rule" {
       for this in var.intra_vpc_security_group_rule.vpcs : this.network_cidr
     ])
     error_message = "All VPCs must have unique network CIDRs."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.intra_vpc_security_group_rule.vpcs : can(cidrnetmask(this.network_cidr))
+    ])
+    error_message = "Each VPC network CIDR must be valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for this in var.intra_vpc_security_group_rule.vpcs : [
+        for secondary_cidr in this.secondary_cidrs :
+        can(cidrnetmask(secondary_cidr))
+    ]]))
+    error_message = "Each Secondary VPC CIDR mush have valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
