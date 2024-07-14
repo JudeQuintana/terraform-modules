@@ -1,5 +1,30 @@
 # Generate Routes to Other VPCs Description
 
+`v1.8.2`
+- now supports genearating routes IPv4 Secondary cidrs and IPv6 cidrs across vpcs
+
+Run the test suites with `terraform test` in the `./modules/generate_routes_to_other_vpcs` directory.
+```
+tests/generate_routes.tftest.hcl... in progress
+  run "setup"... pass
+  run "final"... pass
+  run "ipv4_call_with_n_greater_than_one"... pass
+  run "ipv4_call_with_n_equal_to_one"... pass
+  run "ipv4_call_with_n_equal_to_zero"... pass
+  run "ipv4_cidr_validation"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_one"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
+  run "ipv6_call_with_n_greater_than_one"... pass
+  run "ipv6_call_with_n_equal_to_one"... pass
+  run "ipv6_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
+tests/generate_routes.tftest.hcl... tearing down
+tests/generate_routes.tftest.hcl... pass
+
+Success! 12 passed, 0 failed.
+```
+
+`v1.8.1`
 This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects with [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng).
 
 It will create a map of routes to other VPC networks (execept itself) which will then be consumed by route resources.
