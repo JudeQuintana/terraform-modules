@@ -5,21 +5,25 @@
 - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
 - Supports auto routing IPv4 secondary cidrs and IPv6 cidrs in addtion to IPv4 network cidrs
   - Can blackhole IPv6 cidrs
-module "centralized\_router" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit\_gateway\_centralized\_router\_for\_tiered\_vpc\_ng?ref=v1.8.2"
 
-  env\_prefix       = var.env\_prefix
-  region\_az\_labels = var.region\_az\_labels
-  centralized\_router = {
+`v1.8.2` example:
+```
+module "centralized_router" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng?ref=v1.8.2"
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  centralized_router = {
     name            = "gambit"
-    amazon\_side\_asn = 64512
+    amazon_side_asn = 64512
     vpcs            = module.vpcs
     blackhole = {
       cidrs      = ["172.16.8.0/24"]
-      ipv6\_cidrs = ["2600:1f24:66:c109::/64"]
+      ipv6_cidrs = ["2600:1f24:66:c109::/64"]
     }
   }
 }
+```
 
 `v1.8.1`
 - Now supports VPC attachments for private subnets.
