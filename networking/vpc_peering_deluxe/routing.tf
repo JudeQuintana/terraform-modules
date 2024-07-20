@@ -35,8 +35,8 @@ locals {
 
   peer_vpc_routes_to_local_vpc_subnet_cidrs = [
     for peer_vpc_route_table_id_and_local_vpc_subnet_cidr in setproduct(local.peer_route_table_ids, local.local_vpc_subnet_cidrs) : {
-      route_table_id         = peer_vpc_route_table_id_and_local_vpc_ipv6_subnet_cidr[0]
-      destination_cidr_block = peer_vpc_route_table_id_and_local_vpc_ipv6_subnet_cidr[1]
+      route_table_id         = peer_vpc_route_table_id_and_local_vpc_subnet_cidr[0]
+      destination_cidr_block = peer_vpc_route_table_id_and_local_vpc_subnet_cidr[1]
   }]
 
   peer_new_vpc_routes_to_local_vpc_subnet_cidrs = {
