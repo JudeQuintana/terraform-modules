@@ -13,6 +13,7 @@ variable "vpc_peering_deluxe" {
         full_name                 = string
         id                        = string
         name                      = string
+        network_cidr              = string
         private_subnet_cidrs      = list(string)
         public_subnet_cidrs       = list(string)
         private_ipv6_subnet_cidrs = list(string)
@@ -30,6 +31,7 @@ variable "vpc_peering_deluxe" {
         full_name                 = string
         id                        = string
         name                      = string
+        network_cidr              = string
         private_subnet_cidrs      = list(string)
         public_subnet_cidrs       = list(string)
         private_ipv6_subnet_cidrs = list(string)
@@ -76,6 +78,15 @@ variable "vpc_peering_deluxe" {
       [var.vpc_peering_deluxe.local.vpc.name, var.vpc_peering_deluxe.peer.vpc.name]
     )
     error_message = "Each VPC name must be unique."
+  }
+
+  validation {
+    condition = length(distinct(
+      [var.vpc_peering_deluxe.local.vpc.network_cidr, var.vpc_peering_deluxe.peer.vpc.network_cidr]
+      )) == length(
+      [var.vpc_peering_deluxe.local.vpc.network_cidr, var.vpc_peering_deluxe.peer.vpc.network_cidr]
+    )
+    error_message = "Each VPC network cidr must be unique."
   }
 }
 
