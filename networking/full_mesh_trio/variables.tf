@@ -18,6 +18,8 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -35,6 +37,8 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -52,6 +56,8 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -91,6 +97,8 @@ variable "full_mesh_trio" {
     ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.network_cidrs))
     error_message = "All VPC network CIDRs must be unique across regions."
   }
+
+  #moar ipv6 validation?
 }
 
 variable "tags" {
