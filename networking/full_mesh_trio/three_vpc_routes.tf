@@ -51,8 +51,8 @@ locals {
   # build new three vpc ipv6 routes to one tgw vpcs
   three_vpc_ipv6_routes_to_one_tgw_vpcs = [
     for three_route_table_id_and_one_tgw_ipv6_network_cidr in setproduct(local.three_tgw_vpc_route_table_ids, local.one_tgw_vpc_ipv6_network_cidrs) : {
-      route_table_id         = three_route_table_id_and_one_tgw_ipv6_network_cidr[0]
-      destination_cidr_block = three_route_table_id_and_one_tgw_ipv6_network_cidr[1]
+      route_table_id              = three_route_table_id_and_one_tgw_ipv6_network_cidr[0]
+      destination_ipv6_cidr_block = three_route_table_id_and_one_tgw_ipv6_network_cidr[1]
   }]
 
   three_tgw_new_vpc_ipv6_routes_to_one_tgw_vpcs = {
@@ -74,8 +74,8 @@ resource "aws_route" "this_three_vpc_ipv6_routes_to_one_tgw_vpcs" {
 locals {
   three_vpc_ipv6_routes_to_two_tgw_vpcs = [
     for three_route_table_id_and_two_tgw_ipv6_network_cidr in setproduct(local.three_tgw_vpc_route_table_ids, local.two_tgw_vpc_ipv6_network_cidrs) : {
-      route_table_id         = three_route_table_id_and_two_tgw_ipv6_network_cidr[0]
-      destination_cidr_block = three_route_table_id_and_two_tgw_ipv6_network_cidr[1]
+      route_table_id              = three_route_table_id_and_two_tgw_ipv6_network_cidr[0]
+      destination_ipv6_cidr_block = three_route_table_id_and_two_tgw_ipv6_network_cidr[1]
   }]
 
   three_tgw_new_vpc_ipv6_routes_to_two_tgw_vpcs = {

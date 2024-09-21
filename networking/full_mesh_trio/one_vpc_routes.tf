@@ -71,8 +71,8 @@ resource "aws_route" "this_one_vpc_ipv6_routes_to_two_tgw_vpcs" {
 locals {
   one_vpc_ipv6_routes_to_three_tgw_vpcs = [
     for one_route_table_id_and_three_tgw_ipv6_network_cidr in setproduct(local.one_tgw_vpc_route_table_ids, local.three_tgw_vpc_ipv6_network_cidrs) : {
-      route_table_id         = one_route_table_id_and_three_tgw_ipv6_network_cidr[0]
-      destination_cidr_block = one_route_table_id_and_three_tgw_ipv6_network_cidr[1]
+      route_table_id              = one_route_table_id_and_three_tgw_ipv6_network_cidr[0]
+      destination_ipv6_cidr_block = one_route_table_id_and_three_tgw_ipv6_network_cidr[1]
   }]
 
   one_tgw_new_vpc_ipv6_routes_to_three_tgw_vpcs = {
