@@ -172,9 +172,8 @@ locals {
       for vpc_id, inbound_network_cidrs in local.three_vpc_id_to_two_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.three_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
-        #network_cidrs               = lookup(local.three_vpc_id_to_two_inbound_network_cidrs, vpc_id)
-        type = local.intra_vpc_security_group_rule_type
+        network_cidrs               = lookup(local.three_vpc_id_to_two_inbound_network_cidrs, vpc_id)
+        type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
 }
