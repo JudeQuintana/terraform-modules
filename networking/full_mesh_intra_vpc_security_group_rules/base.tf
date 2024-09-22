@@ -83,7 +83,7 @@ locals {
   three_vpc_id_to_one_inbound_network_cidrs = {
     for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidrs), flatten(values(local.one_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if !contains(lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
+    if !contains(lookup(local.three_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   three_vpc_id_to_two_inbound_network_cidrs = {
