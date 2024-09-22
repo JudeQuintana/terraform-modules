@@ -38,50 +38,50 @@ locals {
 
   upper_env_prefix = upper(var.env_prefix)
 
-  one_vpc_id_to_network_cidr = merge([
+  one_vpc_id_to_network_cidrs = merge([
     for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => vpc.network_cidr
+      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
   }]...)
 
-  two_vpc_id_to_network_cidr = merge([
+  two_vpc_id_to_network_cidrs = merge([
     for this in var.full_mesh_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => vpc.network_cidr
+      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
   }]...)
 
-  three_vpc_id_to_network_cidr = merge([
+  three_vpc_id_to_network_cidrs = merge([
     for this in var.full_mesh_intra_vpc_security_group_rules.three.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => vpc.network_cidr
+      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
   }]...)
 
   one_vpc_id_to_two_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), values(local.two_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), flatten(values(local.two_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.one_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
   one_vpc_id_to_three_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), values(local.three_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), flatten(values(local.three_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.one_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
   two_vpc_id_to_one_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), values(local.one_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), flatten(values(local.one_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.two_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
   two_vpc_id_to_three_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), values(local.three_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), flatten(values(local.three_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.two_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
   three_vpc_id_to_one_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidr), values(local.one_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidr), flatten(values(local.one_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
