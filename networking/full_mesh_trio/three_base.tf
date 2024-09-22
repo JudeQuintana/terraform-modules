@@ -11,7 +11,7 @@ locals {
   three_provider_region_name = data.aws_region.this_three.name
 
   three_tgw                        = var.full_mesh_trio.three.centralized_router
-  three_tgw_vpc_network_cidrs      = toset(concat(local.three_tgw.vpc.network_cidrs, local.two_tgw.vpc.secondary_cidrs))
+  three_tgw_vpc_network_cidrs      = toset(concat(local.three_tgw.vpc.network_cidrs, local.three_tgw.vpc.secondary_cidrs))
   three_tgw_vpc_ipv6_network_cidrs = toset(compact(local.three_tgw.vpc.ipv6_network_cidrs))
   three_tgw_vpc_route_table_ids    = toset(concat(local.three_tgw.vpc.private_route_table_ids, local.three_tgw.vpc.public_route_table_ids))
 }
