@@ -98,7 +98,7 @@ variable "ipv6_full_mesh_intra_vpc_security_group_rules" {
   }
 
   validation {
-    condition     = alltrue([for this in var.ipv6_full_mesh_intra_vpc_security_group_rules.two.intra_vpc_security_group_rules : length(this.vpcs) > 1])
+    condition     = alltrue([for this in var.ipv6_full_mesh_intra_vpc_security_group_rules.two.ipv6_intra_vpc_security_group_rules : length(this.vpcs) > 1])
     error_message = "There must be at least 2 VPCs per Intra VPC Security Group Rule for Two."
   }
 
