@@ -14,10 +14,11 @@ variable "vpc_peering_deluxe" {
         id                        = string
         name                      = string
         network_cidr              = string
+        ipv6_network_cidr         = optional(string)
         private_subnet_cidrs      = list(string)
         public_subnet_cidrs       = list(string)
-        private_ipv6_subnet_cidrs = list(string)
-        public_ipv6_subnet_cidrs  = list(string)
+        private_ipv6_subnet_cidrs = optional(list(string), [])
+        public_ipv6_subnet_cidrs  = optional(list(string), [])
         private_route_table_ids   = list(string)
         public_route_table_ids    = list(string)
         region                    = string
@@ -34,6 +35,7 @@ variable "vpc_peering_deluxe" {
         id                        = string
         name                      = string
         network_cidr              = string
+        ipv6_network_cidr         = optional(string)
         private_subnet_cidrs      = list(string)
         public_subnet_cidrs       = list(string)
         private_ipv6_subnet_cidrs = list(string)
@@ -91,6 +93,42 @@ variable "vpc_peering_deluxe" {
       [var.vpc_peering_deluxe.local.vpc.network_cidr, var.vpc_peering_deluxe.peer.vpc.network_cidr]
     )
     error_message = "Each VPC network cidr must be unique."
+  }
+
+  # IPv6
+  validation {
+    condition     = length(var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs) > 0 ? length(var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs) > 0 : true
+    error_message = "If the var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs is popluated then var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs must also be populated."
+  }
+
+  validation {
+    condition     = length(var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs) > 0 ? length(var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs) > 0 : true
+    error_message = "If the var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs is popluated then var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs must also be populated."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs :
+      contains(concat(var.vpc_peering_deluxe.local.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_ipv6_subnet_cidrs), this)
+    ])
+    error_message = "If the var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs is popluated then those subnets must already exist in the local VPC."
+  }
+
+  validation {
+    condition = alltrue([
+      for this in var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs :
+      contains(concat(var.vpc_peering_deluxe.peer.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_ipv6_subnet_cidrs), this)
+    ])
+    error_message = "If the var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs is popluated then those subnets must already exist in the peer VPC."
+  }
+
+  validation {
+    condition = var.vpc_peering_deluxe.local.vpc.ipv6_network_cidr != null && var.vpc_peering_deluxe.peer.vpc.ipv6_network_cidr != null ? length(distinct(
+      [var.vpc_peering_deluxe.local.vpc.ipv6_network_cidr, var.vpc_peering_deluxe.peer.vpc.ipv6_network_cidr]
+      )) == length(
+      [var.vpc_peering_deluxe.local.vpc.ipv6_network_cidr, var.vpc_peering_deluxe.peer.vpc.ipv6_network_cidr]
+    ) : true
+    error_message = "Each VPC IPv6 network cidr must be unique."
   }
 }
 
