@@ -87,7 +87,7 @@ locals {
   }
 
   three_vpc_id_to_two_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidrs), values(local.two_vpc_id_to_network_cidrs)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidrs), flatten(values(local.two_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if !contains(lookup(local.three_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
@@ -122,7 +122,7 @@ locals {
       for vpc_id, inbound_network_cidrs in local.one_vpc_id_to_two_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
+        network_cidrs               = lookup(local.one_vpc_id_to_two_inbound_network_cidrs, vpc_id)
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
@@ -132,7 +132,7 @@ locals {
       for vpc_id, inbound_network_cidrs in local.one_vpc_id_to_three_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.one_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
+        network_cidrs               = lookup(local.one_vpc_id_to_three_inbound_network_cidrs, vpc_id)
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
@@ -142,7 +142,7 @@ locals {
       for vpc_id, inbound_network_cidrs in local.two_vpc_id_to_one_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.two_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
+        network_cidrs               = lookup(local.two_vpc_id_to_one_inbound_network_cidrs, vpc_id)
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
@@ -152,7 +152,7 @@ locals {
       for vpc_id, inbound_network_cidrs in local.two_vpc_id_to_three_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.two_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
+        network_cidrs               = lookup(local.two_vpc_id_to_three_inbound_network_cidrs, vpc_id)
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
@@ -162,7 +162,7 @@ locals {
       for vpc_id, inbound_network_cidrs in local.three_vpc_id_to_one_inbound_network_cidrs :
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.three_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
+        network_cidrs               = lookup(local.three_vpc_id_to_one_inbound_network_cidrs, vpc_id)
         type                        = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
@@ -173,7 +173,8 @@ locals {
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.three_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
-        type                        = local.intra_vpc_security_group_rule_type
+        #network_cidrs               = lookup(local.three_vpc_id_to_two_inbound_network_cidrs, vpc_id)
+        type = local.intra_vpc_security_group_rule_type
       }, this)
   }]...)
 }
