@@ -57,39 +57,39 @@ locals {
   }]...)
 
   one_vpc_id_to_two_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), flatten(values(local.two_vpc_id_to_network_cidrs))) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidrs), flatten(values(local.two_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.one_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.one_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   one_vpc_id_to_three_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidr), flatten(values(local.three_vpc_id_to_network_cidrs))) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.one_vpc_id_to_network_cidrs), flatten(values(local.three_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.one_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.one_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   two_vpc_id_to_one_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), flatten(values(local.one_vpc_id_to_network_cidrs))) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidrs), flatten(values(local.one_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.two_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.two_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   two_vpc_id_to_three_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidr), flatten(values(local.three_vpc_id_to_network_cidrs))) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.two_vpc_id_to_network_cidrs), flatten(values(local.three_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.two_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.two_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   three_vpc_id_to_one_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidr), flatten(values(local.one_vpc_id_to_network_cidrs))) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidrs), flatten(values(local.one_vpc_id_to_network_cidrs))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   three_vpc_id_to_two_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidr), values(local.two_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.three_vpc_id_to_network_cidrs), values(local.two_vpc_id_to_network_cidrs)) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.three_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+    if !contains(lookup(local.three_vpc_id_to_network_cidrs, vpc_id_and_network_cidr[0]), vpc_id_and_network_cidr[1])
   }
 
   one_rules   = [for this in var.full_mesh_intra_vpc_security_group_rules.one.intra_vpc_security_group_rules : this.rule]
