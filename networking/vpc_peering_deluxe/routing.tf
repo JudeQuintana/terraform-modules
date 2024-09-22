@@ -1,16 +1,16 @@
 locals {
   route_format = "%s|%s"
 
-  only_route_subnet_cidrs      = length(var.vpc_peering_deluxe.local.only_route_subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.peer.only_route_subnet_cidrs) > 0
-  only_route_ipv6_subnet_cidrs = length(var.vpc_peering_deluxe.local.only_route_ipv6_subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.peer.only_route_ipv6_subnet_cidrs) > 0
+  only_route_subnet_cidrs      = length(var.vpc_peering_deluxe.local.only_route.subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.peer.only_route.subnet_cidrs) > 0
+  only_route_ipv6_subnet_cidrs = length(var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs) > 0 && length(var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs) > 0
 
   local_vpc_route_table_ids   = toset(concat(var.vpc_peering_deluxe.local.vpc.private_route_table_ids, var.vpc_peering_deluxe.local.vpc.public_route_table_ids))
-  local_vpc_subnet_cidrs      = local.only_route_subnet_cidrs ? toset(var.vpc_peering_deluxe.local.only_route_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.local.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_subnet_cidrs))
-  local_vpc_ipv6_subnet_cidrs = local.only_route_ipv6_subnet_cidrs ? toset(var.vpc_peering_deluxe.local.only_route_ipv6_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.local.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_ipv6_subnet_cidrs)) # dont need compact()
+  local_vpc_subnet_cidrs      = local.only_route_subnet_cidrs ? toset(var.vpc_peering_deluxe.local.only_route.subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.local.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_subnet_cidrs))
+  local_vpc_ipv6_subnet_cidrs = local.only_route_ipv6_subnet_cidrs ? toset(var.vpc_peering_deluxe.local.only_route.ipv6_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.local.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.local.vpc.public_ipv6_subnet_cidrs)) # dont need compact()
 
   peer_route_table_ids       = toset(concat(var.vpc_peering_deluxe.peer.vpc.private_route_table_ids, var.vpc_peering_deluxe.peer.vpc.public_route_table_ids))
-  peer_vpc_subnet_cidrs      = local.only_route_subnet_cidrs ? toset(var.vpc_peering_deluxe.peer.only_route_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.peer.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_subnet_cidrs))
-  peer_vpc_ipv6_subnet_cidrs = local.only_route_ipv6_subnet_cidrs ? toset(var.vpc_peering_deluxe.peer.only_route_ipv6_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.peer.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_ipv6_subnet_cidrs)) # dont need compact()
+  peer_vpc_subnet_cidrs      = local.only_route_subnet_cidrs ? toset(var.vpc_peering_deluxe.peer.only_route.subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.peer.vpc.private_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_subnet_cidrs))
+  peer_vpc_ipv6_subnet_cidrs = local.only_route_ipv6_subnet_cidrs ? toset(var.vpc_peering_deluxe.peer.only_route.ipv6_subnet_cidrs) : toset(concat(var.vpc_peering_deluxe.peer.vpc.private_ipv6_subnet_cidrs, var.vpc_peering_deluxe.peer.vpc.public_ipv6_subnet_cidrs)) # dont need compact()
 
   local_vpc_routes_to_peer_vpc_subnet_cidrs = [
     for local_vpc_route_table_id_and_peer_vpc_subnet_cidr in setproduct(local.local_vpc_route_table_ids, local.peer_vpc_subnet_cidrs) : {

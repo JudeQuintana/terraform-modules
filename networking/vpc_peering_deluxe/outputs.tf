@@ -7,4 +7,3 @@ output "peering" {
   }
 }
 
-#output routes?
