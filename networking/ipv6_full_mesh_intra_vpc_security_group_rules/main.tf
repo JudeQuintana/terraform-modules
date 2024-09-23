@@ -6,8 +6,8 @@
 * - See it in action in [security_group_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/full_mesh_trio_demo/security_group_rules.tf) in the [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo).
 *
 * ```
-* module "full_mesh_intra_vpc_security_groups_rules" {
-*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_intra_vpc_security_group_rules?ref=v1.7.5"
+* module "ipv6_full_mesh_intra_vpc_security_group_rules" {
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_full_mesh_intra_vpc_security_group_rules?ref=1.9.0
 *
 *   providers = {
 *     aws.one   = aws.use1
@@ -17,15 +17,15 @@
 *
 *   env_prefix       = var.env_prefix
 *   region_az_labels = var.region_az_labels
-*   full_mesh_intra_vpc_security_group_rules = {
+*   ipv6_full_mesh_intra_vpc_security_group_rules = {
 *     one = {
-*       intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_use1
+*       ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_use1
 *     }
 *     two = {
-*       intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_use2
+*       ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_use2
 *     }
 *     three = {
-*       intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_usw2
+*       ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_usw2
 *     }
 *   }
 * }
