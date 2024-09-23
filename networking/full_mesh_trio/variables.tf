@@ -106,9 +106,9 @@ variable "full_mesh_trio" {
   }
 
   validation {
-    condition = length(
+    condition = length(compact(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs)) > 0 ? length(
       distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_network_cidrs))
-    ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_network_cidrs))
+    ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_network_cidrs)) : true
     error_message = "All VPC IPv6 network CIDRs must be unique across regions."
   }
 
