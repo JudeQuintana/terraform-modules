@@ -50,8 +50,8 @@ resource "aws_subnet" "this_private" {
       )
   })
 
-  # private subnet could be a secondary cidr so need to wait for secondary network cidr
-  depends_on = [aws_vpc_ipv4_cidr_block_association.this]
+  # private subnet could be a secondary ipv4 or ipv6 cidr so need to wait for main secondaries
+  depends_on = [aws_vpc_ipv4_cidr_block_association.this, aws_vpc_ipv6_cidr_block_association.this]
 }
 
 # one private route table per az

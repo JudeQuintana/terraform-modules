@@ -22,7 +22,8 @@ variable "tiered_vpc" {
     })
     # ipv6 requires ipam
     ipv6 = optional(object({
-      network_cidr = optional(string)
+      network_cidr    = optional(string)
+      secondary_cidrs = optional(list(string), [])
       ipam_pool = optional(object({
         id = optional(string)
       }), {})
@@ -159,6 +160,11 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
     ]))
     error_message = "Each subnet IPv6 CDIR must be unique across all AZs."
+  }
+
+  validation {
+    condition     = length(var.tiered_vpc.ipv6.secondary_cidrs) > 0 ? var.tiered_vpc.ipv6.network_cidr != null : true
+    error_message = "If var.tiered_vpc.ipv6_secondary_cidrs is populated then var.tiered.vpc_ipv6_network_cidr must be defined."
   }
 }
 

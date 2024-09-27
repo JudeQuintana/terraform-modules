@@ -63,6 +63,23 @@ resource "aws_vpc_ipv4_cidr_block_association" "this" {
 }
 
 locals {
+  ipv6_secondary_cidrs = toset(var.tiered_vpc.ipv6.secondary_cidrs)
+}
+
+resource "aws_vpc_ipv6_cidr_block_association" "this" {
+  for_each = local.ipv6_secondary_cidrs
+
+  ipv6_cidr_block   = each.key
+  vpc_id            = aws_vpc.this.id
+  ipv6_ipam_pool_id = var.tiered_vpc.ipv6.ipam_pool.id
+
+  # only using cidrs
+  lifecycle {
+    ignore_changes = [ipv6_netmask_length]
+  }
+}
+
+locals {
   igw = { for this in [local.public_any_subnet_exists] : this => this if local.public_any_subnet_exists }
 }
 

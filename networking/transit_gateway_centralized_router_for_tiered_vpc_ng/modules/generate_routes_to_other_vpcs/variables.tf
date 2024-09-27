@@ -4,6 +4,7 @@ variable "vpcs" {
     network_cidr            = string
     secondary_cidrs         = optional(list(string), [])
     ipv6_network_cidr       = optional(string)
+    ipv6_secondary_cidrs    = optional(list(string), [])
     private_route_table_ids = list(string)
     public_route_table_ids  = list(string)
   }))

@@ -25,6 +25,7 @@ variable "centralized_router" {
       network_cidr               = string
       secondary_cidrs            = optional(list(string), [])
       ipv6_network_cidr          = optional(string)
+      ipv6_secondary_cidrs       = optional(list(string), [])
       private_route_table_ids    = list(string)
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
@@ -54,6 +55,33 @@ variable "centralized_router" {
       for this in var.centralized_router.vpcs : this.network_cidr
     ])
     error_message = "All VPCs must have unique network CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.centralized_router.vpcs : this.secondary_cidrs
+      ]))) == length(flatten([
+      for this in var.centralized_router.vpcs : this.secondary_cidrs
+    ]))
+    error_message = "All VPCs must have unique secondary CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(compact([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr
+      ]))) == length(compact([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr
+    ]))
+    error_message = "All VPCs must have unique IPv6 network CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs
+      ]))) == length(flatten([
+      for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs
+    ]))
+    error_message = "All VPCs must have unique IPv6 secondary CIDRs."
   }
 
   validation {

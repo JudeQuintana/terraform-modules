@@ -24,6 +24,7 @@ variable "ipv6_intra_vpc_security_group_rule" {
       intra_vpc_security_group_id = string
       name                        = string
       ipv6_network_cidr           = string
+      ipv6_secondary_cidrs        = list(string)
       region                      = string
       account_id                  = string
     }))

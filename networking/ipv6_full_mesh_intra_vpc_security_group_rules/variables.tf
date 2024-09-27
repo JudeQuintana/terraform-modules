@@ -26,6 +26,7 @@ variable "ipv6_full_mesh_intra_vpc_security_group_rules" {
           id                          = string
           intra_vpc_security_group_id = string
           ipv6_network_cidr           = string
+          ipv6_secondary_cidrs        = list(string)
         }))
     })) })
     two = object({
@@ -42,6 +43,7 @@ variable "ipv6_full_mesh_intra_vpc_security_group_rules" {
           id                          = string
           intra_vpc_security_group_id = string
           ipv6_network_cidr           = string
+          ipv6_secondary_cidrs        = list(string)
         }))
     })) })
     three = object({
@@ -58,6 +60,7 @@ variable "ipv6_full_mesh_intra_vpc_security_group_rules" {
           id                          = string
           intra_vpc_security_group_id = string
           ipv6_network_cidr           = string
+          ipv6_secondary_cidrs        = list(string)
         }))
     })) })
   })
