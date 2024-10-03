@@ -1,4 +1,4 @@
-# generate routes to other VPC network_cidrs, secondary_cidrs and ipv6_newtork_cidrs in private and public route tables for each VPC
+# generate routes to other VPC network_cidrs, secondary_cidrs, ipv6_newtork_cidrs and ipv6_secondaary_cidrs in private and public route tables for each VPC
 locals {
   network_cidrs_with_route_table_ids = [
     for this in var.vpcs : {
