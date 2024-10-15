@@ -1,4 +1,3 @@
-# output routes?
 output "peering" {
   value = {
     one = {

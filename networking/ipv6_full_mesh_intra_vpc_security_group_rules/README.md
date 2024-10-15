@@ -5,8 +5,8 @@
 - See it in action in [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/full_mesh_trio_demo/security_group_rules.tf) in the [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo).
 
 ```
-module "full_mesh_intra_vpc_security_groups_rules" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_intra_vpc_security_group_rules?ref=v1.7.5"
+module "ipv6_full_mesh_intra_vpc_security_group_rules" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_full_mesh_intra_vpc_security_group_rules?ref=1.9.0
 
   providers = {
     aws.one   = aws.use1
@@ -16,15 +16,15 @@ module "full_mesh_intra_vpc_security_groups_rules" {
 
   env_prefix       = var.env_prefix
   region_az_labels = var.region_az_labels
-  full_mesh_intra_vpc_security_group_rules = {
+  ipv6_full_mesh_intra_vpc_security_group_rules = {
     one = {
-      intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_use1
+      ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_use1
     }
     two = {
-      intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_use2
+      ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_use2
     }
     three = {
-      intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_usw2
+      ipv6_intra_vpc_security_group_rules = module.ipv6_intra_vpc_security_group_rules_usw2
     }
   }
 }
@@ -71,7 +71,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
-| <a name="input_full_mesh_intra_vpc_security_group_rules"></a> [full\_mesh\_intra\_vpc\_security\_group\_rules](#input\_full\_mesh\_intra\_vpc\_security\_group\_rules) | full mesh intra vpc security group rules configuration | <pre>object({<br>    # security rule object to allow inbound across vpcs intra-vpc security group<br>    one = object({<br>      intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          network_cidr                = string<br>          secondary_cidrs             = optional(list(string), [])<br>        }))<br>    })) })<br>    two = object({<br>      intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          network_cidr                = string<br>          secondary_cidrs             = optional(list(string), [])<br>        }))<br>    })) })<br>    three = object({<br>      intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          network_cidr                = string<br>          secondary_cidrs             = optional(list(string), [])<br>        }))<br>    })) })<br>  })</pre> | n/a | yes |
+| <a name="input_ipv6_full_mesh_intra_vpc_security_group_rules"></a> [ipv6\_full\_mesh\_intra\_vpc\_security\_group\_rules](#input\_ipv6\_full\_mesh\_intra\_vpc\_security\_group\_rules) | IPv6 full mesh intra vpc security group rules configuration | <pre>object({<br>    # security rule object to allow inbound across vpcs intra-vpc security group<br>    one = object({<br>      ipv6_intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          ipv6_network_cidr           = string<br>        }))<br>    })) })<br>    two = object({<br>      ipv6_intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          ipv6_network_cidr           = string<br>        }))<br>    })) })<br>    three = object({<br>      ipv6_intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          ipv6_network_cidr           = string<br>        }))<br>    })) })<br>  })</pre> | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 
 ## Outputs

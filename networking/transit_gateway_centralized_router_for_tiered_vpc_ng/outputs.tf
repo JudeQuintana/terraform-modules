@@ -34,6 +34,14 @@ output "route_table_id" {
   value = aws_ec2_transit_gateway_route_table.this.id
 }
 
+output "ipv4_routes" {
+  value = module.this_generate_routes_to_other_vpcs.ipv4
+}
+
+output "ipv6_routes" {
+  value = module.this_generate_routes_to_other_vpcs.ipv6
+}
+
 output "vpc" {
   # vpc.routes list of objects will only have 3 attributes (per object) instead of all attributes from the route
   # makes it easier to see when troubleshooting many vpc routes and is used for super router
@@ -42,7 +50,8 @@ output "vpc" {
     names                   = [for this in var.centralized_router.vpcs : this.name]
     network_cidrs           = [for this in var.centralized_router.vpcs : this.network_cidr]
     secondary_cidrs         = flatten([for this in var.centralized_router.vpcs : this.secondary_cidrs])
-    ipv6_network_cidrs      = [for this in var.centralized_router.vpcs : this.ipv6_network_cidr]
+    ipv6_network_cidrs      = compact([for this in var.centralized_router.vpcs : this.ipv6_network_cidr])
+    ipv6_secondary_cidrs    = flatten([for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs])
     private_route_table_ids = flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids])
     public_route_table_ids  = flatten([for this in var.centralized_router.vpcs : this.public_route_table_ids])
     # outputing routes is legacy, easier to construct routes from route table ids and network cidrs when
