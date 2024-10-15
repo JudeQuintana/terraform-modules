@@ -130,8 +130,6 @@ variable "vpc_peering_deluxe" {
     ) : true
     error_message = "Each VPC IPv6 network cidr must be unique."
   }
-
-  # add secondary validations
 }
 
 variable "tags" {

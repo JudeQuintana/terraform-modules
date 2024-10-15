@@ -49,6 +49,7 @@ variable "tiered_vpc" {
   })
 
   # using ipv4 validation via cidrnetmask function instead of regex for ipv4
+  # there is a separate provider to allow ipv6 cidr valiation but will force TF >= v1.8.0 so letting the aws provider validate ipv6 cidrs for now.
   validation {
     condition     = can(cidrnetmask(var.tiered_vpc.ipv4.network_cidr))
     error_message = "The VPC network CIDR must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
@@ -151,6 +152,24 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs : concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr)
     ]))
     error_message = "Each subnet CDIR must be unique across all AZs."
+  }
+
+  validation {
+    condition = length(distinct(
+      var.tiered_vpc.ipv4.secondary_cidrs
+      )) == length(
+      var.tiered_vpc.ipv4.secondary_cidrs
+    )
+    error_message = "Each IPv4 secondary CDIR must be unique."
+  }
+
+  validation {
+    condition = length(distinct(
+      var.tiered_vpc.ipv6.secondary_cidrs
+      )) == length(
+      var.tiered_vpc.ipv6.secondary_cidrs
+    )
+    error_message = "Each IPv6 secondary CDIR must be unique."
   }
 
   validation {

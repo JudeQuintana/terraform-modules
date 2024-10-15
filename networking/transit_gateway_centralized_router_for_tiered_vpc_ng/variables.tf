@@ -54,7 +54,7 @@ variable "centralized_router" {
       ])) == length([
       for this in var.centralized_router.vpcs : this.network_cidr
     ])
-    error_message = "All VPCs must have unique network CIDRs."
+    error_message = "All VPCs must have unique IPv4 network CIDRs."
   }
 
   validation {
@@ -63,7 +63,7 @@ variable "centralized_router" {
       ]))) == length(flatten([
       for this in var.centralized_router.vpcs : this.secondary_cidrs
     ]))
-    error_message = "All VPCs must have unique secondary CIDRs."
+    error_message = "All VPCs must have unique IPv4 secondary CIDRs."
   }
 
   validation {

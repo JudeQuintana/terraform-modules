@@ -7,7 +7,7 @@ output "default_security_group_id" {
 }
 
 output "full_name" {
-  value = local.vpc_name
+  value = local.vpc_full_name
 }
 
 output "id" {

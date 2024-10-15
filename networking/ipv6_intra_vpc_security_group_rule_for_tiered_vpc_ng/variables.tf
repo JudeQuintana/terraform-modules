@@ -59,6 +59,15 @@ variable "ipv6_intra_vpc_security_group_rule" {
   }
 
   validation {
+    condition = length(distinct(flatten([
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_secondary_cidrs
+      ]))) == length(flatten([
+      for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.ipv6_secondary_cidrs
+    ]))
+    error_message = "All VPCs must have unique IPv6 secondary CIDRs."
+  }
+
+  validation {
     condition     = length(var.ipv6_intra_vpc_security_group_rule.vpcs) > 1
     error_message = "There must be at least 2 VPCs."
   }

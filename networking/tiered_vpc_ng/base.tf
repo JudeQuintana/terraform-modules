@@ -24,7 +24,7 @@ locals {
 
   # the tiered-vpc name is redundant when viewing in vpc aws console
   # but is most useful when viewing a TGW's VPC attachment.
-  vpc_name = format("%s-tiered-vpc-%s-%s", local.upper_env_prefix, var.tiered_vpc.name, local.region_label)
+  vpc_full_name = format("%s-tiered-vpc-%s-%s", local.upper_env_prefix, var.tiered_vpc.name, local.region_label)
 }
 
 resource "aws_vpc" "this" {
@@ -36,7 +36,7 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = var.tiered_vpc.enable_dns_hostnames
   tags = merge(
     local.default_tags,
-    { Name = local.vpc_name }
+    { Name = local.vpc_full_name }
   )
 
   # only using cidrs
@@ -89,7 +89,7 @@ resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
-    { Name = local.vpc_name }
+    { Name = local.vpc_full_name }
   )
 }
 
@@ -103,6 +103,6 @@ resource "aws_egress_only_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = merge(
     local.default_tags,
-    { Name = local.vpc_name }
+    { Name = local.vpc_full_name }
   )
 }
