@@ -63,7 +63,7 @@ run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one" {
   # error message doesnt support showing a set of objects so must build a string to see what's inside the structure
   assert {
     condition     = output.ipv4 == run.final.ipv4_with_secondary_cidrs_set_of_route_objects_to_other_vpcs
-    error_message = "Incorrect set of ipv4 route objects:\n[\n${join("   \n", [for route in output.ipv4 : format("{\n  destination_cidr_block = \"%s\"\n  route_table_id = \"%s\"\n},", route.destination_cidr_block, route.route_table_id)])}\n]"
+    error_message = "Incorrect set of ipv4 with secondary cidrs route objects:\n[\n${join("   \n", [for route in output.ipv4 : format("{\n  destination_cidr_block = \"%s\"\n  route_table_id = \"%s\"\n},", route.destination_cidr_block, route.route_table_id)])}\n]"
   }
 }
 
