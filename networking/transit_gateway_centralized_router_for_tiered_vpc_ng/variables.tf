@@ -11,8 +11,10 @@ variable "region_az_labels" {
 variable "centralized_router" {
   description = "Centralized Router configuration"
   type = object({
-    name            = string
-    amazon_side_asn = number
+    name             = string
+    amazon_side_asn  = number
+    static_routes    = optional(bool, true)
+    propagate_routes = optional(bool, false)
     blackhole = optional(object({
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
@@ -91,6 +93,11 @@ variable "centralized_router" {
       var.centralized_router.amazon_side_asn >= 4200000000 && var.centralized_router.amazon_side_asn <= 4294967294
     )
     error_message = "The amazon side ASN should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+  }
+
+  validation {
+    condition     = !var.centralized_router.static_routes ? var.centralized_router.propagate_routes : true
+    error_message = "var.centralized_router.static_routes and var.centralized_router.propagate_routes cannot both be false."
   }
 }
 
