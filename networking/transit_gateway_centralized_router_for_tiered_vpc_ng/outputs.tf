@@ -42,7 +42,8 @@ output "vpc" {
     names                   = [for this in var.centralized_router.vpcs : this.name]
     network_cidrs           = [for this in var.centralized_router.vpcs : this.network_cidr]
     secondary_cidrs         = flatten([for this in var.centralized_router.vpcs : this.secondary_cidrs])
-    ipv6_network_cidrs      = [for this in var.centralized_router.vpcs : this.ipv6_network_cidr]
+    ipv6_network_cidrs      = compact([for this in var.centralized_router.vpcs : this.ipv6_network_cidr])
+    ipv6_secondary_cidrs    = flatten([for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs])
     private_route_table_ids = flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids])
     public_route_table_ids  = flatten([for this in var.centralized_router.vpcs : this.public_route_table_ids])
     # outputing routes is legacy, easier to construct routes from route table ids and network cidrs when
