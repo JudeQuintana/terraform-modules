@@ -1,5 +1,17 @@
 /*
 * # Tiered VPC-NG
+* `v1.9.0`
+* - support for IPv6 secondary cidrs.
+* - minor internal changes.
+* - configurate looks the same as the `v1.8.2` example but with IPv6 secondary cidrs defined
+* ```
+*     ipv6 = {
+*       network_cidr    = "2600:1f24:66:c000::/56"
+*       secondary_cidrs = ["2600:1f24:66:c800::/56"]
+*       ipam_pool       = local.ipv6_ipam_pool
+*     }
+* ```
+*
 *
 * `v1.8.2`
 * - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
@@ -52,7 +64,7 @@
 *       name = "app"
 *       ipv4 = {
 *         network_cidr    = "10.0.0.0/18"
-*         secondary_cidrs = ["10.1.0.0/18", "10.2.0.0/18"]
+*         secondary_cidrs = ["10.1.0.0/18"]
 *         ipam_pool       = local.ipv4_ipam_pool
 *       }
 *       ipv6 = {

@@ -1,15 +1,14 @@
-# generate routes to other VPC network_cidrs, secondary_cidrs and ipv6_newtork_cidrs in private and public route tables for each VPC
+# generate routes to other VPC network_cidrs, secondary_cidrs, ipv6_newtork_cidrs and ipv6_secondaary_cidrs in private and public route tables for each VPC
 locals {
   network_cidrs_with_route_table_ids = [
     for this in var.vpcs : {
       network_cidrs      = concat([this.network_cidr], this.secondary_cidrs)
-      ipv6_network_cidrs = compact([this.ipv6_network_cidr])
+      ipv6_network_cidrs = concat(compact([this.ipv6_network_cidr]), this.ipv6_secondary_cidrs)
       route_table_ids    = concat(this.private_route_table_ids, this.public_route_table_ids)
     }
   ]
 
   # ipv4
-  # [ { rtb_id = "vpc-1-rtb-id-123", other_network_cidrs = [ "other-vpc-2-network_cidr", "other-vpc3-network_cidr", ... ] }, ...]
   associated_route_table_ids_with_other_network_cidrs = flatten([
     for this in local.network_cidrs_with_route_table_ids : [
       for route_table_id in this.route_table_ids : {
