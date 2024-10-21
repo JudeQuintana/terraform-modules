@@ -1,6 +1,13 @@
 # Transit Gateway Centralized Router
 - Creates hub and spoke topology from VPCs.
 
+`v1.9.0`
+- support for building IPv6 VPC routes for IPv6 secondary cidrs including variable validation.
+- updated generat\_routes\_to\_vpcs module test suite with IPv6 VPC route tests.
+- build TGW static IPv4 and IPv6 routes for vpc attachments by default which is more ideal.
+- can now toggle route propagation for vpc attachments but disabled by default.
+- requires AWS provider version `>=5.61`
+
 `v1.8.2`
 - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
 - Supports auto routing IPv4 secondary cidrs and IPv6 cidrs in addtion to IPv4 network cidrs
@@ -82,13 +89,13 @@ Main:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.31 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.31 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.61 |
 
 ## Modules
 
@@ -102,6 +109,8 @@ Main:
 |------|------|
 | [aws_ec2_transit_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway) | resource |
 | [aws_ec2_transit_gateway_route.this_blackholes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route_table.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_propagation.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_propagation) | resource |
@@ -115,7 +124,7 @@ Main:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br>    name            = string<br>    amazon_side_asn = number<br>    blackhole = optional(object({<br>      cidrs      = optional(list(string), [])<br>      ipv6_cidrs = optional(list(string), [])<br>    }), {})<br>    vpcs = optional(map(object({<br>      account_id                 = string<br>      full_name                  = string<br>      id                         = string<br>      name                       = string<br>      network_cidr               = string<br>      secondary_cidrs            = optional(list(string), [])<br>      ipv6_network_cidr          = optional(string)<br>      private_route_table_ids    = list(string)<br>      public_route_table_ids     = list(string)<br>      private_special_subnet_ids = list(string)<br>      public_special_subnet_ids  = list(string)<br>      region                     = string<br>    })), {})<br>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      region                     = string<br/>    })), {})<br/>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
