@@ -7,6 +7,7 @@
 - build TGW static IPv4 and IPv6 routes for vpc attachments by default which is more ideal.
 - can now toggle route propagation for vpc attachments but disabled by default.
 - requires AWS provider version `>=5.61`
+- reorg filenames.
 
 `v1.8.2`
 - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
