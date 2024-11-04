@@ -11,8 +11,9 @@ variable "region_az_labels" {
 variable "centralized_router" {
   description = "Centralized Router configuration"
   type = object({
-    name            = string
-    amazon_side_asn = number
+    name             = string
+    amazon_side_asn  = number
+    propagate_routes = optional(bool, false)
     blackhole = optional(object({
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
@@ -25,6 +26,7 @@ variable "centralized_router" {
       network_cidr               = string
       secondary_cidrs            = optional(list(string), [])
       ipv6_network_cidr          = optional(string)
+      ipv6_secondary_cidrs       = optional(list(string), [])
       private_route_table_ids    = list(string)
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
@@ -53,7 +55,34 @@ variable "centralized_router" {
       ])) == length([
       for this in var.centralized_router.vpcs : this.network_cidr
     ])
-    error_message = "All VPCs must have unique network CIDRs."
+    error_message = "All VPCs must have unique IPv4 network CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.centralized_router.vpcs : this.secondary_cidrs
+      ]))) == length(flatten([
+      for this in var.centralized_router.vpcs : this.secondary_cidrs
+    ]))
+    error_message = "All VPCs must have unique IPv4 secondary CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(compact([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr
+      ]))) == length(compact([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr
+    ]))
+    error_message = "All VPCs must have unique IPv6 network CIDRs."
+  }
+
+  validation {
+    condition = length(distinct(flatten([
+      for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs
+      ]))) == length(flatten([
+      for this in var.centralized_router.vpcs : this.ipv6_secondary_cidrs
+    ]))
+    error_message = "All VPCs must have unique IPv6 secondary CIDRs."
   }
 
   validation {

@@ -1,8 +1,5 @@
 # Generate Routes to Other VPCs Description
 
-`v1.8.2`
-- now supports genearating routes IPv4 Secondary cidrs and IPv6 cidrs across vpcs
-
 Run the test suites with `terraform test` in the `./modules/generate_routes_to_other_vpcs` directory.
 ```
 tests/generate_routes.tftest.hcl... in progress
@@ -17,12 +14,22 @@ tests/generate_routes.tftest.hcl... in progress
   run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
   run "ipv6_call_with_n_greater_than_one"... pass
   run "ipv6_call_with_n_equal_to_one"... pass
-  run "ipv6_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
+  run "ipv6_call_with_n_equal_to_zero"... pass
+  run "ipv6_call_with_ipv6_secondary_cidrs_with_n_greater_than_zero"... pass
+  run "ipv6_with_secondary_cidrs_call_with_n_equal_to_one"... pass
+  run "ipv6_with_ipv6_secondary_cidrs_call_with_n_equal_to_zero"... pass
 tests/generate_routes.tftest.hcl... tearing down
 tests/generate_routes.tftest.hcl... pass
 
-Success! 12 passed, 0 failed.
+Success! 15 passed, 0 failed.
 ```
+ The test suite will help when refactoring is needed.
+
+`v1.9.0`
+- supportes generating VPC routes for IPv6 secondary cidrs across vpcs.
+
+`v1.8.2`
+- now supports generating VPC routes IPv4 Secondary cidrs and IPv6 cidrs across vpcs.
 
 `v1.8.1`
 This is a function type module (no resources) that will take a map of `tiered_vpc_ng` objects with [Tiered VPC-NG](https://github.com/JudeQuintana/terraform-modules/tree/master/networking/tiered_vpc_ng).
@@ -60,21 +67,6 @@ resource "aws_route" "this" {
 }
 ```
 
-Run the test suites with `terraform test` in the `./modules/generate_routes_to_other_vpcs` directory.
-```
-tests/generate_routes.tftest.hcl... in progress
-  run "setup"... pass
-  run "final"... pass
-  run "call_with_n_greater_than_one"... pass
-  run "call_with_n_equal_to_one"... pass
-  run "call_with_n_equal_to_zero"... pass
-  run "cidr_validation"... pass
-tests/generate_routes.tftest.hcl... tearing down
-tests/generate_routes.tftest.hcl... pass
-```
-
-The test suite will help when refactoring is needed.
-
 ## Requirements
 
 | Name | Version |
@@ -97,7 +89,7 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br>    network_cidr            = string<br>    secondary_cidrs         = optional(list(string), [])<br>    ipv6_network_cidr       = optional(string)<br>    private_route_table_ids = list(string)<br>    public_route_table_ids  = list(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br/>    network_cidr            = string<br/>    secondary_cidrs         = optional(list(string), [])<br/>    ipv6_network_cidr       = optional(string)<br/>    ipv6_secondary_cidrs    = optional(list(string), [])<br/>    private_route_table_ids = list(string)<br/>    public_route_table_ids  = list(string)<br/>  }))</pre> | n/a | yes |
 
 ## Outputs
 

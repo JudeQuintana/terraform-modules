@@ -14,12 +14,12 @@ locals {
 # Each VPC id should have an inbound rule from all other VPC networks except itself.
 # ipv6
 locals {
-  vpc_id_to_ipv6_network_cidr = { for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.id => this.ipv6_network_cidr if this.ipv6_network_cidr != null }
+  vpc_id_to_ipv6_network_cidrs = { for this in var.ipv6_intra_vpc_security_group_rule.vpcs : this.id => concat([this.ipv6_network_cidr], this.ipv6_secondary_cidrs) }
 
   vpc_id_to_inbound_ipv6_network_cidrs = {
-    for vpc_id_and_ipv6_network_cidr in setproduct(keys(local.vpc_id_to_ipv6_network_cidr), values(local.vpc_id_to_ipv6_network_cidr)) :
+    for vpc_id_and_ipv6_network_cidr in setproduct(keys(local.vpc_id_to_ipv6_network_cidrs), flatten(values(local.vpc_id_to_ipv6_network_cidrs))) :
     vpc_id_and_ipv6_network_cidr[0] => vpc_id_and_ipv6_network_cidr[1]...
-    if lookup(local.vpc_id_to_ipv6_network_cidr, vpc_id_and_ipv6_network_cidr[0]) != vpc_id_and_ipv6_network_cidr[1]
+    if !contains(lookup(local.vpc_id_to_ipv6_network_cidrs, vpc_id_and_ipv6_network_cidr[0]), vpc_id_and_ipv6_network_cidr[1])
   }
 
   vpc_id_to_intra_vpc_ipv6_security_group_rule = {

@@ -7,7 +7,7 @@ output "default_security_group_id" {
 }
 
 output "full_name" {
-  value = local.vpc_name
+  value = local.vpc_full_name
 }
 
 output "id" {
@@ -32,6 +32,10 @@ output "secondary_cidrs" {
 
 output "ipv6_network_cidr" {
   value = var.tiered_vpc.ipv6.network_cidr
+}
+
+output "ipv6_secondary_cidrs" {
+  value = var.tiered_vpc.ipv6.secondary_cidrs
 }
 
 output "private_route_table_ids" {

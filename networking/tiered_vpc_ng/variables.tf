@@ -22,7 +22,8 @@ variable "tiered_vpc" {
     })
     # ipv6 requires ipam
     ipv6 = optional(object({
-      network_cidr = optional(string)
+      network_cidr    = optional(string)
+      secondary_cidrs = optional(list(string), [])
       ipam_pool = optional(object({
         id = optional(string)
       }), {})
@@ -48,6 +49,7 @@ variable "tiered_vpc" {
   })
 
   # using ipv4 validation via cidrnetmask function instead of regex for ipv4
+  # there is a separate provider to allow ipv6 cidr valiation but will force TF >= v1.8.0 so letting the aws provider validate ipv6 cidrs for now.
   validation {
     condition     = can(cidrnetmask(var.tiered_vpc.ipv4.network_cidr))
     error_message = "The VPC network CIDR must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
@@ -153,12 +155,35 @@ variable "tiered_vpc" {
   }
 
   validation {
+    condition = length(distinct(
+      var.tiered_vpc.ipv4.secondary_cidrs
+      )) == length(
+      var.tiered_vpc.ipv4.secondary_cidrs
+    )
+    error_message = "Each IPv4 secondary CDIR must be unique."
+  }
+
+  validation {
+    condition = length(distinct(
+      var.tiered_vpc.ipv6.secondary_cidrs
+      )) == length(
+      var.tiered_vpc.ipv6.secondary_cidrs
+    )
+    error_message = "Each IPv6 secondary CDIR must be unique."
+  }
+
+  validation {
     condition = length(distinct(flatten([
       for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
       ]))) == length(flatten([
       for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
     ]))
     error_message = "Each subnet IPv6 CDIR must be unique across all AZs."
+  }
+
+  validation {
+    condition     = length(var.tiered_vpc.ipv6.secondary_cidrs) > 0 ? var.tiered_vpc.ipv6.network_cidr != null : true
+    error_message = "If var.tiered_vpc.ipv6_secondary_cidrs is populated then var.tiered.vpc_ipv6_network_cidr must be defined."
   }
 }
 

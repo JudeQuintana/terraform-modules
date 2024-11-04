@@ -1,10 +1,25 @@
 Full Mesh Trio module builds peering links (red) between existing hub spoke tgws (Centralized Routers) and adds proper routes to all TGWs and their attached VPCs, etc.
 
-The resulting architecture is a full mesh configurion between 3 hub spoke topologies:
-![full-mesh-trio](https://jq1-io.s3.amazonaws.com/full-mesh-trio/full-mesh-trio.png)
-
+The resulting architecture is a full mesh configurion between 3 hub spoke topologies.
 See it in action in the [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo)
 
+`v1.9.0`:
+- reorganize files
+- ipv4 VPC routes for ipv4 secondary cidrs
+- ipv4 TGW routes for ipv4 secondary cidrs
+- ipv6 VPC routes for ipv6 network cidrs
+- ipv6 TGW routes for ipv6 network cidrs
+- ipv6 VPC routes for ipv6 secondary cidrs
+- ipv6 TGW routes for ipv6 secondary cidrs
+- moar validation
+```
+module "full_mesh_trio" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.9.0"
+...
+```
+
+`v1.7.5`:
+- ipv4 VPC routes for ipv4 network cidrs
 ```
 module "full_mesh_trio" {
   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/full_mesh_trio?ref=v1.7.5"
@@ -39,15 +54,15 @@ output "full_mesh_trio" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.one"></a> [aws.one](#provider\_aws.one) | >=4.20 |
-| <a name="provider_aws.three"></a> [aws.three](#provider\_aws.three) | >=4.20 |
-| <a name="provider_aws.two"></a> [aws.two](#provider\_aws.two) | >=4.20 |
+| <a name="provider_aws.one"></a> [aws.one](#provider\_aws.one) | >=5.61 |
+| <a name="provider_aws.three"></a> [aws.three](#provider\_aws.three) | >=5.61 |
+| <a name="provider_aws.two"></a> [aws.two](#provider\_aws.two) | >=5.61 |
 
 ## Modules
 
@@ -63,10 +78,16 @@ No modules.
 | [aws_ec2_transit_gateway_peering_attachment_accepter.this_one_to_this_two](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_peering_attachment_accepter) | resource |
 | [aws_ec2_transit_gateway_peering_attachment_accepter.this_three_to_this_one](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_peering_attachment_accepter) | resource |
 | [aws_ec2_transit_gateway_peering_attachment_accepter.this_two_to_this_three](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_peering_attachment_accepter) | resource |
+| [aws_ec2_transit_gateway_route.this_one_tgw_ipv6_routes_to_vpcs_in_three_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_one_tgw_ipv6_routes_to_vpcs_in_two_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_one_tgw_routes_to_vpcs_in_three_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_one_tgw_routes_to_vpcs_in_two_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_three_tgw_ipv6_routes_to_vpcs_in_one_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_three_tgw_ipv6_routes_to_vpcs_in_two_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_three_tgw_routes_to_vpcs_in_one_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_three_tgw_routes_to_vpcs_in_two_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_two_tgw_ipv6_routes_to_vpcs_in_one_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_two_tgw_ipv6_routes_to_vpcs_in_three_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_two_tgw_routes_to_vpcs_in_one_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_two_tgw_routes_to_vpcs_in_three_tgw](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this_one_to_this_three](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
@@ -75,10 +96,16 @@ No modules.
 | [aws_ec2_transit_gateway_route_table_association.this_three_to_this_two](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this_two_to_this_one](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this_two_to_this_three](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
+| [aws_route.this_one_vpc_ipv6_routes_to_three_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_one_vpc_ipv6_routes_to_two_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_one_vpc_routes_to_three_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_one_vpc_routes_to_two_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_three_vpc_ipv6_routes_to_one_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_three_vpc_ipv6_routes_to_two_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_three_vpc_routes_to_one_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_three_vpc_routes_to_two_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_two_vpc_ipv6_routes_to_one_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_two_vpc_ipv6_routes_to_three_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_two_vpc_routes_to_one_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_two_vpc_routes_to_three_tgw_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_caller_identity.this_one](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -93,11 +120,11 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
-| <a name="input_full_mesh_trio"></a> [full\_mesh\_trio](#input\_full\_mesh\_trio) | full mesh trio configuration | <pre>object({<br>    one = object({<br>      centralized_router = object({<br>        account_id      = string<br>        amazon_side_asn = string<br>        full_name       = string<br>        id              = string<br>        name            = string<br>        region          = string<br>        route_table_id  = string<br>        vpc = object({<br>          names                   = list(string)<br>          network_cidrs           = list(string)<br>          private_route_table_ids = list(string)<br>          public_route_table_ids  = list(string)<br>        })<br>      })<br>    })<br>    two = object({<br>      centralized_router = object({<br>        account_id      = string<br>        amazon_side_asn = string<br>        full_name       = string<br>        id              = string<br>        name            = string<br>        region          = string<br>        route_table_id  = string<br>        vpc = object({<br>          names                   = list(string)<br>          network_cidrs           = list(string)<br>          private_route_table_ids = list(string)<br>          public_route_table_ids  = list(string)<br>        })<br>      })<br>    })<br>    three = object({<br>      centralized_router = object({<br>        account_id      = string<br>        amazon_side_asn = string<br>        full_name       = string<br>        id              = string<br>        name            = string<br>        region          = string<br>        route_table_id  = string<br>        vpc = object({<br>          names                   = list(string)<br>          network_cidrs           = list(string)<br>          private_route_table_ids = list(string)<br>          public_route_table_ids  = list(string)<br>        })<br>      })<br>    })<br>  })</pre> | n/a | yes |
+| <a name="input_full_mesh_trio"></a> [full\_mesh\_trio](#input\_full\_mesh\_trio) | full mesh trio configuration | <pre>object({<br/>    one = object({<br/>      centralized_router = object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })<br/>    })<br/>    two = object({<br/>      centralized_router = object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })<br/>    })<br/>    three = object({<br/>      centralized_router = object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_peering"></a> [peering](#output\_peering) | output routes? |
+| <a name="output_peering"></a> [peering](#output\_peering) | n/a |

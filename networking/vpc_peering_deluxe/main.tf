@@ -7,6 +7,18 @@
 *
 * See it in action in [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo)
 *
+* `v1.9.0`
+* - ipv6 routes for VPC ipv6 subnet cidrs
+* - moar validation
+* ```
+* module "vpc_peering_deluxe" {
+*  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.9.0"
+* ...
+* ```
+*
+*
+* `v1.7.5`
+* - ipv4 routes for VPC ipv4 subnet cidrs
 * ```
 * module "vpc_peering_deluxe" {
 *  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/vpc_peering_deluxe?ref=v1.7.5"

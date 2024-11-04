@@ -18,6 +18,9 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -35,6 +38,9 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -52,6 +58,9 @@ variable "full_mesh_trio" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -90,6 +99,27 @@ variable "full_mesh_trio" {
       distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.network_cidrs))
     ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.network_cidrs))
     error_message = "All VPC network CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.secondary_cidrs, var.full_mesh_trio.two.centralized_router.vpc.secondary_cidrs, var.full_mesh_trio.three.centralized_router.vpc.secondary_cidrs))
+    ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.secondary_cidrs, var.full_mesh_trio.two.centralized_router.vpc.secondary_cidrs, var.full_mesh_trio.three.centralized_router.vpc.secondary_cidrs))
+    error_message = "All VPC secondary CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(compact(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs)) > 0 ? length(
+      distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_network_cidrs))
+    ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_network_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_network_cidrs)) : true
+    error_message = "All VPC IPv6 network CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_secondary_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_secondary_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_secondary_cidrs))
+    ) == length(concat(var.full_mesh_trio.one.centralized_router.vpc.ipv6_secondary_cidrs, var.full_mesh_trio.two.centralized_router.vpc.ipv6_secondary_cidrs, var.full_mesh_trio.three.centralized_router.vpc.ipv6_secondary_cidrs))
+    error_message = "All VPC IPv6 secondary CIDRs must be unique across regions."
   }
 }
 

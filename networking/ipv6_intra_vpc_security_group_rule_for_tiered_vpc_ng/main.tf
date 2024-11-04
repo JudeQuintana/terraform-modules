@@ -2,7 +2,15 @@
 * # IPv6 Intra VPC Security Group Rule Description
 * This IPv6 Intra VPC Security Group Rule will create a SG Rule for each Tiered VPC allowing inbound-only ports from all other VPC networks (excluding itself).
 *
-* Allowing IPv6 SSH and ping communication across all VPCs example:
+* `v1.9.0`
+* - support for ipv6 secondary cidrs
+* - moar validation
+* ```
+* module "ipv6_intra_vpc_security_group_rules" {
+*   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=1.9.0"
+* ..
+* ```
+*
 * `v1.8.2`
 * - New [Dual Stack Networking Trifecta Demo](https://github.com/JudeQuintana/terraform-main/tree/main/dual_stack_networking_trifecta_demo)
 * - Similar declaration to Intra VPC Security Group Rules modules but this only supports IPv6
@@ -28,6 +36,7 @@
 *   ]
 * }
 *
+* # Allowing IPv6 SSH and ping communication across all VPCs
 * module "ipv6_intra_vpc_security_group_rules" {
 *   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_intra_vpc_security_group_rule_for_tiered_vpc_ng?ref=1.8.2"
 *
