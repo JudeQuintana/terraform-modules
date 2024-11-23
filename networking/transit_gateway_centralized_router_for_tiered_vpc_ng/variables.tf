@@ -19,8 +19,8 @@ variable "centralized_router" {
       ipv6_cidrs = optional(list(string), [])
     }), {})
     isolate = optional(object({
-      subnet_cidrs      = optinal(list(string), [])
-      ipv6_subnet_cidrs = optinal(list(string), [])
+      subnet_cidrs      = optional(list(string), [])
+      ipv6_subnet_cidrs = optional(list(string), [])
     }), {})
     vpcs = optional(map(object({
       account_id                 = string
