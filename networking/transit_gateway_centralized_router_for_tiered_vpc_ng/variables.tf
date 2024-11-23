@@ -105,7 +105,7 @@ variable "centralized_router" {
   validation {
     condition = alltrue(flatten([
       for this in var.centralized_router.isolate.subnet_cidrs : [
-        for vpc in centralized_router.vpcs : contains(concat(vpc.private_subnet_cidrs, vpc.public_subnet_cidrs), this)
+        for vpc in var.centralized_router.vpcs : contains(concat(vpc.private_subnet_cidrs, vpc.public_subnet_cidrs), this)
     ]]))
     error_message = "If the var.centralized_router.isolate.subnet_cidrs is popluated then those subnets must already exist in a VPC."
   }
@@ -113,7 +113,7 @@ variable "centralized_router" {
   validation {
     condition = alltrue(flatten([
       for this in var.centralized_router.isolate.ipv6_subnet_cidrs : [
-        for vpc in centralized_router.vpcs : contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
+        for vpc in var.centralized_router.vpcs : contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
     ]]))
     error_message = "If the var.centralized_router.isolate.ipv6_subnet_cidrs is popluated then those ipv6 subnets must already exist in a VPC."
   }
