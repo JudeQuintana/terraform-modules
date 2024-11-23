@@ -28,7 +28,7 @@ locals {
   }]...)
 
   isolated_ipv6_subnet_cidr_to_vpc_id = {
-    for this in var.centralized_router.isolate.subnet_cidrs :
+    for this in var.centralized_router.isolate.ipv6_subnet_cidrs :
     this => lookup(local.ipv6_subnet_cidr_to_vpc_id, this)
   }
 }
