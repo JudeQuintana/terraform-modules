@@ -103,7 +103,7 @@ variable "centralized_router" {
   }
 
   validation {
-    condition = alltrue(flatten([
+    condition = anytrue(flatten([
       for this in var.centralized_router.isolate.subnet_cidrs : [
         for vpc in var.centralized_router.vpcs : contains(concat(vpc.private_subnet_cidrs, vpc.public_subnet_cidrs), this)
     ]]))
@@ -111,7 +111,7 @@ variable "centralized_router" {
   }
 
   validation {
-    condition = alltrue(flatten([
+    condition = anytrue(flatten([
       for this in var.centralized_router.isolate.ipv6_subnet_cidrs : [
         for vpc in var.centralized_router.vpcs : contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
     ]]))
