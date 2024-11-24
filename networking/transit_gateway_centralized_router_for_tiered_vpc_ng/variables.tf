@@ -18,9 +18,9 @@ variable "centralized_router" {
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
     }), {})
-    isolate = optional(object({
-      subnet_cidrs      = optional(list(string), [])
-      ipv6_subnet_cidrs = optional(list(string), [])
+    route_vpc_subnet = optional(object({
+      cidrs      = optional(list(string), [])
+      ipv6_cidrs = optional(list(string), [])
     }), {})
     vpcs = optional(map(object({
       account_id                 = string
@@ -103,21 +103,21 @@ variable "centralized_router" {
   }
 
   validation {
-    condition = length(var.centralized_router.isolate.subnet_cidrs) == length(flatten([
-      for this in var.centralized_router.isolate.subnet_cidrs : [
+    condition = length(var.centralized_router.route_vpc_subnet.cidrs) == length(flatten([
+      for this in var.centralized_router.route_vpc_subnet.cidrs : [
         for vpc in var.centralized_router.vpcs :
         true if contains(concat(vpc.private_subnet_cidrs, vpc.public_subnet_cidrs), this)
     ]]))
-    error_message = "If the var.centralized_router.isolate.subnet_cidrs is popluated then those subnets must already exist in a VPC."
+    error_message = "If the var.centralized_router.route_vpc_subnet.cidrs is popluated then those subnets must already exist in a VPC."
   }
 
   validation {
-    condition = length(var.centralized_router.isolate.ipv6_subnet_cidrs) == length(flatten([
-      for this in var.centralized_router.isolate.ipv6_subnet_cidrs : [
+    condition = length(var.centralized_router.route_vpc_subnet.ipv6_subnet_cidrs) == length(flatten([
+      for this in var.centralized_router.route_vpc_subnet.ipv6_cidrs : [
         for vpc in var.centralized_router.vpcs :
         true if contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
     ]]))
-    error_message = "If the var.centralized_router.isolate.ipv6_subnet_cidrs is popluated then those ipv6 subnets must already exist in a VPC."
+    error_message = "If the var.centralized_router.route_vpc_subnet.ipv6_cidrs is popluated then those ipv6 subnets must already exist in a VPC."
   }
 }
 
