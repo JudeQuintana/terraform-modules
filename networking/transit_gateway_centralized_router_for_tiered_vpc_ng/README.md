@@ -6,7 +6,7 @@
 
 `v1.9.0`
 - support for building IPv6 VPC routes for IPv6 secondary cidrs including variable validation.
-- updated generat\_routes\_to\_vpcs module test suite with IPv6 VPC route tests.
+- updated generate\_routes\_to\_vpcs module test suite with IPv6 VPC route tests.
 - build TGW static IPv4 and IPv6 routes for vpc attachments by default which is more ideal.
 - can now toggle route propagation for vpc attachments but disabled by default.
 - requires AWS provider version `>=5.61`
