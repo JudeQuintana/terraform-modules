@@ -112,7 +112,7 @@ variable "centralized_router" {
   }
 
   validation {
-    condition = length(var.centralized_router.route_vpc_subnet.ipv6_subnet_cidrs) == length(flatten([
+    condition = length(var.centralized_router.route_vpc_subnet.ipv6_cidrs) == length(flatten([
       for this in var.centralized_router.route_vpc_subnet.ipv6_cidrs : [
         for vpc in var.centralized_router.vpcs :
         true if contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
