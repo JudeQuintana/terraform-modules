@@ -3,6 +3,7 @@ locals {
     for this in var.centralized_router.vpcs : {
       for network_cidr in concat([this.network_cidr], this.secondary_cidrs) :
       network_cidr => this.id
+      if !contains(var.centralized_router.blackhole.cidrs, network_cidr)
   }]...)
 }
 
@@ -19,6 +20,7 @@ locals {
     for this in var.centralized_router.vpcs : {
       for ipv6_network_cidr in concat(compact([this.ipv6_network_cidr]), this.ipv6_secondary_cidrs) :
       ipv6_network_cidr => this.id
+      if !contains(var.centralized_router.blackhole.ipv6_cidrs, ipv6_network_cidr)
   }]...)
 }
 
