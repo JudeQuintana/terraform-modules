@@ -9,4 +9,6 @@ resource "aws_ec2_transit_gateway_route" "this_blackholes" {
   destination_cidr_block         = each.value
   blackhole                      = true
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
+
+  depends_on = [aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs, aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs]
 }

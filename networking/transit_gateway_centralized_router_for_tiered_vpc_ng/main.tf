@@ -2,6 +2,9 @@
 * # Transit Gateway Centralized Router
 * - Creates hub and spoke topology from VPCs.
 *
+* `v1.9.1`
+* - ability to switch between a blackhole route and a static route that have the same cidr/ipv6_cidr
+*
 * `v1.9.0`
 * - support for building IPv6 VPC routes for IPv6 secondary cidrs including variable validation.
 * - updated generat_routes_to_vpcs module test suite with IPv6 VPC route tests.
