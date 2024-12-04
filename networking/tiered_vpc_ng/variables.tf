@@ -34,12 +34,14 @@ variable "tiered_vpc" {
         name      = string
         cidr      = string
         ipv6_cidr = optional(string)
+        isolate   = optional(bool, false)
         special   = optional(bool, false)
       })), [])
       public_subnets = optional(list(object({
         name      = string
         cidr      = string
         ipv6_cidr = optional(string)
+        isolate   = optional(bool, false)
         special   = optional(bool, false)
         natgw     = optional(bool, false)
       })), [])

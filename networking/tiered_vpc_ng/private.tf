@@ -1,21 +1,7 @@
-############################################################################################################
-#
-# - Private Subnets can have a special = true attribute set
-#   - for vpc attachment use when this module is passed to Centralized Router
-# - Private Route Tables are per AZ
-#
-# If NATGWs are enabled for an AZ:
-#   - are updated to route out the NATGW to the internet
-#
-# Note:
-#   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_azs, each.value)))
-#   is building the private AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
-#   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
-#
-############################################################################################################
-
 locals {
   private_label                      = "private"
+  private_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.cidr if private_subnet.isolated]]...))
+  private_any_isolated_subnet_exists = length(local.private_isolated_subnet_cidrs) > 0
   private_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
   private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr if length(this.private_subnets) > 0 }
   private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
@@ -23,6 +9,7 @@ locals {
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 
   #ipv6 dual stack
+  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated]]...))
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
   private_ipv6_azs_with_eigw              = toset([for az, this in var.tiered_vpc.azs : az if this.eigw])
   private_ipv6_any_eigw_enabled           = length(local.private_ipv6_azs_with_eigw) > 0

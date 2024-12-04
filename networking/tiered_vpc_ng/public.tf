@@ -1,23 +1,7 @@
-############################################################################################################
-#
-# - Public Subnets can have a special = true attribute set
-#   - for vpc attachment use when this module is passed to Centralized Router
-# - One Public Route Table shared by all public subnets
-# - IGW which now auto toggles based on if any public subnet exists
-#
-# If NATGWs are enabled for an AZ:
-# - NATGW is created in the public subnet with natgw = true for each AZ
-# - EIP is created and associated to the NATGW
-#
-# Note:
-#   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_azs, each.value)))
-#   is building the public AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
-#   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
-#
-############################################################################################################
-
 locals {
   public_label                      = "public"
+  public_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for public_subnet in this.public_subnets : public_subnet.cidr if public_subnet.isolated]]...))
+  public_any_isolated_subnet_exists = length(local.public_isolated_subnet_cidrs) > 0
   public_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))
   public_any_subnet_exists          = length(local.public_subnet_cidrs) > 0
   public_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.public_subnets[*].cidr if length(this.public_subnets) > 0 }
@@ -27,6 +11,7 @@ locals {
   public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw }]...)
 
   # ipv6 dual stack
+  public_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for public_subnet in this.public_subnets : public_subnet.ipv6_cidr if public_subnet.isolated]]...))
   public_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.public_subnets[*].ipv6_cidr)]))
   public_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
 }
@@ -85,6 +70,7 @@ resource "aws_route" "this_public_route_out" {
   gateway_id             = lookup(aws_internet_gateway.this, each.key).id
 }
 
+#subtract isolated subnets
 # associate each public subnet to the shared route table
 resource "aws_route_table_association" "this_public" {
   for_each = local.public_subnet_cidrs
