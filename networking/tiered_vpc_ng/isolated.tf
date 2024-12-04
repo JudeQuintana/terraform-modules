@@ -25,7 +25,7 @@ resource "aws_route_table_association" "this_private_isolated" {
   for_each = local.private_isolated_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
-  route_table_id = lookup(aws_route_table.this_private_isolated, lookup(local.private_subnet_cidr_to_az, each.key)).id
+  route_table_id = lookup(aws_route_table.this_private_isolated, local.private_any_isolated_subnet_exists).id
 }
 
 locals {
@@ -55,5 +55,5 @@ resource "aws_route_table_association" "this_public_isolated" {
   for_each = local.public_isolated_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
-  route_table_id = lookup(aws_route_table.this_public_isolated, lookup(local.public_subnet_cidr_to_az, each.key)).id
+  route_table_id = lookup(aws_route_table.this_public_isolated, local.public_any_isolated_subnet_exists).id
 }
