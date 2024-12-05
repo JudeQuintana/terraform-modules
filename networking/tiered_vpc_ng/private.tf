@@ -72,8 +72,12 @@ resource "aws_route" "this_private_route_out" {
 }
 
 # associate each private subnet to its respective AZ's route table
+# filter out isolated_subnets
+locals {
+  private_subnet_cidrs_route_table_associations = setsubtract(local.private_subnet_cidrs, local.private_isolated_subnet_cidrs)
+}
 resource "aws_route_table_association" "this_private" {
-  for_each = local.private_subnet_cidrs
+  for_each = local.private_subnet_cidrs_route_table_associations
 
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
   route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id

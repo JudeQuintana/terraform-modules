@@ -72,6 +72,11 @@ resource "aws_route" "this_public_route_out" {
 }
 
 # associate each public subnet to the shared route table
+# filter out isolated_subnets
+locals {
+  public_subnet_cidrs_route_table_associations = setsubtract(local.public_subnet_cidrs, local.public_isolated_subnet_cidrs)
+}
+
 resource "aws_route_table_association" "this_public" {
   for_each = local.public_subnet_cidrs
 

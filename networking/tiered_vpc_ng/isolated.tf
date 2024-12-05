@@ -27,7 +27,7 @@ resource "aws_route_table_association" "this_private_isolated" {
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
   route_table_id = lookup(aws_route_table.this_private_isolated, local.private_any_isolated_subnet_exists).id
 
-  depends_on = [aws_route_table.this_private]
+  depends_on = [aws_route_table_association.this_private]
 }
 
 locals {
@@ -59,5 +59,5 @@ resource "aws_route_table_association" "this_public_isolated" {
   subnet_id      = lookup(aws_subnet.this_public, each.key).id
   route_table_id = lookup(aws_route_table.this_public_isolated, local.public_any_isolated_subnet_exists).id
 
-  depends_on = [aws_route_table.this_public]
+  depends_on = [aws_route_table_association.this_public]
 }
