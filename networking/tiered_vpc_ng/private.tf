@@ -9,7 +9,8 @@ locals {
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 
   #ipv6 dual stack
-  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated]]...))
+  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : compact([for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated])]...))
+  private_any_isolated_ipv6_subnet_exists = length(local.private_isolated_ipv6_subnet_cidrs) > 0
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
   private_ipv6_azs_with_eigw              = toset([for az, this in var.tiered_vpc.azs : az if this.eigw])
   private_ipv6_any_eigw_enabled           = length(local.private_ipv6_azs_with_eigw) > 0
