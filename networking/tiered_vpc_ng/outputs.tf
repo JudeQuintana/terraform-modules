@@ -2,6 +2,10 @@ output "account_id" {
   value = local.account_id
 }
 
+output "region" {
+  value = local.region_name
+}
+
 output "default_security_group_id" {
   value = aws_vpc.this.default_security_group_id
 }
@@ -110,6 +114,3 @@ output "isolated_public_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_public_isolated : lookup(local.public_isolated_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
 
-output "region" {
-  value = local.region_name
-}
