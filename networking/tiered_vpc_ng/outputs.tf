@@ -82,35 +82,19 @@ output "public_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
 
-output "isolated_private_route_table_ids" {
-  value = [for this in aws_route_table.this_private_isolated : this.id]
+output "isolated_route_table_ids" {
+  value = [for this in aws_route_table.this_isolated : this.id]
 }
 
-output "isolated_private_subnet_cidrs" {
-  value = local.private_isolated_subnet_cidrs
+output "isolated_subnet_cidrs" {
+  value = local.isolated_subnet_cidrs
 }
 
-output "isolated_private_ipv6_subnet_cidrs" {
-  value = local.private_isolated_ipv6_subnet_cidrs
+output "isolated_ipv6_subnet_cidrs" {
+  value = local.isolated_ipv6_subnet_cidrs
 }
 
-output "isolated_private_subnet_name_to_subnet_id" {
-  value = { for this in aws_subnet.this_private_isolated : lookup(local.private_isolated_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
-}
-
-output "isolated_public_route_table_ids" {
-  value = [for this in aws_route_table.this_public_isolated : this.id]
-}
-
-output "isolated_public_subnet_cidrs" {
-  value = local.public_isolated_subnet_cidrs
-}
-
-output "isolated_public_ipv6_subnet_cidrs" {
-  value = local.public_isolated_ipv6_subnet_cidrs
-}
-
-output "isolated_public_subnet_name_to_subnet_id" {
-  value = { for this in aws_subnet.this_public_isolated : lookup(local.public_isolated_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
+output "isolated_subnet_name_to_subnet_id" {
+  value = { for this in aws_subnet.this_isolated : lookup(local.isolated_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
 

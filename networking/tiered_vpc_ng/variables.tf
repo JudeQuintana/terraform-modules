@@ -30,16 +30,16 @@ variable "tiered_vpc" {
     }), {})
     azs = map(object({
       eigw = optional(bool, false)
+      isolated_subnets = optional(list(object({
+        name      = string
+        cidr      = string
+        ipv6_cidr = optional(string)
+      })), [])
       private_subnets = optional(list(object({
         name      = string
         cidr      = string
         ipv6_cidr = optional(string)
         special   = optional(bool, false)
-      })), [])
-      isolated_private_subnets = optional(list(object({
-        name      = string
-        cidr      = string
-        ipv6_cidr = optional(string)
       })), [])
       public_subnets = optional(list(object({
         name      = string
@@ -47,11 +47,6 @@ variable "tiered_vpc" {
         ipv6_cidr = optional(string)
         special   = optional(bool, false)
         natgw     = optional(bool, false)
-      })), [])
-      isolated_public_subnets = optional(list(object({
-        name      = string
-        cidr      = string
-        ipv6_cidr = optional(string)
       })), [])
     }))
     enable_dns_support   = optional(bool, true)
