@@ -9,7 +9,6 @@ locals {
 
   # ipv6 isolated_public_subnets
   public_isolated_ipv6_subnet_cidrs                        = toset(flatten([for az, this in var.tiered_vpc.azs : compact(this.isolated_public_subnets[*].ipv6_cidr)]))
-  public_any_isolated_ipv6_subnet_exists                   = length(local.public_isolated_ipv6_subnet_cidrs) > 0
   public_isolated_subnet_cidr_to_isolated_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].ipv6_cidr)]...)
 }
 
