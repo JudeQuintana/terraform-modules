@@ -1,20 +1,25 @@
 locals {
   private_label                      = "private"
-  private_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.cidr if private_subnet.isolated]]...))
-  private_any_isolated_subnet_exists = length(local.private_isolated_subnet_cidrs) > 0
   private_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
-  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => setsubtract(this.private_subnets[*].cidr, local.private_isolated_subnet_cidrs) if length(this.private_subnets) > 0 }
+  private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr if length(this.private_subnets) > 0 }
   private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 
   #ipv6 dual stack
-  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : compact([for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated])]...))
-  private_any_isolated_ipv6_subnet_exists = length(local.private_isolated_ipv6_subnet_cidrs) > 0
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
   private_ipv6_azs_with_eigw              = toset([for az, this in var.tiered_vpc.azs : az if this.eigw])
   private_ipv6_any_eigw_enabled           = length(local.private_ipv6_azs_with_eigw) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
+
+
+  # isolated subnets
+  private_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.cidr if private_subnet.isolated]]...))
+  private_any_isolated_subnet_exists = length(local.private_isolated_subnet_cidrs) > 0
+
+  # isolated ipv6 dual stack
+  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : compact([for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated])]...))
+  private_any_isolated_ipv6_subnet_exists = length(local.private_isolated_ipv6_subnet_cidrs) > 0
 }
 
 resource "aws_subnet" "this_private" {
@@ -72,12 +77,8 @@ resource "aws_route" "this_private_route_out" {
 }
 
 # associate each private subnet to its respective AZ's route table
-# filter out isolated_subnets
-locals {
-  private_subnet_cidrs_route_table_associations = setsubtract(local.private_subnet_cidrs, local.private_isolated_subnet_cidrs)
-}
 resource "aws_route_table_association" "this_private" {
-  for_each = local.private_subnet_cidrs_route_table_associations
+  for_each = local.private_subnet_cidrs
 
   subnet_id      = lookup(aws_subnet.this_private, each.key).id
   route_table_id = lookup(aws_route_table.this_private, lookup(local.private_subnet_cidr_to_az, each.key)).id
