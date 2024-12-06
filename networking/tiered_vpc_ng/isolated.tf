@@ -33,7 +33,8 @@ resource "aws_subnet" "this_isolated" {
       )
   })
 
-  depends_on = [aws_subnet.this_private, aws_subnet.public]
+  # implicitly waits for secondary cidrs to complete
+  depends_on = [aws_subnet.this_private, aws_subnet.this_public]
 }
 
 # isolated private subnets route table is intentionally empty
