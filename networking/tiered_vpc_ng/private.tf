@@ -14,11 +14,11 @@ locals {
 
 
   # isolated subnets
-  private_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : [for private_subnet in this.private_subnets : private_subnet.cidr if private_subnet.isolated]]...))
+  private_isolated_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : this.isolated_private_subnets[*].cidr]))
   private_any_isolated_subnet_exists = length(local.private_isolated_subnet_cidrs) > 0
 
-  # isolated ipv6 dual stack
-  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : compact([for private_subnet in this.private_subnets : private_subnet.ipv6_cidr if private_subnet.isolated])]...))
+  # isolated ipv6 dual stack subnets
+  private_isolated_ipv6_subnet_cidrs      = toset(flatten([for az, this in var.tiered_vpc.azs : compact(this.isolated_private_subnets[*].ipv6_cidr)]))
   private_any_isolated_ipv6_subnet_exists = length(local.private_isolated_ipv6_subnet_cidrs) > 0
 }
 
