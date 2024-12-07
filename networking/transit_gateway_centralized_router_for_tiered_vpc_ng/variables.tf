@@ -35,10 +35,6 @@ variable "centralized_router" {
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
       public_special_subnet_ids  = list(string)
-      private_subnet_cidrs       = list(string)
-      public_subnet_cidrs        = list(string)
-      private_ipv6_subnet_cidrs  = list(string)
-      public_ipv6_subnet_cidrs   = list(string)
       region                     = string
     })), {})
   })
