@@ -18,10 +18,6 @@ variable "centralized_router" {
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
     }), {})
-    route_vpc_subnet = optional(object({
-      cidrs      = optional(list(string), [])
-      ipv6_cidrs = optional(list(string), [])
-    }), {})
     vpcs = optional(map(object({
       account_id                 = string
       full_name                  = string
@@ -96,24 +92,6 @@ variable "centralized_router" {
       var.centralized_router.amazon_side_asn >= 4200000000 && var.centralized_router.amazon_side_asn <= 4294967294
     )
     error_message = "The amazon side ASN should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
-  }
-
-  validation {
-    condition = length(var.centralized_router.route_vpc_subnet.cidrs) == length(flatten([
-      for this in var.centralized_router.route_vpc_subnet.cidrs : [
-        for vpc in var.centralized_router.vpcs :
-        true if contains(concat(vpc.private_subnet_cidrs, vpc.public_subnet_cidrs), this)
-    ]]))
-    error_message = "If the var.centralized_router.route_vpc_subnet.cidrs is popluated then those subnets must already exist in a VPC."
-  }
-
-  validation {
-    condition = length(var.centralized_router.route_vpc_subnet.ipv6_cidrs) == length(flatten([
-      for this in var.centralized_router.route_vpc_subnet.ipv6_cidrs : [
-        for vpc in var.centralized_router.vpcs :
-        true if contains(concat(vpc.private_ipv6_subnet_cidrs, vpc.public_ipv6_subnet_cidrs), this)
-    ]]))
-    error_message = "If the var.centralized_router.route_vpc_subnet.ipv6_cidrs is popluated then those ipv6 subnets must already exist in a VPC."
   }
 }
 
