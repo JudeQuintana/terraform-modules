@@ -29,7 +29,7 @@ resource "aws_subnet" "this_isolated" {
         var.tiered_vpc.name,
         local.isolated_label,
         lookup(local.isolated_subnet_cidr_to_subnet_name, each.key),
-        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.isolaed_subnet_cidr_to_az, each.key)))
+        lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.isolated_subnet_cidr_to_az, each.key)))
       )
   })
 
