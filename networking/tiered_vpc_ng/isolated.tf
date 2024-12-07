@@ -50,7 +50,7 @@ resource "aws_route_table" "this_isolated" {
         local.upper_env_prefix,
         var.tiered_vpc.name,
         local.isolated_label,
-        lookup(var.region_az_labels, format("%s%s", local.region_name, each.key))
+        local.region_label
       )
   })
 }
