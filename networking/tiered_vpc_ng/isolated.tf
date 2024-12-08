@@ -12,6 +12,7 @@ locals {
   isolated_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.isolated_subnets[*].cidr, this.isolated_subnets[*].ipv6_cidr)]...)
 }
 
+# isolated subnets are technically private subnets
 resource "aws_subnet" "this_isolated" {
   for_each = local.isolated_subnet_cidrs
 
@@ -37,7 +38,9 @@ resource "aws_subnet" "this_isolated" {
   depends_on = [aws_vpc_ipv4_cidr_block_association.this, aws_vpc_ipv6_cidr_block_association.this]
 }
 
-# isolated private subnets route table is intentionally empty
+# isolated subnets route table is intentionally empty
+# they can only communicate with other subnets within the vpc
+# which is consistent behvaior even when the vpc is in a full mesh tgw configuration
 resource "aws_route_table" "this_isolated" {
   for_each = local.isolated_route_table
 
