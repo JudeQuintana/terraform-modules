@@ -1,19 +1,3 @@
-############################################################################################################
-#
-# - Private Subnets can have a special = true attribute set
-#   - for vpc attachment use when this module is passed to Centralized Router
-# - Private Route Tables are per AZ
-#
-# If NATGWs are enabled for an AZ:
-#   - are updated to route out the NATGW to the internet
-#
-# Note:
-#   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.private_subnet_to_azs, each.value)))
-#   is building the private AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
-#   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
-#
-############################################################################################################
-
 locals {
   private_label                      = "private"
   private_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))

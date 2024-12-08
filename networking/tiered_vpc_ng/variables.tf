@@ -30,6 +30,11 @@ variable "tiered_vpc" {
     }), {})
     azs = map(object({
       eigw = optional(bool, false)
+      isolated_subnets = optional(list(object({
+        name      = string
+        cidr      = string
+        ipv6_cidr = optional(string)
+      })), [])
       private_subnets = optional(list(object({
         name      = string
         cidr      = string
@@ -58,10 +63,10 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue(flatten([
       for this in var.tiered_vpc.azs : [
-        for subnet_cidr in concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr) :
+        for subnet_cidr in concat(this.private_subnets[*].cidr, this.public_subnets[*].cidr, this.isolated_subnets[*].cidr) :
         can(cidrnetmask(subnet_cidr))
     ]]))
-    error_message = "The VPC private and public subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
+    error_message = "The VPC private, public, and isolated subnet CDIRs must be in valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 
   validation {
@@ -106,16 +111,16 @@ variable "tiered_vpc" {
   validation {
     condition = alltrue([
       for this in var.tiered_vpc.azs :
-      anytrue([for ipv6_cidr in compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr)) : true]) ? var.tiered_vpc.ipv6.network_cidr != null : true
+      anytrue([for ipv6_cidr in compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr, this.isolated_subnets[*].ipv6_cidr)) : true]) ? var.tiered_vpc.ipv6.network_cidr != null : true
     ])
-    error_message = "The var.tiered_vpc.ipv6.network_cidr must be assigned to the VPC if a private subnet or public subnet with an IPv6 CIDR is configured in a dual stack configuration."
+    error_message = "The var.tiered_vpc.ipv6.network_cidr must be assigned to the VPC if a private, public, isolated subnet with an IPv6 CIDR is configured in a dual stack configuration."
   }
 
   validation {
     condition = var.tiered_vpc.ipv6.network_cidr != null ? alltrue([
       for this in var.tiered_vpc.azs :
-    length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) && length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr)]) : true
-    error_message = "If var.tiered_vpc.ipv6.network_cidr is configured for the VPC then all private subnets and/or public subnets that are set must also be configured with a IPv6 CIDR in a dual stack configuration."
+    length(compact(this.private_subnets[*].ipv6_cidr)) == length(this.private_subnets[*].cidr) && length(compact(this.public_subnets[*].ipv6_cidr)) == length(this.public_subnets[*].cidr) && length(compact(this.isolated_subnets[*].ipv6_cidr)) == length(this.isolated_subnets[*].cidr)]) : true
+    error_message = "If var.tiered_vpc.ipv6.network_cidr is configured for the VPC then all private, public or isolated subnets that are set must also be configured with a IPv6 CIDR in a dual stack configuration."
   }
 
   validation {
@@ -138,9 +143,9 @@ variable "tiered_vpc" {
 
   validation {
     condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name, this.isolated_subnets[*].name)
       ]))) == length(flatten([
-      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name)
+      for this in var.tiered_vpc.azs : concat(this.private_subnets[*].name, this.public_subnets[*].name, this.isolated_subnets[*].name)
     ]))
     error_message = "Each subnet name must be unique across all AZs."
   }
@@ -174,9 +179,9 @@ variable "tiered_vpc" {
 
   validation {
     condition = length(distinct(flatten([
-      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
+      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr, this.isolated_subnets[*].ipv6_cidr))
       ]))) == length(flatten([
-      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr))
+      for this in var.tiered_vpc.azs : compact(concat(this.private_subnets[*].ipv6_cidr, this.public_subnets[*].ipv6_cidr, this.isolated_subnets[*].ipv6_cidr))
     ]))
     error_message = "Each subnet IPv6 CDIR must be unique across all AZs."
   }
@@ -192,3 +197,4 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+

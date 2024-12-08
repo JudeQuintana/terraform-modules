@@ -1,21 +1,3 @@
-############################################################################################################
-#
-# - Public Subnets can have a special = true attribute set
-#   - for vpc attachment use when this module is passed to Centralized Router
-# - One Public Route Table shared by all public subnets
-# - IGW which now auto toggles based on if any public subnet exists
-#
-# If NATGWs are enabled for an AZ:
-# - NATGW is created in the public subnet with natgw = true for each AZ
-# - EIP is created and associated to the NATGW
-#
-# Note:
-#   lookup(var.region_az_labels, format("%s%s", local.region_name, lookup(local.public_subnet_to_azs, each.value)))
-#   is building the public AZ name on the fly by looking the up the AZ letter via subnet cidr then combining the AZ
-#   with the region to build full AZ name (ie us-east-1b) then lookup the shortname for the full region name (ie use1b)
-#
-############################################################################################################
-
 locals {
   public_label                      = "public"
   public_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.public_subnets[*].cidr]))

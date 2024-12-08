@@ -1,4 +1,7 @@
 # Tiered VPC-NG
+`v1.9.1`
+- support for dual stack isolated subnets
+
 `v1.9.0`
 - support for IPv6 secondary cidrs.
 - minor internal changes.
@@ -378,11 +381,14 @@ No modules.
 | [aws_route.this_private_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_public_ipv6_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_public_route_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route_table.this_isolated](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table_association.this_isolated](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_security_group.this_intra_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_subnet.this_isolated](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.this_private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.this_public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
@@ -398,7 +404,7 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br/>    name = string<br/>    # ipv4 requires ipam<br/>    ipv4 = object({<br/>      network_cidr    = string<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = object({<br/>        id = string<br/>      })<br/>    })<br/>    # ipv6 requires ipam<br/>    ipv6 = optional(object({<br/>      network_cidr    = optional(string)<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = optional(object({<br/>        id = optional(string)<br/>      }), {})<br/>    }), {})<br/>    azs = map(object({<br/>      eigw = optional(bool, false)<br/>      private_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>      })), [])<br/>      public_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>        natgw     = optional(bool, false)<br/>      })), [])<br/>    }))<br/>    enable_dns_support   = optional(bool, true)<br/>    enable_dns_hostnames = optional(bool, true)<br/>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br/>    name = string<br/>    # ipv4 requires ipam<br/>    ipv4 = object({<br/>      network_cidr    = string<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = object({<br/>        id = string<br/>      })<br/>    })<br/>    # ipv6 requires ipam<br/>    ipv6 = optional(object({<br/>      network_cidr    = optional(string)<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = optional(object({<br/>        id = optional(string)<br/>      }), {})<br/>    }), {})<br/>    azs = map(object({<br/>      eigw = optional(bool, false)<br/>      isolated_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>      })), [])<br/>      private_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>      })), [])<br/>      public_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>        natgw     = optional(bool, false)<br/>      })), [])<br/>    }))<br/>    enable_dns_support   = optional(bool, true)<br/>    enable_dns_hostnames = optional(bool, true)<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
@@ -411,6 +417,10 @@ No modules.
 | <a name="output_intra_vpc_security_group_id"></a> [intra\_vpc\_security\_group\_id](#output\_intra\_vpc\_security\_group\_id) | n/a |
 | <a name="output_ipv6_network_cidr"></a> [ipv6\_network\_cidr](#output\_ipv6\_network\_cidr) | n/a |
 | <a name="output_ipv6_secondary_cidrs"></a> [ipv6\_secondary\_cidrs](#output\_ipv6\_secondary\_cidrs) | n/a |
+| <a name="output_isolated_ipv6_subnet_cidrs"></a> [isolated\_ipv6\_subnet\_cidrs](#output\_isolated\_ipv6\_subnet\_cidrs) | n/a |
+| <a name="output_isolated_route_table_ids"></a> [isolated\_route\_table\_ids](#output\_isolated\_route\_table\_ids) | n/a |
+| <a name="output_isolated_subnet_cidrs"></a> [isolated\_subnet\_cidrs](#output\_isolated\_subnet\_cidrs) | n/a |
+| <a name="output_isolated_subnet_name_to_subnet_id"></a> [isolated\_subnet\_name\_to\_subnet\_id](#output\_isolated\_subnet\_name\_to\_subnet\_id) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | n/a |
 | <a name="output_private_ipv6_subnet_cidrs"></a> [private\_ipv6\_subnet\_cidrs](#output\_private\_ipv6\_subnet\_cidrs) | n/a |
