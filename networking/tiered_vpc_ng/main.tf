@@ -1,6 +1,6 @@
 /*
 * # Tiered VPC-NG
-* `v1.9.1`
+* `v1.9.2`
 * - support for dual stack isolated subnets
 *
 * `v1.9.0`
