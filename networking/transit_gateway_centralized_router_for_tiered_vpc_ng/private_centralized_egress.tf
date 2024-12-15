@@ -27,11 +27,11 @@ resource "aws_route" "this_private_centralized_egress_vpc_ipv6_route_out" {
 
 locals {
   # validation: should only be one
-  private_centralized_egress_route_any_cidr_to_leader_vpc_id = { for this in var.centralized_router.vpcs : local.route_any_cidr => this.id if this.centralized_egress.private.leader } # or if public.leader too (later)
+  private_centralized_egress_route_any_cidr_to_central_vpc_id = { for this in var.centralized_router.vpcs : local.route_any_cidr => this.id if this.centralized_egress.private.central } # or if public.central too (later)
 }
 
-resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_leader_vpc_routes" {
-  for_each = local.private_centralized_egress_route_any_cidr_to_leader_vpc_id
+resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_central_vpc_routes" {
+  for_each = local.private_centralized_egress_route_any_cidr_to_central_vpc_id
 
   destination_cidr_block         = each.key
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
@@ -41,11 +41,11 @@ resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_leader_vpc
 
 locals {
   # validation: should only be one
-  private_centralized_egress_route_any_ipv6_cidr_to_leader_vpc_id = { for this in local.private_centralized_egress_route_any_ipv6_cidr_to_leader_vpc_id : local.route_any_ipv6_cidr => this.id if this.ipv6_network_cidr != null } # or if public.leader too (later)
+  private_centralized_egress_route_any_ipv6_cidr_to_central_vpc_id = { for this in local.private_centralized_egress_route_any_ipv6_cidr_to_central_vpc_id : local.route_any_ipv6_cidr => this.id if this.ipv6_network_cidr != null } # or if public.central too (later)
 }
 
 resource "aws_ec2_transit_gateway_route" "this_centralized_egress_vpc_ipv6_route_out" {
-  for_each = local.private_centralized_egress_route_any_ipv6_cidr_to_leader_vpc_id
+  for_each = local.private_centralized_egress_route_any_ipv6_cidr_to_central_vpc_id
 
   destination_ipv6_cidr_block    = each.key
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id

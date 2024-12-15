@@ -34,8 +34,8 @@ variable "centralized_router" {
       public_special_subnet_ids  = list(string)
       centralized_egress = optional(object({
         private = optional(object({
-          opt_in = optional(bool, false)
-          leader = optional(bool, false)
+          opt_in  = optional(bool, false)
+          central = optional(bool, false)
         }), {})
       }), {})
     })), {})

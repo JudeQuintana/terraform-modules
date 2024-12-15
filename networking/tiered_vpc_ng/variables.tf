@@ -31,8 +31,8 @@ variable "tiered_vpc" {
     centralized_egress = optional(object({
       #validation: both can't be true
       private = optional(object({
-        opt_in = optional(bool, false)
-        leader = optional(bool, false) # think of better var name
+        opt_in  = optional(bool, false)
+        central = optional(bool, false) # think of better var name
       }), {})
     }), {})
     azs = map(object({
