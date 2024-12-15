@@ -1,6 +1,5 @@
 locals {
   route_any_cidr                             = "0.0.0.0/0"
-  route_any_ipv6_cidr                        = "::/0"
   private_centralized_egress_route_table_ids = toset(flatten([for this in var.centralized_router.vpcs : this.private_route_table_ids if this.centralized_egress.private.opt_in]))
 }
 
@@ -14,7 +13,7 @@ resource "aws_route" "this_private_centralized_egress_vpc_route_out" {
 
 locals {
   # validation: should only be one
-  private_centralized_egress_route_any_cidr_to_central_vpc_id = { for this in var.centralized_router.vpcs : local.route_any_cidr => this.id if this.centralized_egress.private.central } # or if public.central too (later)
+  private_centralized_egress_route_any_cidr_to_central_vpc_id = { for this in var.centralized_router.vpcs : local.route_any_cidr => this.id if this.centralized_egress.private.central }
 }
 
 resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_central_vpc_routes" {
