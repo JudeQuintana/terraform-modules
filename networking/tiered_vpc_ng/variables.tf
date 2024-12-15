@@ -19,6 +19,13 @@ variable "tiered_vpc" {
       ipam_pool = object({
         id = string
       })
+      centralized_egress = optional(object({
+        #validation: both can't be true
+        private = optional(object({
+          opt_in  = optional(bool, false)
+          central = optional(bool, false) # think of better var name
+        }), {})
+      }), {})
     })
     # ipv6 requires ipam
     ipv6 = optional(object({
@@ -26,13 +33,6 @@ variable "tiered_vpc" {
       secondary_cidrs = optional(list(string), [])
       ipam_pool = optional(object({
         id = optional(string)
-      }), {})
-    }), {})
-    centralized_egress = optional(object({
-      #validation: both can't be true
-      private = optional(object({
-        opt_in  = optional(bool, false)
-        central = optional(bool, false) # think of better var name
       }), {})
     }), {})
     azs = map(object({

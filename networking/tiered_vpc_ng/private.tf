@@ -1,5 +1,5 @@
 locals {
-  private_centralized_egress_opt_in = var.tiered_vpc.centralized_egress.private.opt_in
+  private_ipv4_centralized_egress_opt_in = var.tiered_vpc.ipv4.centralized_egress.private.opt_in
 
   private_label                      = "private"
   private_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : this.private_subnets[*].cidr]))
@@ -10,7 +10,7 @@ locals {
 
   #ipv6 dual stack
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))
-  private_ipv6_azs_with_eigw              = toset([for az, this in var.tiered_vpc.azs : az if this.eigw && !local.private_centralized_egress_opt_in])
+  private_ipv6_azs_with_eigw              = toset([for az, this in var.tiered_vpc.azs : az if this.eigw])
   private_ipv6_any_eigw_enabled           = length(local.private_ipv6_azs_with_eigw) > 0
   private_subnet_cidr_to_ipv6_subnet_cidr = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].ipv6_cidr)]...)
 }
