@@ -20,6 +20,7 @@ variable "centralized_router" {
     }), {})
     vpcs = optional(map(object({
       account_id                 = string
+      region                     = string
       full_name                  = string
       id                         = string
       name                       = string
@@ -31,7 +32,12 @@ variable "centralized_router" {
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
       public_special_subnet_ids  = list(string)
-      region                     = string
+      centralized_egress = optional(object({
+        private = optional(object({
+          opt_in = optional(bool, false)
+          leader = optional(bool, false)
+        }), {})
+      }), {})
     })), {})
   })
 

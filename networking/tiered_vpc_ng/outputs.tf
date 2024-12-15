@@ -42,6 +42,10 @@ output "ipv6_secondary_cidrs" {
   value = var.tiered_vpc.ipv6.secondary_cidrs
 }
 
+output "centralized_egress" {
+  value = var.tiered_vpc.centralized_egress
+}
+
 output "private_route_table_ids" {
   value = [for this in aws_route_table.this_private : this.id]
 }

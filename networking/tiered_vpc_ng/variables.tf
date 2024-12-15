@@ -28,13 +28,15 @@ variable "tiered_vpc" {
         id = optional(string)
       }), {})
     }), {})
+    centralized_egress = optional(object({
+      #validation: both can't be true
+      private = optional(object({
+        opt_in = optional(bool, false)
+        leader = optional(bool, false) # think of better var name
+      }), {})
+    }), {})
     azs = map(object({
       eigw = optional(bool, false)
-      isolated_subnets = optional(list(object({
-        name      = string
-        cidr      = string
-        ipv6_cidr = optional(string)
-      })), [])
       private_subnets = optional(list(object({
         name      = string
         cidr      = string
@@ -48,9 +50,14 @@ variable "tiered_vpc" {
         special   = optional(bool, false)
         natgw     = optional(bool, false)
       })), [])
+      isolated_subnets = optional(list(object({
+        name      = string
+        cidr      = string
+        ipv6_cidr = optional(string)
+      })), [])
     }))
-    enable_dns_support   = optional(bool, true)
-    enable_dns_hostnames = optional(bool, true)
+    dns_support   = optional(bool, true)
+    dns_hostnames = optional(bool, true)
   })
 
   # using ipv4 validation via cidrnetmask function instead of regex for ipv4
