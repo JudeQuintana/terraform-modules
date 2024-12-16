@@ -5,7 +5,6 @@ locals {
   private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
-  private_ipv4_centralized_egress    = var.tiered_vpc.ipv4.centralized_egress.private
 
   #ipv6 dual stack
   private_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.private_subnets[*].ipv6_cidr)]))

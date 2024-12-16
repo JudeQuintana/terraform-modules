@@ -42,15 +42,15 @@ output "ipv6_secondary_cidrs" {
   value = var.tiered_vpc.ipv6.secondary_cidrs
 }
 
-output "private_centralized_egress" {
+output "centralized_egress_private" {
   value = var.tiered_vpc.ipv4.centralized_egress.private
 }
 
-output "public_centralized_egress" {
+output "centralized_egress_public" {
   value = var.tiered_vpc.ipv4.centralized_egress.public
 }
 
-output "central_centralized_egress" {
+output "centralized_egress_central" {
   value = var.tiered_vpc.ipv4.centralized_egress.central
 }
 

@@ -32,9 +32,9 @@ variable "centralized_router" {
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
       public_special_subnet_ids  = list(string)
-      private_centralized_egress = optional(bool, false)
-      public_centralized_egress  = optional(bool, false)
-      central_centralized_egress = optional(bool, false)
+      centralized_egress_private = optional(bool, false)
+      entralized_egress_public   = optional(bool, false)
+      centralized_egress_central = optional(bool, false)
     })), {})
   })
 

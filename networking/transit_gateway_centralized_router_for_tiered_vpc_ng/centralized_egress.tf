@@ -4,7 +4,7 @@ locals {
   centralized_egress_route_any_cidr_to_central_vpc_id = {
     for this in var.centralized_router.vpcs :
     local.centralized_egress_route_any_cidr => this.id
-    if this.central_centralized_egress
+    if this.centralized_egress_central
   }
 }
 
@@ -17,16 +17,16 @@ resource "aws_ec2_transit_gateway_route" "this_central_centralized_egress_tgw_ce
 }
 
 locals {
-  private_centralized_egress_route_table_id_to_route_any_cidr = merge([
+  centralized_egress_private_route_table_id_to_route_any_cidr = merge([
     for this in var.centralized_router.vpcs : {
       for private_route_table_id in this.private_route_table_ids :
       private_route_table_id => local.centralized_egress_route_any_cidr
-      if this.private_centralized_egress
+      if this.centralized_egress_private
   }]...)
 }
 
-resource "aws_route" "this_private_centralized_egress_vpc_route_any" {
-  for_each = local.private_centralized_egress_route_table_id_to_route_any_cidr
+resource "aws_route" "this_centralized_egress_private_vpc_route_any" {
+  for_each = local.centralized_egress_private_route_table_id_to_route_any_cidr
 
   destination_cidr_block = each.value
   route_table_id         = each.key
@@ -34,16 +34,16 @@ resource "aws_route" "this_private_centralized_egress_vpc_route_any" {
 }
 
 locals {
-  public_centralized_egress_route_table_id_to_route_any_cidr = merge([
+  centralized_egress_public_route_table_id_to_route_any_cidr = merge([
     for this in var.centralized_router.vpcs : {
       for public_route_table_id in this.public_route_table_ids :
       public_route_table_id => local.centralized_egress_route_any_cidr
-      if this.public_centralized_egress
+      if this.centralized_egress_public
   }]...)
 }
 
-resource "aws_route" "this_public_centralized_egress_vpc_route_any" {
-  for_each = local.public_centralized_egress_route_table_id_to_route_any_cidr
+resource "aws_route" "this_centralized_egress_public_vpc_route_any" {
+  for_each = local.centralized_egress_public_route_table_id_to_route_any_cidr
 
   destination_cidr_block = each.value
   route_table_id         = each.key
