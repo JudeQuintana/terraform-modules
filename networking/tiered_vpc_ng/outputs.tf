@@ -42,18 +42,6 @@ output "ipv6_secondary_cidrs" {
   value = var.tiered_vpc.ipv6.secondary_cidrs
 }
 
-output "centralized_egress_private" {
-  value = var.tiered_vpc.ipv4.centralized_egress.private
-}
-
-output "centralized_egress_public" {
-  value = var.tiered_vpc.ipv4.centralized_egress.public
-}
-
-output "centralized_egress_central" {
-  value = var.tiered_vpc.ipv4.centralized_egress.central
-}
-
 output "private_route_table_ids" {
   value = [for this in aws_route_table.this_private : this.id]
 }
@@ -108,5 +96,17 @@ output "isolated_ipv6_subnet_cidrs" {
 
 output "isolated_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_isolated : lookup(local.isolated_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
+}
+
+output "centralized_egress_private" {
+  value = var.tiered_vpc.ipv4.centralized_egress.private
+}
+
+output "centralized_egress_public" {
+  value = var.tiered_vpc.ipv4.centralized_egress.public
+}
+
+output "centralized_egress_central" {
+  value = var.tiered_vpc.ipv4.centralized_egress.central
 }
 
