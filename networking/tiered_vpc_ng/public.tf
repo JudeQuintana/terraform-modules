@@ -7,6 +7,8 @@ locals {
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
   public_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
   public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw } if !local.private_ipv4_centralized_egress]...)
+  public_ipv4_centralized_egress    = var.tiered_vpc.ipv4.centralized_egress.public
+  public_route_out_igw              = { for this in igw : this => this if local.public_ipv4_centralized_egress }
 
   # ipv6 dual stack
   public_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.public_subnets[*].ipv6_cidr)]))
@@ -60,7 +62,7 @@ resource "aws_route_table" "this_public" {
 # one public route out through IGW for all public subnets across azs if an igw exists
 # igw will exists if public subnet exists
 resource "aws_route" "this_public_route_out" {
-  for_each = local.igw
+  for_each = local.public_route_out_igw
 
   destination_cidr_block = local.route_any_cidr
   route_table_id         = lookup(aws_route_table.this_public, each.key).id
