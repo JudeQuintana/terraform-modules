@@ -21,8 +21,9 @@ locals {
     for this in var.centralized_router.vpcs : {
       for private_route_table_id in this.private_route_table_ids :
       private_route_table_id => local.centralized_egress_route_any_cidr
-      if this.centralized_egress_private
-  }]...)
+    }
+    if this.centralized_egress_private
+  ]...)
 }
 
 resource "aws_route" "this_centralized_egress_private_vpc_route_any" {
@@ -38,8 +39,9 @@ locals {
     for this in var.centralized_router.vpcs : {
       for public_route_table_id in this.public_route_table_ids :
       public_route_table_id => local.centralized_egress_route_any_cidr
-      if this.centralized_egress_public
-  }]...)
+    }
+    if this.centralized_egress_public
+  ]...)
 }
 
 resource "aws_route" "this_centralized_egress_public_vpc_route_any" {
