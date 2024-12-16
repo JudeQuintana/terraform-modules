@@ -8,7 +8,7 @@ locals {
   public_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
   public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw } if !local.private_ipv4_centralized_egress]...)
   public_ipv4_centralized_egress    = var.tiered_vpc.ipv4.centralized_egress.public
-  public_route_out_igw              = { for this in igw : this => this if local.public_ipv4_centralized_egress }
+  public_route_out_igw              = { for this in igw : this => this if !local.public_ipv4_centralized_egress }
 
   # ipv6 dual stack
   public_ipv6_subnet_cidrs               = toset(flatten([for this in var.tiered_vpc.azs : compact(this.public_subnets[*].ipv6_cidr)]))
