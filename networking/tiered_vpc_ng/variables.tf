@@ -20,11 +20,10 @@ variable "tiered_vpc" {
         id = string
       })
       centralized_egress = optional(object({
-        #validation: both can't be true
-        private = optional(object({
-          opt_in  = optional(bool, false)
-          central = optional(bool, false) # think of better var name
-        }), {})
+        # todo validation
+        central = optional(bool, false)
+        private = optional(bool, false)
+        public  = optional(bool, false)
       }), {})
     })
     # ipv6 requires ipam

@@ -46,6 +46,14 @@ output "private_centralized_egress" {
   value = var.tiered_vpc.ipv4.centralized_egress.private
 }
 
+output "public_centralized_egress" {
+  value = var.tiered_vpc.ipv4.centralized_egress.public
+}
+
+output "central_centralized_egress" {
+  value = var.tiered_vpc.ipv4.centralized_egress.central
+}
+
 output "private_route_table_ids" {
   value = [for this in aws_route_table.this_private : this.id]
 }
