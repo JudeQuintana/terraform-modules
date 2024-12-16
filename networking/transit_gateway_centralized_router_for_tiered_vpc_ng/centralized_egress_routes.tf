@@ -8,6 +8,7 @@ locals {
   }
 }
 
+# centralized egress tgw routes
 resource "aws_ec2_transit_gateway_route" "this_central_centralized_egress_tgw_central_vpc_route_any" {
   for_each = local.centralized_egress_route_any_cidr_to_central_vpc_id
 
@@ -16,6 +17,7 @@ resource "aws_ec2_transit_gateway_route" "this_central_centralized_egress_tgw_ce
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.value).id
 }
 
+# centralized egress private vpc routes
 locals {
   centralized_egress_private_route_table_id_to_route_any_cidr = merge([
     for this in var.centralized_router.vpcs : {
@@ -34,6 +36,7 @@ resource "aws_route" "this_centralized_egress_private_vpc_route_any" {
   transit_gateway_id     = aws_ec2_transit_gateway.this.id
 }
 
+# centralized egress public vpc routes
 locals {
   centralized_egress_public_route_table_id_to_route_any_cidr = merge([
     for this in var.centralized_router.vpcs : {
