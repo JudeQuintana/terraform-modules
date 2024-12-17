@@ -6,7 +6,7 @@ locals {
   public_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.public_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   public_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.public_subnets[*].cidr, this.public_subnets[*].name)]...)
   public_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.special }]...)
-  public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw } if !var.tiered_vpc.ipv4.centralized_egress.private]...)
+  public_natgw_az_to_subnet_cidr    = merge([for az, this in var.tiered_vpc.azs : { for public_subnet in this.public_subnets : az => public_subnet.cidr if public_subnet.natgw && !var.tiered_vpc.ipv4.centralized_egress.private }]...)
   public_route_out_igw              = { for this in local.igw : this => this if !var.tiered_vpc.ipv4.centralized_egress.public }
 
   # ipv6 dual stack
