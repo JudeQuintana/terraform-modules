@@ -23,7 +23,6 @@ variable "tiered_vpc" {
         # todo validation
         central = optional(bool, false)
         private = optional(bool, false)
-        public  = optional(bool, false)
       }), {})
     })
     # ipv6 requires ipam

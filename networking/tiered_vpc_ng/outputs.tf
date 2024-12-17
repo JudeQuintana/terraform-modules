@@ -102,10 +102,6 @@ output "centralized_egress_private" {
   value = var.tiered_vpc.ipv4.centralized_egress.private
 }
 
-output "centralized_egress_public" {
-  value = var.tiered_vpc.ipv4.centralized_egress.public
-}
-
 output "centralized_egress_central" {
   value = var.tiered_vpc.ipv4.centralized_egress.central
 }

@@ -33,7 +33,6 @@ variable "centralized_router" {
       private_special_subnet_ids = list(string)
       public_special_subnet_ids  = list(string)
       centralized_egress_private = optional(bool, false)
-      centralized_egress_public  = optional(bool, false)
       centralized_egress_central = optional(bool, false)
     })), {})
   })
