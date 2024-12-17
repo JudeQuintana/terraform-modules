@@ -32,7 +32,7 @@ resource "aws_ec2_transit_gateway_route" "this_tgw_ipv6_routes_to_vpcs" {
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.value).id
 }
 
-# propagate routes
+# propagate routes for all attachments
 locals {
   propagate_routes_vpc_id_to_vpc_attachment = { for vpc_id, this in local.vpc_id_to_vpc_attachment : vpc_id => this if var.centralized_router.propagate_routes }
 }
@@ -57,5 +57,9 @@ resource "aws_ec2_transit_gateway_route" "this_blackholes" {
   blackhole                      = true
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 
-  depends_on = [aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs, aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs]
+  depends_on = [
+    aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs,
+    aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs,
+    aws_ec2_transit_gateway_route.this_centralized_egress_tgw_central_vpc_route_any
+  ]
 }

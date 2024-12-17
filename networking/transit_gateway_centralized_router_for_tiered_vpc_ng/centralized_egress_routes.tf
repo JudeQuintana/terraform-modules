@@ -3,8 +3,8 @@ locals {
   # validation: should only be one
   centralized_egress_central_route_any_cidr_to_vpc_id = {
     for this in var.centralized_router.vpcs :
-    local.centralized_egress_route_any_cidr => this.id
-    if this.centralized_egress_central
+    this.id => local.centralized_egress_route_any_cidr
+    if this.centralized_egress_central && !contains(var.centralized_router.blackhole.cidrs, local.centralized_egress_route_any_cidr)
   }
 }
 
@@ -12,9 +12,9 @@ locals {
 resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_central_vpc_route_any" {
   for_each = local.centralized_egress_central_route_any_cidr_to_vpc_id
 
-  destination_cidr_block         = each.key
+  destination_cidr_block         = each.value
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
-  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.value).id
+  transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
 }
 
 # private vpc routes
@@ -23,8 +23,7 @@ locals {
     for this in var.centralized_router.vpcs : {
       for private_route_table_id in this.private_route_table_ids :
       private_route_table_id => local.centralized_egress_route_any_cidr
-    }
-    if this.centralized_egress_private
+    } if this.centralized_egress_private
   ]...)
 }
 
@@ -45,8 +44,7 @@ locals {
     for this in var.centralized_router.vpcs : {
       for public_route_table_id in this.public_route_table_ids :
       public_route_table_id => local.centralized_egress_route_any_cidr
-    }
-    if this.centralized_egress_public
+    } if this.centralized_egress_public
   ]...)
 }
 
