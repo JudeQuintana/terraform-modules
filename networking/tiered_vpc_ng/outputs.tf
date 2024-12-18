@@ -82,8 +82,8 @@ output "public_subnet_name_to_subnet_id" {
   value = { for this in aws_subnet.this_public : lookup(local.public_subnet_cidr_to_subnet_name, this.cidr_block) => this.id }
 }
 
-output "public_natgw_eips" {
-  value = [for this in aws_eip.this_public : this.public_ip]
+output "public_natgw_az_to_eip" {
+  value = { for az, this in aws_eip.this_public : az => this.public_ip }
 }
 
 output "isolated_route_table_ids" {
