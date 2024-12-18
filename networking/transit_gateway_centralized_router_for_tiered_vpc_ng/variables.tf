@@ -95,6 +95,29 @@ variable "centralized_router" {
     )
     error_message = "The amazon side ASN should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
   }
+
+  validation {
+    condition = anytrue([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr != null
+      ]) ? alltrue([
+      for this in var.centralized_router.vpcs : this.ipv6_network_cidr != null
+    ]) : true
+    error_message = "If any VPC has IPv6 configured then all VPCs must also have IPv6 configured."
+  }
+
+  validation {
+    condition = anytrue([
+      for this in var.centralized_router.vpcs : this.centralized_egress_private
+    ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) == 1 : true
+    error_message = "If any VPC has centralized_egress_private = true then there must be one VPC with centralized_egress_central = true."
+  }
+
+  validation {
+    condition = anytrue([
+      for this in var.centralized_router.vpcs : this.centralized_egress_central
+    ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_private if this.centralized_egress_private]) - 1 == length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) : true
+    error_message = "If there is VPC has centralized_egress_central = true then rest of the VPCs must have centralized_egress_private = true."
+  }
 }
 
 variable "tags" {

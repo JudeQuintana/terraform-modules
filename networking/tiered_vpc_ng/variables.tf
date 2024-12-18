@@ -195,6 +195,38 @@ variable "tiered_vpc" {
     condition     = length(var.tiered_vpc.ipv6.secondary_cidrs) > 0 ? var.tiered_vpc.ipv6.network_cidr != null : true
     error_message = "If var.tiered_vpc.ipv6_secondary_cidrs is populated then var.tiered.vpc_ipv6_network_cidr must be defined."
   }
+
+  validation {
+    condition     = var.tiered_vpc.ipv4.centralized_egress.central ? !var.tiered_vpc.ipv4.centralized_egress.private : true
+    error_message = "var.tiered_vpc.centralized_egress.central and var.tiered_vpc.centralized_egress.private cannot both be true."
+  }
+
+  validation {
+    condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
+      for this in var.tiered_vpc.azs : [
+        for public_subnet in this.public_subnets :
+        public_subnet.natgw if public_subnet.natgw
+    ]])) == length(var.tiered_vpc.azs) : true
+    error_message = "If var.tiered_vpc.centralized_egress.central is true then each AZ must have a NATGW."
+  }
+
+  validation {
+    condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
+      for this in var.tiered_vpc.azs : [
+        for private_subnet in this.private_subnets :
+        private_subnet.special if private_subnet.special
+    ]])) == length(var.tiered_vpc.azs) : true
+    error_message = "If var.tiered_vpc.centralized_egress.central is true then one private subnet mush have special = true per AZ."
+  }
+
+  validation {
+    condition = var.tiered_vpc.ipv4.centralized_egress.private ? length(flatten([
+      for this in var.tiered_vpc.azs : [
+        for public_subnet in this.public_subnets :
+        public_subnet.natgw if public_subnet.natgw
+    ]])) == 0 : true
+    error_message = "If var.tiered_vpc.centralized_egress.private is true then there must not be a NATGW per AZ."
+  }
 }
 
 variable "tags" {
