@@ -1,6 +1,5 @@
 locals {
   centralized_egress_route_any_cidr = "0.0.0.0/0"
-  # validation: should only be one
   centralized_egress_central_route_any_cidr_to_vpc_id = {
     for this in var.centralized_router.vpcs :
     this.id => local.centralized_egress_route_any_cidr

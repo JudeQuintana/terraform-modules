@@ -20,7 +20,6 @@ variable "tiered_vpc" {
         id = string
       })
       centralized_egress = optional(object({
-        # todo validation
         central = optional(bool, false)
         private = optional(bool, false)
       }), {})
