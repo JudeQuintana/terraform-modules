@@ -115,7 +115,7 @@ variable "centralized_router" {
   validation {
     condition = anytrue([
       for this in var.centralized_router.vpcs : this.centralized_egress_central
-    ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_private if this.centralized_egress_private]) - 1 == length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) : true
+    ]) ? length(var.centralized_router.vpcs) - length([for this in var.centralized_router.vpcs : this.centralized_egress_private if this.centralized_egress_private]) == length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) : true
     error_message = "If there is VPC has centralized_egress_central = true then rest of the VPCs must have centralized_egress_private = true."
   }
 }
