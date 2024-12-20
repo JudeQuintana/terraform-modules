@@ -1,8 +1,16 @@
+locals {
+  vpcs = {
+    for this in var.centralized_router.vpcs :
+    this.id => this
+    if length(concat(this.private_special_subnet_ids, this.public_special_subnet_ids)) > 0
+  }
+}
+
 # Create routes to other VPC network_cidrs in private and public route tables for each VPC
 module "this_generate_routes_to_other_vpcs" {
   source = "./modules/generate_routes_to_other_vpcs"
 
-  vpcs = var.centralized_router.vpcs
+  vpcs = local.vpcs
 }
 
 locals {

@@ -32,7 +32,7 @@ variable "tiered_vpc" {
         id = optional(string)
       }), {})
     }), {})
-    azs = map(object({
+    azs = optional(map(object({
       eigw = optional(bool, false)
       private_subnets = optional(list(object({
         name      = string
@@ -52,7 +52,7 @@ variable "tiered_vpc" {
         cidr      = string
         ipv6_cidr = optional(string)
       })), [])
-    }))
+    })), {})
     dns_support   = optional(bool, true)
     dns_hostnames = optional(bool, true)
   })
@@ -89,11 +89,12 @@ variable "tiered_vpc" {
   }
 
   validation {
-    condition = alltrue([
-      for this in var.tiered_vpc.azs :
-      length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1
-    ])
-    error_message = "There must be either 1 private subnet or 1 public subnet with the special attribute set to true per AZ."
+    condition = alltrue(flatten([
+      for this in var.tiered_vpc.azs : [
+        for subnet in concat(this.private_subnets, this.public_subnets) :
+        anytrue([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special]) ? length([for subnet in concat(this.private_subnets, this.public_subnets) : subnet.special if subnet.special]) == 1 : true
+    ]]))
+    error_message = "There must be either 1 private subnet or 1 public subnet with the special = true per AZ if special = true is set at all."
   }
 
   validation {
