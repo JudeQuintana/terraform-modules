@@ -203,6 +203,11 @@ variable "tiered_vpc" {
   }
 
   validation {
+    condition     = var.tiered_vpc.ipv4.centralized_egress.remove_az ? !var.tiered_vpc.ipv4.centralized_egress.private : true
+    error_message = "var.tiered_vpc.centralized_egress.remove_az and var.tiered_vpc.centralized_egress.private cannot both be true."
+  }
+
+  validation {
     condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
       for this in var.tiered_vpc.azs : [
         for public_subnet in this.public_subnets :
