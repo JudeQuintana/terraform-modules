@@ -20,8 +20,9 @@ variable "tiered_vpc" {
         id = string
       })
       centralized_egress = optional(object({
-        central = optional(bool, false)
-        private = optional(bool, false)
+        central   = optional(bool, false)
+        remove_az = optional(bool, false)
+        private   = optional(bool, false)
       }), {})
     })
     # ipv6 requires ipam
@@ -205,9 +206,9 @@ variable "tiered_vpc" {
     condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
       for this in var.tiered_vpc.azs : [
         for public_subnet in this.public_subnets :
-        public_subnet.natgw if public_subnet.natgw
-    ]])) == length(var.tiered_vpc.azs) : true
-    error_message = "If var.tiered_vpc.centralized_egress.central is true then each AZ must have a NATGW."
+        public_subnet.natgw if public_subnet.natgw && !var.tiered_vpc.ipv4.centralized_egress.remove_az
+    ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
+    error_message = "If var.tiered_vpc.centralized_egress.central is true then each AZ must have a NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {
@@ -215,8 +216,8 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs : [
         for private_subnet in this.private_subnets :
         private_subnet.special if private_subnet.special
-    ]])) == length(var.tiered_vpc.azs) : true
-    error_message = "If var.tiered_vpc.centralized_egress.central is true then one private subnet mush have special = true per AZ."
+    ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
+    error_message = "If var.tiered_vpc.centralized_egress.central is true then one private subnet mush have special = true per AZ unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {
