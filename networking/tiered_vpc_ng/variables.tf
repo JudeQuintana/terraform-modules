@@ -210,8 +210,17 @@ variable "tiered_vpc" {
   validation {
     condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
       for this in var.tiered_vpc.azs : [
+        for private_subnet in this.private_subnets :
+        private_subnet.special if private_subnet.special
+    ]])) > 0 : true
+    error_message = "If var.tiered_vpc.centralized_egress.central then there must be at least one private subnet with special = true."
+  }
+
+  validation {
+    condition = var.tiered_vpc.ipv4.centralized_egress.central ? length(flatten([
+      for this in var.tiered_vpc.azs : [
         for public_subnet in this.public_subnets :
-        public_subnet.natgw if public_subnet.natgw && !var.tiered_vpc.ipv4.centralized_egress.remove_az
+        public_subnet.natgw if public_subnet.natgw
     ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
     error_message = "If var.tiered_vpc.centralized_egress.central is true then each AZ must have a NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
