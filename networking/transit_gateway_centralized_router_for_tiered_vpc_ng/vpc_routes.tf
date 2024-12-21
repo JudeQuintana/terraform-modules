@@ -1,4 +1,5 @@
 locals {
+  # the if statement controls wether or not to add the vpc and it's azs the to the mesh
   vpcs = {
     for this in var.centralized_router.vpcs :
     this.id => this
