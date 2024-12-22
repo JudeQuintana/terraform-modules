@@ -19,7 +19,7 @@ resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_central_vp
 # private vpc routes
 locals {
   centralized_egress_private_route_table_id_to_route_any_cidr = merge([
-    for this in var.centralized_router.vpcs : {
+    for this in local.vpcs : {
       for private_route_table_id in this.private_route_table_ids :
       private_route_table_id => local.centralized_egress_route_any_cidr
     } if this.centralized_egress_private
