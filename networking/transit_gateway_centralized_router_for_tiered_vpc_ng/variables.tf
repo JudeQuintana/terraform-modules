@@ -98,15 +98,6 @@ variable "centralized_router" {
 
   validation {
     condition = anytrue([
-      for this in var.centralized_router.vpcs : this.ipv6_network_cidr != null
-      ]) ? alltrue([
-      for this in var.centralized_router.vpcs : this.ipv6_network_cidr != null
-    ]) : true
-    error_message = "If any VPC has IPv6 configured then all VPCs must also have IPv6 configured."
-  }
-
-  validation {
-    condition = anytrue([
       for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central
     ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) == 1 : true
     error_message = "There must be one VPC with centralized_egress_central = true."
