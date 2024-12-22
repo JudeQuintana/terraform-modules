@@ -222,7 +222,7 @@ variable "tiered_vpc" {
         for public_subnet in this.public_subnets :
         public_subnet.natgw if public_subnet.natgw
     ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
-    error_message = "If var.tiered_vpc.centralized_egress.central = true then each AZ must have a NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true (used for decomissioning an AZ)."
+    error_message = "If var.tiered_vpc.centralized_egress.central = true then each AZ must have a NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {
@@ -231,7 +231,7 @@ variable "tiered_vpc" {
         for private_subnet in this.private_subnets :
         private_subnet.special if private_subnet.special
     ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
-    error_message = "If var.tiered_vpc.centralized_egress.central = true then one private subnet mush have special = true per AZ unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true (used for decomissioning an AZ)."
+    error_message = "If var.tiered_vpc.centralized_egress.central = true then one private subnet mush have special = true per AZ unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {
