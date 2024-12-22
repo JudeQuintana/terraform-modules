@@ -1,6 +1,6 @@
 locals {
   # the if will add the vpc and it's azs the to the mesh if there's 1 or more AZs with spcecial = true
-  # if there are no AZs with special = true then the AZ is fully removed from the mesh
+  # if there are no AZs with special = true then the VPC is fully removed from the mesh
   vpcs = {
     for this in var.centralized_router.vpcs :
     this.id => this
