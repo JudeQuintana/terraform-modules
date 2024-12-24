@@ -47,10 +47,11 @@ resource "aws_route_table" "this_public" {
     local.default_tags,
     {
       Name = format(
-        "%s-%s-%s-%s",
+        "%s-%s-%s-%s-%s",
         upper(var.env_prefix),
         var.tiered_vpc.name,
         local.public_label,
+        "all",
         local.region_label
       )
   })
