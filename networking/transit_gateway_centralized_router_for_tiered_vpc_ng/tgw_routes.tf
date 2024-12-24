@@ -57,7 +57,8 @@ resource "aws_ec2_transit_gateway_route" "this_blackholes" {
   blackhole                      = true
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 
-  # ability to override any automatic static routes
+  # blackhole routes are filtered out from each dependant resource
+  # which gives the ability to gracefully override any automatic static tgw route (0.0.0.0/0, etc)
   depends_on = [
     aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs,
     aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs,
