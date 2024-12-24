@@ -134,7 +134,7 @@ variable "tiered_vpc" {
       for this in var.tiered_vpc.azs :
       this.eigw ? length([for subnet in this.private_subnets : subnet.ipv6_cidr if subnet.ipv6_cidr != null]) > 0 : true
     ])
-    error_message = "If eigw is true for an AZ then at least one private IPv6 dual stack subnet must be configured in the same AZ."
+    error_message = "If eigw is true for an AZ then at least 1 private IPv6 dual stack subnet must be configured in the same AZ."
   }
 
   validation {
@@ -213,7 +213,7 @@ variable "tiered_vpc" {
         for public_subnet in this.public_subnets :
         public_subnet.natgw if public_subnet.natgw
     ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
-    error_message = "If var.tiered_vpc.centralized_egress.central = true then each AZ must have a NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
+    error_message = "If var.tiered_vpc.centralized_egress.central = true then each AZ must have 1 NATGW unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {
@@ -222,7 +222,7 @@ variable "tiered_vpc" {
         for private_subnet in this.private_subnets :
         private_subnet.special if private_subnet.special
     ]])) == length(var.tiered_vpc.azs) || var.tiered_vpc.ipv4.centralized_egress.remove_az : true
-    error_message = "If var.tiered_vpc.centralized_egress.central = true then one private subnet mush have special = true per AZ unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
+    error_message = "If var.tiered_vpc.centralized_egress.central = true then 1 private subnet mush have special = true per AZ unless var.tiered_vpc.ipv4.centralized_egress.remove_az = true."
   }
 
   validation {

@@ -101,14 +101,14 @@ variable "centralized_router" {
     condition = anytrue([
       for this in var.centralized_router.vpcs : this.centralized_egress_private
     ]) ? alltrue([for this in var.centralized_router.vpcs : length(this.public_natgw_az_to_eip) == 0 if this.centralized_egress_private]) : true
-    error_message = "Every VPC with centralized_egress_private = true must have zero NATGWs per AZ."
+    error_message = "Every VPC with centralized_egress_private = true must have 0 NATGWs per AZ."
   }
 
   validation {
     condition = anytrue([
       for this in var.centralized_router.vpcs : this.centralized_egress_central
     ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) == 1 : true
-    error_message = "There must be one VPC with centralized_egress_central = true."
+    error_message = "There must be 1 VPC with centralized_egress_central = true."
   }
 }
 
