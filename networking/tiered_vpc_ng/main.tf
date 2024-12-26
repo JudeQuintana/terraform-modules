@@ -9,7 +9,7 @@
 * - better validation on private and public subnets that have `special = true` attribute set per AZ
 *   - allows for more fexible building and destroying AZs for the VPC.
 * - AWS ref: [Centralized Egress](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/using-nat-gateway-for-centralized-egress.html)
-* - New [Centralized Egress Dual Stack Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/centralized_egresss_dual_stack_full_mesh_trio_demo)
+* - New [Centralized Egress Dual Stack Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/centralized_egress_dual_stack_full_mesh_trio_demo)
 *
 * `v1.9.2`
 * - support for dual stack isolated subnets
