@@ -49,10 +49,11 @@ resource "aws_route_table" "this_isolated" {
     local.default_tags,
     {
       Name = format(
-        "%s-%s-%s-%s",
+        "%s-%s-%s-%s-%s",
         local.upper_env_prefix,
         var.tiered_vpc.name,
         local.isolated_label,
+        "all",
         local.region_label
       )
   })

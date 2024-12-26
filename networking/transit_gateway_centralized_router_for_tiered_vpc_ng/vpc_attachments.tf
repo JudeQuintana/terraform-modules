@@ -1,7 +1,7 @@
 locals {
   vpc_attachment_format = "%s <-> %s"
   vpc_id_to_vpc_attachment = {
-    for this in var.centralized_router.vpcs :
+    for this in local.vpcs :
     this.id => {
       full_name    = this.full_name
       subnet_ids   = concat(this.private_special_subnet_ids, this.public_special_subnet_ids)

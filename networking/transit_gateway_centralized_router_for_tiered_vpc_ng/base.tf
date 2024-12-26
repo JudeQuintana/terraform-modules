@@ -29,12 +29,12 @@ resource "aws_ec2_transit_gateway" "this" {
   lifecycle {
     # preconditions are evaluated on apply only.
     precondition {
-      condition     = alltrue([for this in var.centralized_router.vpcs : contains([local.region_name], this.region)])
+      condition     = alltrue([for this in local.vpcs : contains([local.region_name], this.region)])
       error_message = "All VPC regions must match the aws provider region for Centralized Router."
     }
 
     precondition {
-      condition     = alltrue([for this in var.centralized_router.vpcs : contains([local.account_id], this.account_id)])
+      condition     = alltrue([for this in local.vpcs : contains([local.account_id], this.account_id)])
       error_message = "All VPC account IDs must match the aws provider account ID for Centralized Router."
     }
   }

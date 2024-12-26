@@ -1,4 +1,16 @@
 # Tiered VPC-NG
+
+`v1.9.3`
+- support for centralized egress modes when passed to centralized router
+  - `central = true` makes VPC the egress VPC
+  - `private = true` makes VPC opt in to route private subnet traffic out the egress VPC per AZ
+  - outputs for each mode
+- new `output.public_natgw_az_to_eip` map of natgw eip per az
+- better validation on private and public subnets that have `special = true` attribute set per AZ
+  - allows for more fexible building and destroying AZs for the VPC.
+- AWS ref: [Centralized Egress](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/using-nat-gateway-for-centralized-egress.html)
+- New [Centralized Egress Dual Stack Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/centralized_egress_dual_stack_full_mesh_trio_demo)
+
 `v1.9.2`
 - support for dual stack isolated subnets
 
@@ -404,13 +416,15 @@ No modules.
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
-| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br/>    name = string<br/>    # ipv4 requires ipam<br/>    ipv4 = object({<br/>      network_cidr    = string<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = object({<br/>        id = string<br/>      })<br/>    })<br/>    # ipv6 requires ipam<br/>    ipv6 = optional(object({<br/>      network_cidr    = optional(string)<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = optional(object({<br/>        id = optional(string)<br/>      }), {})<br/>    }), {})<br/>    azs = map(object({<br/>      eigw = optional(bool, false)<br/>      isolated_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>      })), [])<br/>      private_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>      })), [])<br/>      public_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>        natgw     = optional(bool, false)<br/>      })), [])<br/>    }))<br/>    enable_dns_support   = optional(bool, true)<br/>    enable_dns_hostnames = optional(bool, true)<br/>  })</pre> | n/a | yes |
+| <a name="input_tiered_vpc"></a> [tiered\_vpc](#input\_tiered\_vpc) | Tiered VPC configuration | <pre>object({<br/>    name = string<br/>    # ipv4 requires ipam<br/>    ipv4 = object({<br/>      network_cidr    = string<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = object({<br/>        id = string<br/>      })<br/>      centralized_egress = optional(object({<br/>        central   = optional(bool, false)<br/>        remove_az = optional(bool, false)<br/>        private   = optional(bool, false)<br/>      }), {})<br/>    })<br/>    # ipv6 requires ipam<br/>    ipv6 = optional(object({<br/>      network_cidr    = optional(string)<br/>      secondary_cidrs = optional(list(string), [])<br/>      ipam_pool = optional(object({<br/>        id = optional(string)<br/>      }), {})<br/>    }), {})<br/>    azs = optional(map(object({<br/>      eigw = optional(bool, false)<br/>      private_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>      })), [])<br/>      public_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>        special   = optional(bool, false)<br/>        natgw     = optional(bool, false)<br/>      })), [])<br/>      isolated_subnets = optional(list(object({<br/>        name      = string<br/>        cidr      = string<br/>        ipv6_cidr = optional(string)<br/>      })), [])<br/>    })), {})<br/>    dns_support   = optional(bool, true)<br/>    dns_hostnames = optional(bool, true)<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | n/a |
+| <a name="output_centralized_egress_central"></a> [centralized\_egress\_central](#output\_centralized\_egress\_central) | n/a |
+| <a name="output_centralized_egress_private"></a> [centralized\_egress\_private](#output\_centralized\_egress\_private) | n/a |
 | <a name="output_default_security_group_id"></a> [default\_security\_group\_id](#output\_default\_security\_group\_id) | n/a |
 | <a name="output_full_name"></a> [full\_name](#output\_full\_name) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
@@ -429,6 +443,7 @@ No modules.
 | <a name="output_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#output\_private\_subnet\_cidrs) | n/a |
 | <a name="output_private_subnet_name_to_subnet_id"></a> [private\_subnet\_name\_to\_subnet\_id](#output\_private\_subnet\_name\_to\_subnet\_id) | n/a |
 | <a name="output_public_ipv6_subnet_cidrs"></a> [public\_ipv6\_subnet\_cidrs](#output\_public\_ipv6\_subnet\_cidrs) | n/a |
+| <a name="output_public_natgw_az_to_eip"></a> [public\_natgw\_az\_to\_eip](#output\_public\_natgw\_az\_to\_eip) | n/a |
 | <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | n/a |
 | <a name="output_public_special_subnet_ids"></a> [public\_special\_subnet\_ids](#output\_public\_special\_subnet\_ids) | n/a |
 | <a name="output_public_subnet_cidrs"></a> [public\_subnet\_cidrs](#output\_public\_subnet\_cidrs) | n/a |

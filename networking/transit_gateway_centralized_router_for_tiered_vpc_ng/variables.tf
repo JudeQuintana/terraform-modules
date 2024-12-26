@@ -20,6 +20,7 @@ variable "centralized_router" {
     }), {})
     vpcs = optional(map(object({
       account_id                 = string
+      region                     = string
       full_name                  = string
       id                         = string
       name                       = string
@@ -31,7 +32,9 @@ variable "centralized_router" {
       public_route_table_ids     = list(string)
       private_special_subnet_ids = list(string)
       public_special_subnet_ids  = list(string)
-      region                     = string
+      public_natgw_az_to_eip     = map(string)
+      centralized_egress_private = bool
+      centralized_egress_central = bool
     })), {})
   })
 
@@ -92,6 +95,20 @@ variable "centralized_router" {
       var.centralized_router.amazon_side_asn >= 4200000000 && var.centralized_router.amazon_side_asn <= 4294967294
     )
     error_message = "The amazon side ASN should be within 64512 to 65534 (inclusive) for 16-bit ASNs and 4200000000 to 4294967294 (inclusive) for 32-bit ASNs."
+  }
+
+  validation {
+    condition = anytrue([
+      for this in var.centralized_router.vpcs : this.centralized_egress_private
+    ]) ? alltrue([for this in var.centralized_router.vpcs : length(this.public_natgw_az_to_eip) == 0 if this.centralized_egress_private]) : true
+    error_message = "Every VPC with centralized_egress_private = true must have 0 NATGWs per AZ."
+  }
+
+  validation {
+    condition = anytrue([
+      for this in var.centralized_router.vpcs : this.centralized_egress_central
+    ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) == 1 : true
+    error_message = "There must be 1 VPC with centralized_egress_central = true."
   }
 }
 
