@@ -5,6 +5,7 @@
 * - support for centralized egress modes when passed to centralized router
 *   - `central = true` makes VPC the egress VPC
 *   - `private = true` makes VPC opt in to route private subnet traffic out the egress VPC per AZ
+*   - outputs for each mode
 * - new `output.public_natgw_az_to_eip` map of natgw eip per az
 * - better validation on private and public subnets that have `special = true` attribute set per AZ
 *   - allows for more fexible building and destroying AZs for the VPC.
