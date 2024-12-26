@@ -2,6 +2,11 @@
 * # Transit Gateway Centralized Router
 * - Creates hub and spoke topology from VPCs.
 *
+* `v1.9.3`
+* - support for VPC centralized egress modes when passed to centralized router with validation
+*   - when a VPC has `central = true` create `0.0.0.0/0` route on tgw route table
+*   - when a VPC has `private = true` create `0.0.0.0/0` route on all private subnet route tables.
+*
 * `v1.9.1`
 * - ability to switch between a blackhole route and a static route that have the same cidr/ipv6_cidr for vpc attachments.
 *

@@ -1,6 +1,11 @@
 # Transit Gateway Centralized Router
 - Creates hub and spoke topology from VPCs.
 
+`v1.9.3`
+- support for VPC centralized egress modes when passed to centralized router with validation
+  - when a VPC has `central = true` create `0.0.0.0/0` route on tgw route table
+  - when a VPC has `private = true` create `0.0.0.0/0` route on all private subnet route tables.
+
 `v1.9.1`
 - ability to switch between a blackhole route and a static route that have the same cidr/ipv6\_cidr for vpc attachments.
 
@@ -113,12 +118,14 @@ Main:
 |------|------|
 | [aws_ec2_transit_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway) | resource |
 | [aws_ec2_transit_gateway_route.this_blackholes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_centralized_egress_tgw_central_vpc_route_any](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_tgw_ipv6_routes_to_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_tgw_routes_to_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route_table.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_propagation.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_propagation) | resource |
 | [aws_ec2_transit_gateway_vpc_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_vpc_attachment) | resource |
+| [aws_route.this_centralized_egress_private_vpc_route_any](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_ipv6_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -128,7 +135,7 @@ Main:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      region                     = string<br/>    })), {})<br/>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      region                     = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      public_natgw_az_to_eip     = map(string)<br/>      centralized_egress_private = optional(bool, false)<br/>      centralized_egress_central = optional(bool, false)<br/>    })), {})<br/>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
