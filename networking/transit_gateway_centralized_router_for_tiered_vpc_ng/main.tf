@@ -6,6 +6,13 @@
 * - support for VPC centralized egress modes when passed to centralized router with validation
 *   - when a VPC has `central = true` create `0.0.0.0/0` route on tgw route table
 *   - when a VPC has `private = true` create `0.0.0.0/0` route on all private subnet route tables.
+* - It is no longer required for a VPC's AZ to have a private or public subnet with `special = true` but
+*   if there are subnets with `special = true` then it must be either 1 private or 1 public subnet that has it
+*   configured per AZ (validation enforced).
+* - Any VPC that has a private or public subnet with `special = true`, that subnet will be used as
+*   the VPC attachment for it's AZ when passed to Centralized Router.
+* - If the VPC does not have any AZs with private or public subnet with `special = true` it will be removed
+*   from the Centralized Router.
 *
 * `v1.9.1`
 * - ability to switch between a blackhole route and a static route that have the same cidr/ipv6_cidr for vpc attachments.
