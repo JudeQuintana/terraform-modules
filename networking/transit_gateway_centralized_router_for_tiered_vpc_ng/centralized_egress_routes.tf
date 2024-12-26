@@ -1,6 +1,6 @@
 locals {
   centralized_egress_route_any_cidr = "0.0.0.0/0"
-  centralized_egress_central_vpc_id_to_route_any_cidr_ = {
+  centralized_egress_central_vpc_id_to_route_any_cidr = {
     for this in local.vpcs :
     this.id => local.centralized_egress_route_any_cidr
     if this.centralized_egress_central && !contains(var.centralized_router.blackhole.cidrs, local.centralized_egress_route_any_cidr)
