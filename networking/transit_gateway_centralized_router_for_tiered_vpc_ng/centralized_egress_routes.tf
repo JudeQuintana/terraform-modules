@@ -16,7 +16,6 @@ resource "aws_ec2_transit_gateway_route" "this_centralized_egress_tgw_central_vp
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_vpc_attachment.this, each.key).id
 }
 
-# private vpc routes
 locals {
   centralized_egress_private_route_table_id_to_route_any_cidr = merge([
     for this in local.vpcs : {
@@ -26,6 +25,7 @@ locals {
   ]...)
 }
 
+# private vpc routes
 resource "aws_route" "this_centralized_egress_private_vpc_route_any" {
   for_each = local.centralized_egress_private_route_table_id_to_route_any_cidr
 
