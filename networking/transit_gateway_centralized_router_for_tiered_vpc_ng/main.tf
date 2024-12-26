@@ -12,6 +12,8 @@
 * - Any VPC that has a private or public subnet with `special = true`, that subnet will be used as
 *   the VPC attachment for it's AZ when passed to Centralized Router.
 * - If the VPC does not have any AZs with private or public subnet with `special = true` it will be removed
+* - AWS ref: [Centralized Egress](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/using-nat-gateway-for-centralized-egress.html)
+* - New [Centralized Egress Dual Stack Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/centralized_egresss_dual_stack_full_mesh_trio_demo)
 *   from the Centralized Router.
 *
 * `v1.9.1`
