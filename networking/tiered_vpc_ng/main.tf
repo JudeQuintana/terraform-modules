@@ -1,6 +1,9 @@
 /*
 * # Tiered VPC-NG
 *
+* `v1.9.4`
+* - minor isolated subnets logic fix
+*
 * `v1.9.3`
 * - support for centralized egress modes when passed to centralized router
 *   - `central = true` makes VPC the egress VPC
