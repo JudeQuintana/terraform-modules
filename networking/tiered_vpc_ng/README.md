@@ -1,7 +1,7 @@
 # Tiered VPC-NG
 
 `v1.9.4`
-- minor isolated subnets logic fix
+- minor: x\_az\_to\_subnet\_cidrs logic not needed.
 
 `v1.9.3`
 - support for centralized egress modes when passed to centralized router
