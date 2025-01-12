@@ -2,7 +2,7 @@
 * # Tiered VPC-NG
 *
 * `v1.9.4`
-* - minor: x_az_to_subnet_cidrs logic not needed.
+* - minor: public_az_to_subnet_cidrs and isolated_az_to_subnet_cidrs logic not needed but is required for private_az_to_subnet_cidrs.
 *
 * `v1.9.3`
 * - support for centralized egress modes when passed to centralized router
