@@ -3,7 +3,7 @@
 * - Creates hub and spoke topology from VPCs.
 *
 * `v1.9.4`
-* - remove legacy output `vpc.routes`
+* - remove legacy output `vpc.routes`. will rebuild super router at a later time but no need to keep this around.
 *
 * `v1.9.3`
 * - support for VPC centralized egress modes when passed to centralized router with validation
