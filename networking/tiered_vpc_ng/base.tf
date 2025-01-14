@@ -15,9 +15,6 @@ locals {
   route_any_cidr      = "0.0.0.0/0"
   route_any_ipv6_cidr = "::/0"
   upper_env_prefix    = upper(var.env_prefix)
-
-  # Set Environment tag since we have have var.env_prefix
-  # add or override with var.tags
   default_tags = merge({
     Environment = var.env_prefix
   }, var.tags)

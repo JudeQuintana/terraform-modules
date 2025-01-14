@@ -3,7 +3,7 @@ locals {
   isolated_subnet_cidrs               = toset(flatten([for az, this in var.tiered_vpc.azs : this.isolated_subnets[*].cidr]))
   isolated_any_subnet_exists          = length(local.isolated_subnet_cidrs) > 0
   isolated_route_table                = { for this in [local.isolated_any_subnet_exists] : this => this if local.isolated_any_subnet_exists }
-  isolated_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.isolated_subnets[*].cidr if local.isolated_any_subnet_exists }
+  isolated_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.isolated_subnets[*].cidr }
   isolated_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.isolated_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   isolated_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.isolated_subnets[*].cidr, this.isolated_subnets[*].name)]...)
 

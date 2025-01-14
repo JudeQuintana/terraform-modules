@@ -1,5 +1,8 @@
 # Tiered VPC-NG
 
+`v1.9.4`
+- minor: public\_az\_to\_subnet\_cidrs and isolated\_az\_to\_subnet\_cidrs logic not needed but is required for private\_az\_to\_subnet\_cidrs because it is used for route table resource creation.
+
 `v1.9.3`
 - support for centralized egress modes when passed to centralized router
   - `central = true` makes VPC the egress VPC
