@@ -40,6 +40,7 @@ variable "tiered_vpc" {
         cidr      = string
         ipv6_cidr = optional(string)
         special   = optional(bool, false)
+        tags      = optional(map(string), {})
       })), [])
       public_subnets = optional(list(object({
         name      = string
@@ -47,11 +48,13 @@ variable "tiered_vpc" {
         ipv6_cidr = optional(string)
         special   = optional(bool, false)
         natgw     = optional(bool, false)
+        tags      = optional(map(string), {})
       })), [])
       isolated_subnets = optional(list(object({
         name      = string
         cidr      = string
         ipv6_cidr = optional(string)
+        tags      = optional(map(string), {})
       })), [])
     })), {})
     dns_support   = optional(bool, true)
