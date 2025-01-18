@@ -23,8 +23,8 @@ resource "aws_subnet" "this_public" {
   ipv6_cidr_block         = lookup(local.public_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = true
   tags = merge(
-    local.default_tags,
     lookup(local.public_subnet_cidr_to_tags, each.key),
+    local.default_tags,
     {
       Name = format(
         "%s-%s-%s-%s-%s",
