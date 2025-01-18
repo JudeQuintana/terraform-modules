@@ -1,6 +1,9 @@
 /*
 * # Tiered VPC-NG
 *
+* `v1.9.5`
+* - tag individual private, public or isolated subnets. useful for kubernetes clusters.
+*
 * `v1.9.4`
 * - minor: public_az_to_subnet_cidrs and isolated_az_to_subnet_cidrs logic not needed but is required for private_az_to_subnet_cidrs because it is used for route table resource creation.
 *
