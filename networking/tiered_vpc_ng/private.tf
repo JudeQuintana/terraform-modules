@@ -4,6 +4,7 @@ locals {
   private_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.private_subnets[*].cidr if length(this.private_subnets) > 0 }
   private_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.private_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   private_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].name)]...)
+  private_subnet_cidr_to_tags        = merge([for this in var.tiered_vpc.azs : zipmap(this.private_subnets[*].cidr, this.private_subnets[*].tags)]...)
   private_az_to_special_subnet_cidr  = merge([for az, this in var.tiered_vpc.azs : { for private_subnet in this.private_subnets : az => private_subnet.cidr if private_subnet.special }]...)
 
   #ipv6 dual stack
@@ -22,6 +23,7 @@ resource "aws_subnet" "this_private" {
   ipv6_cidr_block         = lookup(local.private_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = false
   tags = merge(
+    lookup(local.private_subnet_cidr_to_tags, each.key),
     local.default_tags,
     {
       Name = format(

@@ -6,6 +6,7 @@ locals {
   isolated_az_to_subnet_cidrs         = { for az, this in var.tiered_vpc.azs : az => this.isolated_subnets[*].cidr }
   isolated_subnet_cidr_to_az          = { for subnet_cidr, azs in transpose(local.isolated_az_to_subnet_cidrs) : subnet_cidr => element(azs, 0) }
   isolated_subnet_cidr_to_subnet_name = merge([for this in var.tiered_vpc.azs : zipmap(this.isolated_subnets[*].cidr, this.isolated_subnets[*].name)]...)
+  isolated_subnet_cidr_to_tags        = merge([for this in var.tiered_vpc.azs : zipmap(this.isolated_subnets[*].cidr, this.isolated_subnets[*].tags)]...)
 
   # isolated ipv6 dual stack subnets
   isolated_ipv6_subnet_cidrs               = toset(flatten([for az, this in var.tiered_vpc.azs : compact(this.isolated_subnets[*].ipv6_cidr)]))
@@ -22,6 +23,7 @@ resource "aws_subnet" "this_isolated" {
   ipv6_cidr_block         = lookup(local.isolated_subnet_cidr_to_ipv6_subnet_cidr, each.key)
   map_public_ip_on_launch = false
   tags = merge(
+    lookup(local.isolated_subnet_cidr_to_tags, each.key),
     local.default_tags,
     {
       Name = format(
