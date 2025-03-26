@@ -18,6 +18,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -35,6 +38,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -52,6 +58,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -69,6 +78,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -86,6 +98,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -103,6 +118,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -120,6 +138,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -137,6 +158,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -154,6 +178,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -171,6 +198,9 @@ variable "mega_mesh" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
