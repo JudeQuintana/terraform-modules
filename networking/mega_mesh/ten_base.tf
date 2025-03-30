@@ -10,8 +10,9 @@ locals {
   ten_provider_account_id  = data.aws_caller_identity.this_ten.account_id
   ten_provider_region_name = data.aws_region.this_ten.name
 
-  ten_tgw                     = var.mega_mesh.ten.centralized_router
-  ten_tgw_vpc_network_cidrs   = toset(concat(local.ten_tgw.vpc.network_cidrs, local.ten_tgw.vpc.secondary_cidrs))
-  ten_tgw_vpc_route_table_ids = toset(concat(local.ten_tgw.vpc.private_route_table_ids, local.ten_tgw.vpc.public_route_table_ids))
+  ten_tgw                        = var.mega_mesh.ten.centralized_router
+  ten_tgw_vpc_network_cidrs      = toset(concat(local.ten_tgw.vpc.network_cidrs, local.ten_tgw.vpc.secondary_cidrs))
+  ten_tgw_vpc_ipv6_network_cidrs = toset(cocnat(local.ten_tgw.vpc.ipv6_network_cidrs, local.ten_tgw.vpc.ipv6_secondary_cidrs))
+  ten_tgw_vpc_route_table_ids    = toset(concat(local.ten_tgw.vpc.private_route_table_ids, local.ten_tgw.vpc.public_route_table_ids))
 }
 
