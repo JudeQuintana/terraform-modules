@@ -1,19 +1,68 @@
 locals {
   route_format = "%s|%s"
 
-  local_tgws_all_vpc_network_cidrs              = flatten(local.local_tgws[*].vpc.network_cidrs)
-  local_tgws_all_vpc_routes                     = flatten(local.local_tgws[*].vpc.routes)
-  local_tgws_all_vpc_routes_route_table_ids     = local.local_tgws_all_vpc_routes[*].route_table_id
-  local_tgws_all_vpc_routes_transit_gateway_ids = local.local_tgws_all_vpc_routes[*].transit_gateway_id
-  local_tgws_all_route_table_ids                = local.local_tgws[*].route_table_id
-  local_tgws_all_ids                            = local.local_tgws[*].id
+  local_tgws_all_vpc_network_cidrs = flatten(local.local_tgws[*].vpc.network_cidrs)
+  #local_tgws_all_vpc_routes        = flatten(local.local_tgws[*].vpc.routes)
+  #local_tgws_all_vpc_routes_route_table_ids = local.local_tgws_all_vpc_routes[*].route_table_id
 
-  peer_tgws_all_vpc_network_cidrs              = flatten(local.peer_tgws[*].vpc.network_cidrs)
-  peer_tgws_all_vpc_routes                     = flatten(local.peer_tgws[*].vpc.routes)
-  peer_tgws_all_vpc_routes_route_table_ids     = local.peer_tgws_all_vpc_routes[*].route_table_id
-  peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes[*].transit_gateway_id
-  peer_tgws_all_route_table_ids                = local.peer_tgws[*].route_table_id
-  peer_tgws_all_ids                            = local.peer_tgws[*].id
+  local_tgws_all_vpc_routes_route_table_ids_with_tgw_id = [
+    for this in local.local_tgws : {
+      route_table_ids    = concat(this.vpc.private_route_table_ids, this.vpc.public_route_table_ids)
+      transit_gateway_id = this.id
+    }
+  ]
+
+  # keep track of current rtb-id to tgw-id
+  local_tgws_all_vpc_routes_route_table_id_to_tgw_id = merge([
+    for this in local.local_tgws_all_vpc_routes_route_table_ids_with_tgw_id : {
+      for route_table_id in this.route_table_ids :
+      route_table_id => this.transit_gateway_id
+    }
+  ]...)
+
+  local_tgws_all_vpc_tgw_id_to_routes_route_table_ids = {
+    for this in local.local_tgws_all_vpc_routes_route_table_ids_with_tgw_id :
+    this.transit_gateway_id => this.route_table_ids
+  }
+
+  local_tgws_all_vpc_routes_route_table_ids = flatten(local.local_tgws_all_vpc_routes_route_table_ids_with_tgw_id[*].route_table_ids)
+  #local_tgws_all_vpc_routes_transit_gateway_ids = local.local_tgws_all_vpc_routes[*].transit_gateway_id
+  local_tgws_all_vpc_routes_transit_gateway_ids = local.local_tgws_all_vpc_routes_route_table_ids_with_tgw_id[*].transit_gateway_id
+
+  local_tgws_all_route_table_ids = local.local_tgws[*].route_table_id
+  local_tgws_all_ids             = local.local_tgws[*].id
+
+  peer_tgws_all_vpc_network_cidrs = flatten(local.peer_tgws[*].vpc.network_cidrs)
+  #peer_tgws_all_vpc_routes        = flatten(local.peer_tgws[*].vpc.routes)
+  #peer_tgws_all_vpc_routes_route_table_ids     = local.peer_tgws_all_vpc_routes[*].route_table_id
+  #peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes[*].transit_gateway_id
+
+  peer_tgws_all_vpc_routes_route_table_ids_with_tgw_id = [
+    for this in local.peer_tgws : {
+      route_table_ids    = concat(this.vpc.private_route_table_ids, this.vpc.public_route_table_ids)
+      transit_gateway_id = this.id
+    }
+  ]
+
+  # keep track of current rtb-id to tgw-id
+  peer_tgws_all_vpc_routes_route_table_id_to_tgw_id = merge([
+    for this in local.peer_tgws_all_vpc_routes_route_table_ids_with_tgw_id : {
+      for route_table_id in this.route_table_ids :
+      route_table_id => this.transit_gateway_id
+    }
+  ]...)
+
+  peer_tgws_all_vpc_tgw_id_to_routes_route_table_ids = {
+    for this in local.peer_tgws_all_vpc_routes_route_table_ids_with_tgw_id :
+    this.transit_gateway_id => this.route_table_ids
+  }
+
+  peer_tgws_all_vpc_routes_route_table_ids = flatten(local.peer_tgws_all_vpc_routes_route_table_ids_with_tgw_id[*].route_table_ids)
+  #peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes[*].transit_gateway_id
+  peer_tgws_all_vpc_routes_transit_gateway_ids = local.peer_tgws_all_vpc_routes_route_table_ids_with_tgw_id[*].transit_gateway_id
+
+  peer_tgws_all_route_table_ids = local.peer_tgws[*].route_table_id
+  peer_tgws_all_ids             = local.peer_tgws[*].id
 }
 
 ########################################################################################
@@ -84,8 +133,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_local_to_locals
 # resource "aws_ec2_transit_gateway_route_table_propagation" "this_local" {}
 
 locals {
-  # keep track of current rtb-id to tgw-id
-  local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id = zipmap(local.local_tgws_all_vpc_routes_route_table_ids, local.local_tgws_all_vpc_routes_transit_gateway_ids)
+  #local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id = zipmap(local.local_tgws_all_vpc_routes_route_table_ids, local.local_tgws_all_vpc_routes_transit_gateway_ids)
 
   # build new local vpc routes to other peer tgws
   local_vpc_routes_to_peer_tgws = [
@@ -107,7 +155,8 @@ resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id, each.value.route_table_id)
+  #transit_gateway_id     = lookup(local.local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id, each.value.route_table_id)
+  transit_gateway_id = lookup(local.local_tgws_all_vpc_routes_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {
@@ -121,7 +170,8 @@ locals {
   # generate current existing local vpc routes
   local_current_vpc_routes = flatten([
     for this in local.local_tgws : [
-      for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+      #for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+      for route_table_id_and_vpc_network_cidr in setproduct(lookup(local.local_tgws_all_vpc_tgw_id_to_routes_route_table_ids, this.id), this.vpc.network_cidrs) : {
         route_table_id         = route_table_id_and_vpc_network_cidr[0]
         destination_cidr_block = route_table_id_and_vpc_network_cidr[1]
   }]])
@@ -140,7 +190,8 @@ resource "aws_route" "this_local_vpcs_routes_to_local_vpcs" {
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id, each.value.route_table_id)
+  #transit_gateway_id     = lookup(local.local_tgw_all_vpc_route_table_id_to_local_all_vpc_tgw_id, each.value.route_table_id)
+  transit_gateway_id = lookup(local.local_tgws_all_vpc_routes_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {
@@ -271,7 +322,7 @@ resource "aws_ec2_transit_gateway_route_table_association" "this_peer_to_peers" 
 
 locals {
   # keep track of current rtb-id to tgw-id
-  peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id = zipmap(local.peer_tgws_all_vpc_routes_route_table_ids, local.peer_tgws_all_vpc_routes_transit_gateway_ids)
+  #peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id = zipmap(local.peer_tgws_all_vpc_routes_route_table_ids, local.peer_tgws_all_vpc_routes_transit_gateway_ids)
 
   # build new peer vpc routes to other local tgws
   peer_vpc_routes_to_local_tgws = [
@@ -293,7 +344,8 @@ resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id, each.value.route_table_id)
+  #transit_gateway_id = lookup(local.peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id, each.value.route_table_id)
+  transit_gateway_id = lookup(local.peer_tgws_all_vpc_routes_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {
@@ -307,7 +359,8 @@ locals {
   # generate current existing peer vpc routes
   peer_current_vpc_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+      #for route_table_id_and_vpc_network_cidr in setproduct(this.vpc.routes[*].route_table_id, this.vpc.network_cidrs) : {
+      for route_table_id_and_vpc_network_cidr in setproduct(lookup(local.peer_tgws_all_vpc_tgw_id_to_routes_route_table_ids, this.id), this.vpc.network_cidrs) : {
         route_table_id         = route_table_id_and_vpc_network_cidr[0]
         destination_cidr_block = route_table_id_and_vpc_network_cidr[1]
   }]])
@@ -326,7 +379,8 @@ resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id, each.value.route_table_id)
+  #transit_gateway_id     = lookup(local.peer_tgw_all_vpc_route_table_id_to_peer_all_vpc_tgw_id, each.value.route_table_id)
+  transit_gateway_id = lookup(local.peer_tgws_all_vpc_routes_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {
