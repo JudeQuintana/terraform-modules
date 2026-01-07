@@ -12,7 +12,8 @@ output "local" {
     amazon_side_asn = var.super_router.local.amazon_side_asn
     full_name       = local.local_super_router_name
     id              = aws_ec2_transit_gateway.this_local.id
-    network_cidrs   = local.local_tgws_vpc_network_cidrs
+    network_cidrs   = flatten(local.local_tgws[*].vpc.network_cidrs)
+    secondary_cidrs = flatten(local.local_tgws[*].vpc.secondary_cidrs)
     region          = local.local_region_name
     route_table_id  = aws_ec2_transit_gateway_route_table.this_local.id
   }
@@ -24,7 +25,8 @@ output "peer" {
     amazon_side_asn = var.super_router.peer.amazon_side_asn
     full_name       = local.peer_super_router_name
     id              = aws_ec2_transit_gateway.this_peer.id
-    network_cidrs   = local.peer_tgws_vpc_network_cidrs
+    network_cidrs   = flatten(local.peer_tgws[*].vpc.network_cidrs)
+    secondary_cidrs = flatten(local.peer_tgws[*].vpc.secondary_cidrs)
     region          = local.peer_region_name
     route_table_id  = aws_ec2_transit_gateway_route_table.this_peer.id
   }
