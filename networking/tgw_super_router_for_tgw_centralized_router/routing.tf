@@ -21,7 +21,7 @@ locals {
     this.transit_gateway_id => this.route_table_ids
   }
 
-  local_tgws_vpc_network_cidrs   = flatten(local.local_tgws[*].vpc.network_cidrs)
+  local_tgws_vpc_network_cidrs   = flatten(concat(local.local_tgws[*].vpc.network_cidrs, local.local_tgws[*].vpc.secondary_cidrs))
   local_tgws_vpc_route_table_ids = flatten(local.local_tgws_vpc_route_table_ids_with_tgw_id[*].route_table_ids)
   local_tgws_route_table_ids     = local.local_tgws[*].route_table_id
   local_tgws_ids                 = local.local_tgws[*].id
@@ -46,7 +46,7 @@ locals {
     this.transit_gateway_id => this.route_table_ids
   }
 
-  peer_tgws_vpc_network_cidrs   = flatten(local.peer_tgws[*].vpc.network_cidrs)
+  peer_tgws_vpc_network_cidrs   = flatten(concat(local.peer_tgws[*].vpc.network_cidrs, local.peer_tgws[*].vpc.secondary_cidrs))
   peer_tgws_vpc_route_table_ids = flatten(local.peer_tgws_vpc_route_table_ids_with_tgw_id[*].route_table_ids)
   peer_tgws_route_table_ids     = local.peer_tgws[*].route_table_id
   peer_tgws_ids                 = local.peer_tgws[*].id
