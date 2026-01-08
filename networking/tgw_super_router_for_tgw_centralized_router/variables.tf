@@ -11,10 +11,12 @@ variable "region_az_labels" {
 variable "super_router" {
   description = "Super Router configuration"
   type = object({
-    name            = string
-    blackhole_cidrs = optional(list(string), [])
+    name = string
     local = object({
       amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs = optional(list(string), [])
+      }), {})
       centralized_routers = optional(map(object({
         account_id      = string
         amazon_side_asn = string
@@ -34,6 +36,9 @@ variable "super_router" {
     })
     peer = object({
       amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs = optional(list(string), [])
+      }), {})
       centralized_routers = optional(map(object({
         account_id      = string
         amazon_side_asn = string
