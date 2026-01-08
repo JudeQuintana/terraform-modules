@@ -1,3 +1,14 @@
+# one route table for all local network_cidrs
+resource "aws_ec2_transit_gateway_route_table" "this_local" {
+  provider = aws.local
+
+  transit_gateway_id = aws_ec2_transit_gateway.this_local.id
+  tags = merge(
+    local.default_tags,
+    { Name = local.local_super_router_name }
+  )
+}
+
 locals {
   local_tgws_vpc_route_table_ids_with_tgw_id = [
     for this in local.local_tgws : {
@@ -21,20 +32,7 @@ locals {
   local_tgws_vpc_route_table_ids = flatten(local.local_tgws_vpc_route_table_ids_with_tgw_id[*].route_table_ids)
   local_tgws_route_table_ids     = local.local_tgws[*].route_table_id
   local_tgws_ids                 = local.local_tgws[*].id
-}
 
-# one route table for all local network_cidrs
-resource "aws_ec2_transit_gateway_route_table" "this_local" {
-  provider = aws.local
-
-  transit_gateway_id = aws_ec2_transit_gateway.this_local.id
-  tags = merge(
-    local.default_tags,
-    { Name = local.local_super_router_name }
-  )
-}
-
-locals {
   local_vpc_network_cidr_to_local_tgw = merge([
     for this in local.local_tgws : {
       for vpc_network_cidr in this.vpc.network_cidrs :

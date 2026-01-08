@@ -1,3 +1,14 @@
+# one route table for all peer network_cidrs
+resource "aws_ec2_transit_gateway_route_table" "this_peer" {
+  provider = aws.peer
+
+  transit_gateway_id = aws_ec2_transit_gateway.this_peer.id
+  tags = merge(
+    local.default_tags,
+    { Name = local.peer_super_router_name }
+  )
+}
+
 locals {
   peer_tgws_vpc_route_table_ids_with_tgw_id = [
     for this in local.peer_tgws : {
@@ -21,20 +32,7 @@ locals {
   peer_tgws_vpc_route_table_ids = flatten(local.peer_tgws_vpc_route_table_ids_with_tgw_id[*].route_table_ids)
   peer_tgws_route_table_ids     = local.peer_tgws[*].route_table_id
   peer_tgws_ids                 = local.peer_tgws[*].id
-}
 
-# one route table for all peer network_cidrs
-resource "aws_ec2_transit_gateway_route_table" "this_peer" {
-  provider = aws.peer
-
-  transit_gateway_id = aws_ec2_transit_gateway.this_peer.id
-  tags = merge(
-    local.default_tags,
-    { Name = local.peer_super_router_name }
-  )
-}
-
-locals {
   peer_vpc_network_cidr_to_peer_tgw = merge([
     for this in local.peer_tgws : {
       for vpc_network_cidr in this.vpc.network_cidrs :
