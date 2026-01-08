@@ -41,6 +41,10 @@ locals {
   local_tgws_ids                 = local.local_tgws[*].id
 }
 
+########################################################################################
+# Begin Local Centralized Router Side
+#########################################################################################
+
 # add all local tgw routes to local tgw super router
 resource "aws_ec2_transit_gateway_route" "this_local" {
   provider = aws.local
@@ -200,6 +204,10 @@ resource "aws_ec2_transit_gateway_route" "this_local_tgw_routes_to_local_tgws" {
   destination_cidr_block         = each.value.destination_cidr_block
   transit_gateway_attachment_id  = lookup(aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals, lookup(local.local_tgw_route_table_id_to_local_tgw_id, each.value.route_table_id)).id
 }
+
+########################################################################################
+# Begin Local Super Router Side
+#########################################################################################
 
 # add all peer tgw routes to local tgw super router
 resource "aws_ec2_transit_gateway_route" "this_local_to_peer_tgws" {
