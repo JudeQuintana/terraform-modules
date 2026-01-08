@@ -45,7 +45,6 @@ locals {
 resource "aws_ec2_transit_gateway_route" "this_local" {
   provider = aws.local
 
-  #for_each = local.local_vpc_network_cidr_to_local_tgw_id
   for_each = local.local_vpc_network_cidr_to_local_tgw_id
 
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
