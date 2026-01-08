@@ -15,7 +15,7 @@ output "local" {
     network_cidrs       = local.local_tgws_vpc_network_cidrs
     region              = local.local_region_name
     route_table_id      = aws_ec2_transit_gateway_route_table.this_local.id
-    centralized_routers = [for this in var.super_router.local.centralized_routers : this]
+    centralized_routers = local.local_tgws
   }
 }
 
@@ -28,6 +28,6 @@ output "peer" {
     network_cidrs       = local.peer_tgws_vpc_network_cidrs
     region              = local.peer_region_name
     route_table_id      = aws_ec2_transit_gateway_route_table.this_peer.id
-    centralized_routers = [for this in var.super_router.peer.centralized_routers : this]
+    centralized_routers = local.peer_tgws
   }
 }
