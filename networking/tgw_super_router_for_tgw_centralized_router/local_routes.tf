@@ -12,31 +12,31 @@ resource "aws_ec2_transit_gateway_route_table" "this_local" {
 locals {
   local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id = [
     for this in local.local_tgws : {
-      network_cidrs      = concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)
-      route_table_ids    = concat(this.vpc.private_route_table_ids, this.vpc.public_route_table_ids)
-      transit_gateway_id = this.id
+      vpc_network_cidrs   = concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)
+      vpc_route_table_ids = concat(this.vpc.private_route_table_ids, this.vpc.public_route_table_ids)
+      transit_gateway_id  = this.id
   }]
 
   local_vpc_network_cidr_to_local_tgw_id = merge([
     for this in local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id : {
-      for vpc_network_cidr in this.network_cidrs :
+      for vpc_network_cidr in this.vpc_network_cidrs :
       vpc_network_cidr => this.transit_gateway_id
   }]...)
 
   # keep track of current rtb-id to tgw-id
   local_tgws_vpc_route_table_id_to_tgw_id = merge([
     for this in local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id : {
-      for route_table_id in this.route_table_ids :
-      route_table_id => this.transit_gateway_id
+      for vpc_route_table_id in this.vpc_route_table_ids :
+      vpc_route_table_id => this.transit_gateway_id
   }]...)
 
   local_tgws_vpc_tgw_id_to_route_table_ids = {
     for this in local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id :
-    this.transit_gateway_id => this.route_table_ids
+    this.transit_gateway_id => this.vpc_route_table_ids
   }
 
-  local_tgws_vpc_network_cidrs   = flatten(local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id[*].network_cidrs)
-  local_tgws_vpc_route_table_ids = flatten(local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id[*].route_table_ids)
+  local_tgws_vpc_network_cidrs   = flatten(local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id[*].vpc_network_cidrs)
+  local_tgws_vpc_route_table_ids = flatten(local.local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id[*].vpc_route_table_ids)
   local_tgws_route_table_ids     = local.local_tgws[*].route_table_id
   local_tgws_ids                 = local.local_tgws[*].id
 }
