@@ -32,23 +32,23 @@ locals {
   local_vpc_id_to_network_cidr = merge([
     for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => vpc.network_cidr
+      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
   }]...)
 
   peer_vpc_id_to_network_cidr = merge([
     for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => vpc.network_cidr
+      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
   }]...)
 
   local_vpc_id_to_peer_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), values(local.peer_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), flatten(values(local.peer_vpc_id_to_network_cidr))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.local_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
 
   peer_vpc_id_to_local_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.peer_vpc_id_to_network_cidr), values(local.local_vpc_id_to_network_cidr)) :
+    for vpc_id_and_network_cidr in setproduct(keys(local.peer_vpc_id_to_network_cidr), flatten(values(local.local_vpc_id_to_network_cidr))) :
     vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
     if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
   }
@@ -69,6 +69,7 @@ locals {
   }]...)
 
   intra_vpc_security_group_rules_format = "%s|%s-%s-%s"
+  intra_vpc_security_group_rules_type   = "ingress"
 
   local_vpc_id_and_rule_to_peer_intra_vpc_security_group_rule = merge([
     for this in local.peer_rules : {
@@ -76,7 +77,7 @@ locals {
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.local_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
-        type                        = "ingress"
+        type                        = local.intra_vpc_security_group_rules_type
       }, this)
   }]...)
 
@@ -86,7 +87,7 @@ locals {
       format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.peer_vpc_id_to_intra_vpc_security_group_id, vpc_id)
         network_cidrs               = inbound_network_cidrs
-        type                        = "ingress"
+        type                        = local.intra_vpc_security_group_rules_type
       }, this)
   }]...)
 }
