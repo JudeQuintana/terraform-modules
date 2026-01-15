@@ -1,6 +1,6 @@
 locals {
-  local_blackhole_cidrs = toset(concat(var.super_router.local.blackhole.cidrs))
-  peer_blackhole_cidrs  = toset(concat(var.super_router.peer.blackhole.cidrs))
+  local_blackhole_cidrs = toset(var.super_router.local.blackhole.cidrs)
+  peer_blackhole_cidrs  = toset(var.super_router.peer.blackhole.cidrs)
 }
 
 # destination_cidr_block can be ipv4 or ipv6 (no separate attribute or resource)
