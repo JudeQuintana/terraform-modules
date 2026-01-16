@@ -26,7 +26,7 @@ variable "super_intra_vpc_security_group_rules" {
           id                          = string
           intra_vpc_security_group_id = string
           network_cidr                = string
-          secondary_cidrs             = optional(list(string), [])
+          secondary_cidrs             = list(string)
         }))
     })) })
     peer = object({
@@ -43,7 +43,7 @@ variable "super_intra_vpc_security_group_rules" {
           id                          = string
           intra_vpc_security_group_id = string
           network_cidr                = string
-          secondary_cidrs             = optional(list(string), [])
+          secondary_cidrs             = list(string)
         }))
     })) })
   })
