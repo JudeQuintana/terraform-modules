@@ -28,7 +28,7 @@ variable "super_router" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
-          secondary_cidrs         = optional(list(string), [])
+          secondary_cidrs         = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
@@ -50,7 +50,7 @@ variable "super_router" {
         vpc = object({
           names                   = list(string)
           network_cidrs           = list(string)
-          secondary_cidrs         = optional(list(string), [])
+          secondary_cidrs         = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
         })
