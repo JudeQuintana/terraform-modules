@@ -1,6 +1,6 @@
 locals {
-  local_blackhole_cidrs = toset(var.super_router.local.blackhole.cidrs)
-  peer_blackhole_cidrs  = toset(var.super_router.peer.blackhole.cidrs)
+  local_blackhole_cidrs = toset(concat(var.super_router.local.blackhole.cidrs, var.super_router.local.blackhole.ipv6_cidrs))
+  peer_blackhole_cidrs  = toset(concat(var.super_router.peer.blackhole.cidrs, var.super_router.peer.blackhole.ipv6_cidrs))
 }
 
 # destination_cidr_block can be ipv4 or ipv6 (no separate attribute or resource)
@@ -14,6 +14,7 @@ resource "aws_ec2_transit_gateway_route" "this_local_blackholes" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this_local.id
 }
 
+# destination_cidr_block can be ipv4 or ipv6 (no separate attribute or resource)
 resource "aws_ec2_transit_gateway_route" "this_peer_blackholes" {
   provider = aws.peer
 

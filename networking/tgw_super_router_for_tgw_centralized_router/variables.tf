@@ -15,7 +15,8 @@ variable "super_router" {
     local = object({
       amazon_side_asn = number
       blackhole = optional(object({
-        cidrs = optional(list(string), [])
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
       }), {})
       centralized_routers = optional(map(object({
         account_id      = string
@@ -39,7 +40,8 @@ variable "super_router" {
     peer = object({
       amazon_side_asn = number
       blackhole = optional(object({
-        cidrs = optional(list(string), [])
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
       }), {})
       centralized_routers = optional(map(object({
         account_id      = string
