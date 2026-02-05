@@ -1,14 +1,14 @@
 # IPv6 Super Intra VPC Secuity Group Rules Description
-- This allowing inbound protocols across regions based on rules (ie ssh, icmp, etc) that
+- This allowing inbound protocols for IPv6 CIDRS across regions based on rules (ie ssh, icmp, etc) that
   were used in each intra\_vpc\_security\_group\_rules modules for all vpcs in each region.
 - Rule sets for local and peer should be the same. also enforce by validation
 
-- See [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_demo/security_group_rules.tf) in the [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo).
+- See [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_revamped_demo/security_group_rules.tf) in the [Super Router Revamped Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_revamped_demo).
 
 Example:
 ```
 module "ipv6_super_intra_vpc_security_group_rules_usw2_to_use1" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/super_intra_vpc_security_group_rules?ref=v1.7.5"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/ipv6_super_intra_vpc_security_group_rules?ref=v1.9.6"
 
   providers = {
     aws.local = aws.usw2
