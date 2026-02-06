@@ -140,9 +140,16 @@ variable "super_router" {
 
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
-    error_message = "All VPC network CIDRs must be unique across regions."
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
+    error_message = "All VPC IPv4 network and secondary CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
+    error_message = "All VPC IPv6 network and secondary CIDRs must be unique across regions."
   }
 
   validation {
