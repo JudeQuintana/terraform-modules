@@ -1,4 +1,50 @@
 # Super Router Description
+v1.9.6 (v1.0.1):
+Super Router now fully interprets AWS TGW network intent across address space, topology, and egress semantics, with no special cases.
+
+What's new
+- Full support for IPv4 and IPv6, including primary and secondary CIDRs
+- Ability to define blackhole CIDRs on either side of Super Router
+- Operates on semantic facts (CIDRs × route table identities) rather than emitted route artifacts
+- Compatible with Centralized Router v1.0.6
+
+Semantic Coverage
+
+Super Router now provides complete semantic coverage of the AWS TGW routing domain:
+- Expressive: handles all CIDR and address-family combinations
+- Compositional: hierarchical domains compose cleanly
+- Complete: covers the full AWS TGW routing semantic space
+
+Example:
+```
+# Super Router is composed of two TGWs, one in each region.
+module "super_router_usw2_to_use1" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/tgw_super_router_for_tgw_centralized_router?ref=v1.9.6"
+
+  providers = {
+    aws.local = aws.usw2 # local super router tgw will be built in the aws.local provider region
+    aws.peer  = aws.use1 # peer super router tgw will be built in the aws.peer provider region
+  }
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  super_router = {
+    name = "professor-x"
+    local = {
+      amazon_side_asn     = 64521
+      blackhole           = local.blackhole
+      centralized_routers = module.centralized_routers_usw2
+    }
+    peer = {
+      amazon_side_asn     = 64522
+      blackhole           = local.blackhole
+      centralized_routers = module.centralized_routers_use1
+    }
+  }
+}
+```
+
+v1.7.5 (v1.0.0):
 This is a follow up to the [generating routes post](https://jq1.io/posts/generating_routes/).
 
 Original Blog Post: [Super Powered, Super Sharp, Super Router!](https://jq1.io/posts/super_router/)
@@ -72,11 +118,19 @@ No modules.
 | [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_peering_attachment_accepter) | resource |
 | [aws_ec2_transit_gateway_route.this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_local_blackholes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_local_ipv6](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_local_ipv6_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_local_tgw_ipv6_routes_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_local_tgw_ipv6_routes_to_vpcs_in_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_local_tgw_routes_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_local_tgw_routes_to_vpcs_in_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_local_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_peer_blackholes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_peer_ipv6](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_peer_ipv6_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_peer_tgw_ipv6_routes_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_ec2_transit_gateway_route.this_peer_tgw_ipv6_routes_to_vpcs_in_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_peer_tgw_routes_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_peer_tgw_routes_to_vpcs_in_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_peer_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
@@ -88,9 +142,13 @@ No modules.
 | [aws_ec2_transit_gateway_route_table_association.this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this_peer_to_peers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 | [aws_ec2_transit_gateway_route_table_association.this_peer_to_this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
+| [aws_route.this_local_vpc_ipv6_routes_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_local_vpc_routes_to_peer_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_local_vpcs_ipv6_routes_to_local_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_local_vpcs_routes_to_local_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_peer_vpc_ipv6_routes_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_peer_vpc_routes_to_local_tgws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_peer_vpcs_ipv6_routes_to_peer_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_peer_vpcs_routes_to_peer_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_caller_identity.this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_caller_identity.this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -105,14 +163,13 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
-| <a name="input_super_router"></a> [super\_router](#input\_super\_router) | Super Router configuration | <pre>object({<br>    name            = string<br>    blackhole_cidrs = optional(list(string), [])<br>    local = object({<br>      amazon_side_asn = number<br>      centralized_routers = optional(map(object({<br>        account_id      = string<br>        amazon_side_asn = string<br>        full_name       = string<br>        id              = string<br>        name            = string<br>        region          = string<br>        route_table_id  = string<br>        vpc = object({<br>          names         = list(string)<br>          network_cidrs = list(string)<br>          routes = list(object({<br>            route_table_id         = string<br>            destination_cidr_block = string<br>            transit_gateway_id     = string<br>          }))<br>        })<br>      })), {})<br>    })<br>    peer = object({<br>      amazon_side_asn = number<br>      centralized_routers = optional(map(object({<br>        account_id      = string<br>        amazon_side_asn = string<br>        full_name       = string<br>        id              = string<br>        name            = string<br>        region          = string<br>        route_table_id  = string<br>        vpc = object({<br>          names         = list(string)<br>          network_cidrs = list(string)<br>          routes = list(object({<br>            route_table_id         = string<br>            destination_cidr_block = string<br>            transit_gateway_id     = string<br>          }))<br>        })<br>      })), {})<br>    })<br>  })</pre> | n/a | yes |
+| <a name="input_super_router"></a> [super\_router](#input\_super\_router) | Super Router configuration | <pre>object({<br/>    name = string<br/>    local = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })), {})<br/>    })<br/>    peer = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })), {})<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_blackhole_cidrs"></a> [blackhole\_cidrs](#output\_blackhole\_cidrs) | n/a |
 | <a name="output_local"></a> [local](#output\_local) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_peer"></a> [peer](#output\_peer) | n/a |

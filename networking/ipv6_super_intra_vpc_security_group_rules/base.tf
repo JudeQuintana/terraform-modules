@@ -29,65 +29,65 @@ locals {
     Environment = var.env_prefix
   })
 
-  local_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : {
+  local_vpc_id_to_ipv6_network_cidr = merge([
+    for this in var.ipv6_super_intra_vpc_security_group_rules.local.ipv6_intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
+      vpc.id => concat([vpc.ipv6_network_cidr], vpc.ipv6_secondary_cidrs)
   }]...)
 
-  peer_vpc_id_to_network_cidr = merge([
-    for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : {
+  peer_vpc_id_to_ipv6_network_cidr = merge([
+    for this in var.ipv6_super_intra_vpc_security_group_rules.peer.ipv6_intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
-      vpc.id => concat([vpc.network_cidr], vpc.secondary_cidrs)
+      vpc.id => concat([vpc.ipv6_network_cidr], vpc.ipv6_secondary_cidrs)
   }]...)
 
-  local_vpc_id_to_peer_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.local_vpc_id_to_network_cidr), flatten(values(local.peer_vpc_id_to_network_cidr))) :
-    vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.local_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+  local_vpc_id_to_peer_inbound_ipv6_network_cidrs = {
+    for vpc_id_and_ipv6_network_cidr in setproduct(keys(local.local_vpc_id_to_ipv6_network_cidr), flatten(values(local.peer_vpc_id_to_ipv6_network_cidr))) :
+    vpc_id_and_ipv6_network_cidr[0] => vpc_id_and_ipv6_network_cidr[1]...
+    if lookup(local.local_vpc_id_to_ipv6_network_cidr, vpc_id_and_ipv6_network_cidr[0]) != vpc_id_and_ipv6_network_cidr[1]
   }
 
-  peer_vpc_id_to_local_inbound_network_cidrs = {
-    for vpc_id_and_network_cidr in setproduct(keys(local.peer_vpc_id_to_network_cidr), flatten(values(local.local_vpc_id_to_network_cidr))) :
-    vpc_id_and_network_cidr[0] => vpc_id_and_network_cidr[1]...
-    if lookup(local.peer_vpc_id_to_network_cidr, vpc_id_and_network_cidr[0]) != vpc_id_and_network_cidr[1]
+  peer_vpc_id_to_local_inbound_ipv6_network_cidrs = {
+    for vpc_id_and_ipv6_network_cidr in setproduct(keys(local.peer_vpc_id_to_ipv6_network_cidr), flatten(values(local.local_vpc_id_to_ipv6_network_cidr))) :
+    vpc_id_and_ipv6_network_cidr[0] => vpc_id_and_ipv6_network_cidr[1]...
+    if lookup(local.peer_vpc_id_to_ipv6_network_cidr, vpc_id_and_ipv6_network_cidr[0]) != vpc_id_and_ipv6_network_cidr[1]
   }
 
-  local_rules = [for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : this.rule]
-  peer_rules  = [for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : this.rule]
+  local_rules = [for this in var.ipv6_super_intra_vpc_security_group_rules.local.ipv6_intra_vpc_security_group_rules : this.rule]
+  peer_rules  = [for this in var.ipv6_super_intra_vpc_security_group_rules.peer.ipv6_intra_vpc_security_group_rules : this.rule]
 
   local_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.local.intra_vpc_security_group_rules : {
+    for this in var.ipv6_super_intra_vpc_security_group_rules.local.ipv6_intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
   peer_vpc_id_to_intra_vpc_security_group_id = merge([
-    for this in var.super_intra_vpc_security_group_rules.peer.intra_vpc_security_group_rules : {
+    for this in var.ipv6_super_intra_vpc_security_group_rules.peer.ipv6_intra_vpc_security_group_rules : {
       for vpc in this.vpcs :
       vpc.id => vpc.intra_vpc_security_group_id
   }]...)
 
-  intra_vpc_security_group_rules_format = "%s|%s-%s-%s"
-  intra_vpc_security_group_rules_type   = "ingress"
+  ipv6_intra_vpc_security_group_rules_format = "%s|%s-%s-%s"
+  ipv6_intra_vpc_security_group_rules_type   = "ingress"
 
   local_vpc_id_and_rule_to_peer_intra_vpc_security_group_rule = merge([
     for this in local.peer_rules : {
-      for vpc_id, inbound_network_cidrs in local.local_vpc_id_to_peer_inbound_network_cidrs :
-      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+      for vpc_id, inbound_ipv6_network_cidrs in local.local_vpc_id_to_peer_inbound_ipv6_network_cidrs :
+      format(local.ipv6_intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.local_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
-        type                        = local.intra_vpc_security_group_rules_type
+        ipv6_network_cidrs          = inbound_ipv6_network_cidrs
+        type                        = local.ipv6_intra_vpc_security_group_rules_type
       }, this)
   }]...)
 
   peer_vpc_id_and_rule_to_local_intra_vpc_security_group_rule = merge([
     for this in local.local_rules : {
-      for vpc_id, inbound_network_cidrs in local.peer_vpc_id_to_local_inbound_network_cidrs :
-      format(local.intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
+      for vpc_id, inbound_ipv6_network_cidrs in local.peer_vpc_id_to_local_inbound_ipv6_network_cidrs :
+      format(local.ipv6_intra_vpc_security_group_rules_format, vpc_id, this.protocol, this.from_port, this.to_port) => merge({
         intra_vpc_security_group_id = lookup(local.peer_vpc_id_to_intra_vpc_security_group_id, vpc_id)
-        network_cidrs               = inbound_network_cidrs
-        type                        = local.intra_vpc_security_group_rules_type
+        ipv6_network_cidrs          = inbound_ipv6_network_cidrs
+        type                        = local.ipv6_intra_vpc_security_group_rules_type
       }, this)
   }]...)
 }
@@ -98,7 +98,7 @@ resource "aws_security_group_rule" "this_local" {
   for_each = local.local_vpc_id_and_rule_to_peer_intra_vpc_security_group_rule
 
   security_group_id = each.value.intra_vpc_security_group_id
-  cidr_blocks       = each.value.network_cidrs
+  ipv6_cidr_blocks  = each.value.ipv6_network_cidrs
   type              = each.value.type
   from_port         = each.value.from_port
   to_port           = each.value.to_port
@@ -141,7 +141,7 @@ resource "aws_security_group_rule" "this_peer" {
   for_each = local.peer_vpc_id_and_rule_to_local_intra_vpc_security_group_rule
 
   security_group_id = each.value.intra_vpc_security_group_id
-  cidr_blocks       = each.value.network_cidrs
+  ipv6_cidr_blocks  = each.value.ipv6_network_cidrs
   type              = each.value.type
   from_port         = each.value.from_port
   to_port           = each.value.to_port

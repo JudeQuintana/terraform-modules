@@ -1,8 +1,36 @@
 # Super Intra VPC Secuity Group Rules Description
-- This allowing inbound protocols across regions based on rules (ie ssh, icmp, etc) that
+- This allowing inbound protocols for IPv4 CIDRs across regions based on rules (ie ssh, icmp, etc) that
   were used in each intra\_vpc\_security\_group\_rules modules for all vpcs in each region.
 - Rule sets for local and peer should be the same. also enforce by validation
 
+v1.9.6 (v1.0.1):
+- Support for IPv4 secondaries.
+- See [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_revamped_demo/security_group_rules.tf) in the [Super Router Revamped Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_revamped_demo).
+
+Example (same as before except the source change):
+```
+module "super_intra_vpc_security_group_rules_usw2_to_use1" {
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/super_intra_vpc_security_group_rules?ref=v1.9.6"
+
+  providers = {
+    aws.local = aws.usw2
+    aws.peer  = aws.use1
+  }
+
+  env_prefix       = var.env_prefix
+  region_az_labels = var.region_az_labels
+  super_intra_vpc_security_group_rules = {
+    local = {
+      intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_usw2
+    }
+    peer = {
+      intra_vpc_security_group_rules = module.intra_vpc_security_group_rules_use1
+    }
+  }
+}
+```
+
+v1.7.5 (v1.0.0):
 - See [security\_group\_rules.tf](https://github.com/JudeQuintana/terraform-main/blob/main/super_router_demo/security_group_rules.tf) in the [Super Router Demo](https://github.com/JudeQuintana/terraform-main/tree/main/super_router_demo).
 
 Example:
@@ -63,7 +91,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
-| <a name="input_super_intra_vpc_security_group_rules"></a> [super\_intra\_vpc\_security\_group\_rules](#input\_super\_intra\_vpc\_security\_group\_rules) | super intra vpc security group rules configuration | <pre>object({<br>    # security rule object to allow inbound across vpcs intra-vpc security group<br>    local = object({<br>      intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          network_cidr                = string<br>        }))<br>    })) })<br>    peer = object({<br>      intra_vpc_security_group_rules = map(object({<br>        account_id = string<br>        region     = string<br>        rule = object({<br>          label     = string<br>          protocol  = string<br>          from_port = number<br>          to_port   = number<br>        })<br>        vpcs = map(object({<br>          id                          = string<br>          intra_vpc_security_group_id = string<br>          network_cidr                = string<br>        }))<br>    })) })<br>  })</pre> | n/a | yes |
+| <a name="input_super_intra_vpc_security_group_rules"></a> [super\_intra\_vpc\_security\_group\_rules](#input\_super\_intra\_vpc\_security\_group\_rules) | super intra vpc security group rules configuration | <pre>object({<br/>    # security rule object to allow inbound across vpcs intra-vpc security group<br/>    local = object({<br/>      intra_vpc_security_group_rules = map(object({<br/>        account_id = string<br/>        region     = string<br/>        rule = object({<br/>          label     = string<br/>          protocol  = string<br/>          from_port = number<br/>          to_port   = number<br/>        })<br/>        vpcs = map(object({<br/>          id                          = string<br/>          intra_vpc_security_group_id = string<br/>          network_cidr                = string<br/>          secondary_cidrs             = list(string)<br/>        }))<br/>    })) })<br/>    peer = object({<br/>      intra_vpc_security_group_rules = map(object({<br/>        account_id = string<br/>        region     = string<br/>        rule = object({<br/>          label     = string<br/>          protocol  = string<br/>          from_port = number<br/>          to_port   = number<br/>        })<br/>        vpcs = map(object({<br/>          id                          = string<br/>          intra_vpc_security_group_id = string<br/>          network_cidr                = string<br/>          secondary_cidrs             = list(string)<br/>        }))<br/>    })) })<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 

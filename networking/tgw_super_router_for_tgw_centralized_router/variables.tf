@@ -11,10 +11,13 @@ variable "region_az_labels" {
 variable "super_router" {
   description = "Super Router configuration"
   type = object({
-    name            = string
-    blackhole_cidrs = optional(list(string), [])
+    name = string
     local = object({
       amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
+      }), {})
       centralized_routers = optional(map(object({
         account_id      = string
         amazon_side_asn = string
@@ -24,18 +27,22 @@ variable "super_router" {
         region          = string
         route_table_id  = string
         vpc = object({
-          names         = list(string)
-          network_cidrs = list(string)
-          routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-            transit_gateway_id     = string
-          }))
+          names                   = list(string)
+          network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         })
       })), {})
     })
     peer = object({
       amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
+      }), {})
       centralized_routers = optional(map(object({
         account_id      = string
         amazon_side_asn = string
@@ -45,13 +52,13 @@ variable "super_router" {
         region          = string
         route_table_id  = string
         vpc = object({
-          names         = list(string)
-          network_cidrs = list(string)
-          routes = list(object({
-            route_table_id         = string
-            destination_cidr_block = string
-            transit_gateway_id     = string
-          }))
+          names                   = list(string)
+          network_cidrs           = list(string)
+          secondary_cidrs         = list(string)
+          ipv6_network_cidrs      = list(string)
+          ipv6_secondary_cidrs    = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
         })
       })), {})
     })
@@ -133,9 +140,16 @@ variable "super_router" {
 
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.network_cidrs]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.network_cidrs])))
-    error_message = "All VPC network CIDRs must be unique across regions."
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
+    error_message = "All VPC IPv4 network and secondary CIDRs must be unique across regions."
+  }
+
+  validation {
+    condition = length(
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
+    error_message = "All VPC IPv6 network and secondary CIDRs must be unique across regions."
   }
 
   validation {
