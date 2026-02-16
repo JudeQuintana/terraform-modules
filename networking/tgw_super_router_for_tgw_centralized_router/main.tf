@@ -14,7 +14,7 @@
 * Super Router now provides complete semantic coverage of the AWS TGW routing domain:
 * - Expressive: handles all CIDR and address-family combinations
 * - Compositional: hierarchical domains compose cleanly
-* - Complete: covers the full AWS TGW semantic space
+* - Complete: covers the full AWS TGW routing semantic space
 *
 * Example:
 * ```
