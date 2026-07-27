@@ -18,6 +18,18 @@ variable "centralized_router" {
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
     }), {})
+    policy = optional(object({
+      deny = optional(list(object({
+        from = object({
+          network_cidr    = string
+          secondary_cidrs = optional(list(string), [])
+        })
+        to = object({
+          network_cidr    = string
+          secondary_cidrs = optional(list(string), [])
+        })
+      })), [])
+    }), {})
     vpcs = optional(map(object({
       account_id                 = string
       region                     = string
