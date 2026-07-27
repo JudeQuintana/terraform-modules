@@ -24,3 +24,20 @@ variable "vpcs" {
     error_message = "Each Secondary VPC CIDR valid IPv4 CIDR notation (ie x.x.x.x/xx -> 10.46.0.0/20). Check for typos."
   }
 }
+
+variable "policy" {
+  description = "routing policy constraints"
+  type = object({
+    deny = optional(list(object({
+      from = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+  })
+  default = {}
+}

@@ -9,11 +9,16 @@ locals {
   ]
 
   # ipv4
+  # filter: exclude self CIDRs (!contains this) and denied CIDRs (!contains denied)
   associated_route_table_ids_with_other_network_cidrs = flatten([
     for this in local.network_cidrs_with_route_table_ids : [
       for route_table_id in this.route_table_ids : {
-        route_table_id      = route_table_id
-        other_network_cidrs = [for n in flatten(local.network_cidrs_with_route_table_ids[*].network_cidrs) : n if !contains(this.network_cidrs, n)]
+        route_table_id = route_table_id
+        other_network_cidrs = [
+          for n in flatten(local.network_cidrs_with_route_table_ids[*].network_cidrs) : n
+          if !contains(this.network_cidrs, n)
+          && !contains(lookup(local.denied_cidr_to_network_cidrs, element(this.network_cidrs, 0)), n)
+        ]
   }]])
 
   # the better way to serve routes like hotcakes
