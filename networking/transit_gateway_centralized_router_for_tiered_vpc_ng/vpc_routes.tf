@@ -2,7 +2,8 @@
 module "this_generate_routes_to_other_vpcs" {
   source = "./modules/generate_routes_to_other_vpcs"
 
-  vpcs = local.vpcs
+  vpcs   = local.vpcs
+  policy = var.policy
 }
 
 locals {
