@@ -38,6 +38,13 @@ variable "policy" {
         secondary_cidrs = optional(list(string), [])
       })
     })), [])
+    segments = optional(list(object({
+      name = string
+      vpcs = list(object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      }))
+    })), [])
   })
   default = {}
 }
