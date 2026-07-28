@@ -28,6 +28,7 @@ variable "vpcs" {
 variable "policy" {
   description = "routing policy constraints"
   type = object({
+    default = optional(string, "allow")
     deny = optional(list(object({
       from_vpc = object({
         network_cidr    = string
@@ -38,13 +39,25 @@ variable "policy" {
         secondary_cidrs = optional(list(string), [])
       })
     })), [])
-    segments = optional(list(object({
-      name = string
-      vpcs = list(object({
+    allow = optional(list(object({
+      from_vpc = object({
         network_cidr    = string
         secondary_cidrs = optional(list(string), [])
-      }))
+      })
+      to_vpc = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
     })), [])
+    segments = optional(map(list(object({
+      network_cidr    = string
+      secondary_cidrs = optional(list(string), [])
+    }))), {})
   })
   default = {}
+
+  validation {
+    condition     = contains(["allow", "deny"], var.policy.default)
+    error_message = "Policy default must be \"allow\" or \"deny\"."
+  }
 }

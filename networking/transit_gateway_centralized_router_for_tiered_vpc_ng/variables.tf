@@ -19,6 +19,7 @@ variable "centralized_router" {
       ipv6_cidrs = optional(list(string), [])
     }), {})
     policy = optional(object({
+      default = optional(string, "allow")
       deny = optional(list(object({
         from_vpc = object({
           network_cidr    = string
@@ -29,13 +30,20 @@ variable "centralized_router" {
           secondary_cidrs = optional(list(string), [])
         })
       })), [])
-      segments = optional(list(object({
-        name = string
-        vpcs = list(object({
+      allow = optional(list(object({
+        from_vpc = object({
           network_cidr    = string
           secondary_cidrs = optional(list(string), [])
-        }))
+        })
+        to_vpc = object({
+          network_cidr    = string
+          secondary_cidrs = optional(list(string), [])
+        })
       })), [])
+      segments = optional(map(list(object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      }))), {})
     }), {})
     vpcs = optional(map(object({
       account_id                 = string

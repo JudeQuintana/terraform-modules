@@ -23,15 +23,12 @@ run "ipv4_one_segment_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     policy = {
-      segments = [
-        {
-          name = "workers"
-          vpcs = [
-            { network_cidr = "10.0.0.0/20" },
-            { network_cidr = "172.16.0.0/20" }
-          ]
-        }
-      ]
+      segments = {
+        workers = [
+          { network_cidr = "10.0.0.0/20" },
+          { network_cidr = "172.16.0.0/20" }
+        ]
+      }
     }
   }
 
@@ -47,16 +44,10 @@ run "ipv4_two_segments_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     policy = {
-      segments = [
-        {
-          name = "alpha"
-          vpcs = [{ network_cidr = "10.0.0.0/20" }]
-        },
-        {
-          name = "beta"
-          vpcs = [{ network_cidr = "172.16.0.0/20" }]
-        }
-      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20" }]
+        beta  = [{ network_cidr = "172.16.0.0/20" }]
+      }
     }
   }
 
@@ -71,20 +62,11 @@ run "ipv4_all_separate_segments" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     policy = {
-      segments = [
-        {
-          name = "alpha"
-          vpcs = [{ network_cidr = "10.0.0.0/20" }]
-        },
-        {
-          name = "beta"
-          vpcs = [{ network_cidr = "172.16.0.0/20" }]
-        },
-        {
-          name = "gamma"
-          vpcs = [{ network_cidr = "192.168.0.0/20" }]
-        }
-      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20" }]
+        beta  = [{ network_cidr = "172.16.0.0/20" }]
+        gamma = [{ network_cidr = "192.168.0.0/20" }]
+      }
     }
   }
 
@@ -98,7 +80,7 @@ run "ipv4_all_separate_segments" {
 run "ipv4_empty_segments_unchanged" {
   variables {
     vpcs   = run.setup.ipv4_tiered_vpcs
-    policy = { segments = [] }
+    policy = { segments = {} }
   }
 
   assert {
