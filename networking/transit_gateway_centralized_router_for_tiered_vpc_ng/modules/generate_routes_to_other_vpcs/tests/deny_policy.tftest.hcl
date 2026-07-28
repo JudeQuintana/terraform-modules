@@ -17,8 +17,8 @@ run "ipv4_deny_app_to_cicd" {
     policy = {
       deny = [
         {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
+          from_vpc = { network_cidr = "10.0.0.0/20" }
+          to_vpc   = { network_cidr = "172.16.0.0/20" }
         }
       ]
     }
@@ -37,11 +37,11 @@ run "ipv4_with_secondary_cidrs_deny_app_to_cicd" {
     policy = {
       deny = [
         {
-          from = {
+          from_vpc = {
             network_cidr    = "10.0.0.0/20"
             secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"]
           }
-          to = {
+          to_vpc = {
             network_cidr    = "172.16.0.0/20"
             secondary_cidrs = ["172.17.0.0/20"]
           }
@@ -63,16 +63,16 @@ run "ipv4_deny_all_pairs" {
     policy = {
       deny = [
         {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
+          from_vpc = { network_cidr = "10.0.0.0/20" }
+          to_vpc   = { network_cidr = "172.16.0.0/20" }
         },
         {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "192.168.0.0/20" }
+          from_vpc = { network_cidr = "10.0.0.0/20" }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
         },
         {
-          from = { network_cidr = "172.16.0.0/20" }
-          to   = { network_cidr = "192.168.0.0/20" }
+          from_vpc = { network_cidr = "172.16.0.0/20" }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
         }
       ]
     }

@@ -1,12 +1,12 @@
 locals {
   # ipv4 deny policy
   # normalize each deny rule's VPC objects into full CIDR lists per side
-  # ie { from = module.vpcs["app"], to = module.vpcs["cicd"] } becomes
+  # ie { from_vpc = module.vpcs["app"], to_vpc = module.vpcs["cicd"] } becomes
   # { from_cidrs = ["10.0.0.0/20", ...secondaries], to_cidrs = ["172.16.0.0/20", ...secondaries] }
   deny_rules = [
     for rule in var.policy.deny : {
-      from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
-      to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
+      from_cidrs = concat([rule.from_vpc.network_cidr], rule.from_vpc.secondary_cidrs)
+      to_cidrs   = concat([rule.to_vpc.network_cidr], rule.to_vpc.secondary_cidrs)
     }
   ]
 

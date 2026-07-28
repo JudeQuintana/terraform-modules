@@ -20,11 +20,11 @@ variable "centralized_router" {
     }), {})
     policy = optional(object({
       deny = optional(list(object({
-        from = object({
+        from_vpc = object({
           network_cidr    = string
           secondary_cidrs = optional(list(string), [])
         })
-        to = object({
+        to_vpc = object({
           network_cidr    = string
           secondary_cidrs = optional(list(string), [])
         })
