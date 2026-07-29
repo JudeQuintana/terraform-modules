@@ -34,15 +34,17 @@ output "route_table_id" {
   value = aws_ec2_transit_gateway_route_table.this.id
 }
 
-output "vpc" {
+output "vpcs" {
   value = {
-    names                   = [for this in local.vpcs : this.name]
-    network_cidrs           = [for this in local.vpcs : this.network_cidr]
-    secondary_cidrs         = flatten([for this in local.vpcs : this.secondary_cidrs])
-    ipv6_network_cidrs      = compact([for this in local.vpcs : this.ipv6_network_cidr])
-    ipv6_secondary_cidrs    = flatten([for this in local.vpcs : this.ipv6_secondary_cidrs])
-    private_route_table_ids = flatten([for this in local.vpcs : this.private_route_table_ids])
-    public_route_table_ids  = flatten([for this in local.vpcs : this.public_route_table_ids])
+    for this in local.vpcs :
+    this.name => {
+      network_cidr            = this.network_cidr
+      secondary_cidrs         = this.secondary_cidrs
+      ipv6_network_cidr       = this.ipv6_network_cidr
+      ipv6_secondary_cidrs    = this.ipv6_secondary_cidrs
+      private_route_table_ids = this.private_route_table_ids
+      public_route_table_ids  = this.public_route_table_ids
+    }
   }
 }
 
