@@ -12,9 +12,9 @@ resource "aws_ec2_transit_gateway_route_table" "this_peer" {
 locals {
   peer_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id = [
     for this in local.peer_tgws : {
-      vpc_network_cidrs      = concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)
-      vpc_ipv6_network_cidrs = concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)
-      vpc_route_table_ids    = concat(this.vpc.private_route_table_ids, this.vpc.public_route_table_ids)
+      vpc_network_cidrs      = flatten([for vpc in values(this.vpcs) : concat([vpc.network_cidr], vpc.secondary_cidrs)])
+      vpc_ipv6_network_cidrs = flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])
+      vpc_route_table_ids    = flatten([for vpc in values(this.vpcs) : concat(vpc.private_route_table_ids, vpc.public_route_table_ids)])
       transit_gateway_id     = this.id
   }]
 
@@ -67,57 +67,20 @@ resource "aws_ec2_transit_gateway_route" "this_peer" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-locals {
-  # build new peer vpc routes to other local tgws
-  peer_vpc_routes_to_local_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_vpc_route_table_ids, local.local_tgws_vpc_network_cidrs) : {
-      route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
-      destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
-  }]
-
-  peer_tgw_all_new_vpc_routes_to_local_tgws = {
-    for this in local.peer_vpc_routes_to_local_tgws :
-    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_vpc_routes_to_local_tgws
+  for_each = local.peer_cross_region_ipv4_routes
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
   transit_gateway_id     = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
-locals {
-  # build new peer vpc routes to other peer vpcs
-  peer_vpc_routes_to_peer_tgws = [
-    for route_table_id_and_peer_tgw_network_cidr in setproduct(local.peer_tgws_vpc_route_table_ids, local.peer_tgws_vpc_network_cidrs) : {
-      route_table_id         = route_table_id_and_peer_tgw_network_cidr[0]
-      destination_cidr_block = route_table_id_and_peer_tgw_network_cidr[1]
-  }]
-
-  # generate current existing peer vpc routes
-  peer_current_vpc_routes = flatten([
-    for this in local.peer_tgws : [
-      for route_table_id_and_vpc_network_cidr in setproduct(lookup(local.peer_tgws_vpc_tgw_id_to_route_table_ids, this.id), concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)) : {
-        route_table_id         = route_table_id_and_vpc_network_cidr[0]
-        destination_cidr_block = route_table_id_and_vpc_network_cidr[1]
-  }]])
-
-  # subtract current existing peer vpc routes from all peer vpc routes
-  peer_tgw_all_new_vpc_routes_to_peer_vpcs = {
-    for this in setsubtract(local.peer_vpc_routes_to_peer_tgws, local.peer_current_vpc_routes) :
-    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_vpc_routes_to_peer_vpcs
+  for_each = local.peer_intra_region_ipv4_routes
 
   route_table_id         = each.value.route_table_id
   destination_cidr_block = each.value.destination_cidr_block
@@ -161,7 +124,7 @@ locals {
   # generate current existing peer tgw routes for its peer vpcs
   peer_current_tgw_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_network_cidr in setproduct([this.route_table_id], concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)) : {
+      for route_table_id_and_network_cidr in setproduct([this.route_table_id], flatten([for vpc in values(this.vpcs) : concat([vpc.network_cidr], vpc.secondary_cidrs)])) : {
         route_table_id         = route_table_id_and_network_cidr[0]
         destination_cidr_block = route_table_id_and_network_cidr[1]
   }]])
@@ -254,7 +217,7 @@ locals {
   # generate current existing peer vpc ipv6 routes
   peer_current_vpc_ipv6_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_vpc_ipv6_network_cidr in setproduct(lookup(local.peer_tgws_vpc_tgw_id_to_route_table_ids, this.id), concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)) : {
+      for route_table_id_and_vpc_ipv6_network_cidr in setproduct(lookup(local.peer_tgws_vpc_tgw_id_to_route_table_ids, this.id), flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])) : {
         route_table_id              = route_table_id_and_vpc_ipv6_network_cidr[0]
         destination_ipv6_cidr_block = route_table_id_and_vpc_ipv6_network_cidr[1]
   }]])
@@ -311,7 +274,7 @@ locals {
   # generate current existing peer tgw ipv6 routes for its peer vpcs
   peer_current_tgw_ipv6_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_ipv6_network_cidr in setproduct([this.route_table_id], concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)) : {
+      for route_table_id_and_ipv6_network_cidr in setproduct([this.route_table_id], flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])) : {
         route_table_id              = route_table_id_and_ipv6_network_cidr[0]
         destination_ipv6_cidr_block = route_table_id_and_ipv6_network_cidr[1]
   }]])
