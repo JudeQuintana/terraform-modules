@@ -4,12 +4,6 @@ locals {
     merge([for cr in local.peer_tgws : cr.vpcs]...)
   )
 
-  local_route_table_ids = toset(local.local_tgws_vpc_route_table_ids)
-  peer_route_table_ids  = toset(local.peer_tgws_vpc_route_table_ids)
-
-  local_network_cidrs = toset(local.local_tgws_vpc_network_cidrs)
-  peer_network_cidrs  = toset(local.peer_tgws_vpc_network_cidrs)
-
   # routes within the same CR are already managed by the centralized router
   local_self_cr_routes = toset(flatten([
     for this in local.local_tgws : [
@@ -42,27 +36,27 @@ locals {
   local_cross_region_ipv4_routes = {
     for this in module.cross_region_routes.ipv4 :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-    if contains(local.local_route_table_ids, this.route_table_id) && contains(local.peer_network_cidrs, this.destination_cidr_block)
+    if contains(local.local_tgws_vpc_route_table_ids, this.route_table_id) && contains(local.peer_tgws_vpc_network_cidrs, this.destination_cidr_block)
   }
 
   # local VPC routes to other local VPCs (intra-region, cross-CR)
   local_intra_region_ipv4_routes = {
     for this in module.cross_region_routes.ipv4 :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-    if contains(local.local_route_table_ids, this.route_table_id) && contains(local.local_network_cidrs, this.destination_cidr_block) && !contains(local.local_self_cr_routes, format(local.route_format, this.route_table_id, this.destination_cidr_block))
+    if contains(local.local_tgws_vpc_route_table_ids, this.route_table_id) && contains(local.local_tgws_vpc_network_cidrs, this.destination_cidr_block) && !contains(local.local_self_cr_routes, format(local.route_format, this.route_table_id, this.destination_cidr_block))
   }
 
   # peer VPC routes to local CIDRs (cross-region)
   peer_cross_region_ipv4_routes = {
     for this in module.cross_region_routes.ipv4 :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-    if contains(local.peer_route_table_ids, this.route_table_id) && contains(local.local_network_cidrs, this.destination_cidr_block)
+    if contains(local.peer_tgws_vpc_route_table_ids, this.route_table_id) && contains(local.local_tgws_vpc_network_cidrs, this.destination_cidr_block)
   }
 
   # peer VPC routes to other peer VPCs (intra-region, cross-CR)
   peer_intra_region_ipv4_routes = {
     for this in module.cross_region_routes.ipv4 :
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-    if contains(local.peer_route_table_ids, this.route_table_id) && contains(local.peer_network_cidrs, this.destination_cidr_block) && !contains(local.peer_self_cr_routes, format(local.route_format, this.route_table_id, this.destination_cidr_block))
+    if contains(local.peer_tgws_vpc_route_table_ids, this.route_table_id) && contains(local.peer_tgws_vpc_network_cidrs, this.destination_cidr_block) && !contains(local.peer_self_cr_routes, format(local.route_format, this.route_table_id, this.destination_cidr_block))
   }
 }
