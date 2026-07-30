@@ -222,6 +222,72 @@ run "ipv4_with_secondary_cidrs_allow_overrides_segments" {
   }
 }
 
+# combined precedence: deny + allow + segments all active, each pair takes a different path
+# deny=[app<->general], allow=[app<->cicd], segments={alpha=[app], beta=[cicd]}, default=allow
+# app -> cicd: allowed (allow overrides cross-segment deny)
+# app -> general: denied (explicit deny)
+# cicd -> general: allowed (default=allow, general unsegmented)
+# general -> cicd: allowed (default=allow)
+# general -> app: denied (explicit deny)
+run "ipv4_combined_precedence" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    policy = {
+      deny = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20" }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
+        }
+      ]
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20" }
+          to_vpc   = { network_cidr = "172.16.0.0/20" }
+        }
+      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20" }]
+        beta  = [{ network_cidr = "172.16.0.0/20" }]
+      }
+    }
+  }
+
+  assert {
+    condition     = output.ipv4 == run.final_precedence.ipv4_combined_precedence
+    error_message = "Combined precedence failed:\n[\n${join("   \n", [for route in output.ipv4 : format("{\n  destination_cidr_block = \"%s\"\n  route_table_id = \"%s\"\n},", route.destination_cidr_block, route.route_table_id)])}\n]"
+  }
+}
+
+# combined precedence with secondary cidrs
+run "ipv4_with_secondary_cidrs_combined_precedence" {
+  variables {
+    vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    policy = {
+      deny = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
+        }
+      ]
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+        }
+      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }]
+        beta  = [{ network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }]
+      }
+    }
+  }
+
+  assert {
+    condition     = output.ipv4 == run.final_precedence.ipv4_with_secondary_cidrs_combined_precedence
+    error_message = "Combined precedence with secondary cidrs failed:\n[\n${join("   \n", [for route in output.ipv4 : format("{\n  destination_cidr_block = \"%s\"\n  route_table_id = \"%s\"\n},", route.destination_cidr_block, route.route_table_id)])}\n]"
+  }
+}
+
 # default=allow with empty policy = full mesh (backwards compatible)
 run "ipv4_default_allow_empty_policy" {
   variables {
