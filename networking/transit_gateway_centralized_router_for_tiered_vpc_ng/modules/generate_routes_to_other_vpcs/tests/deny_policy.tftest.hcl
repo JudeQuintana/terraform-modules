@@ -84,6 +84,34 @@ run "ipv4_deny_all_pairs" {
   }
 }
 
+# deny all pairs with secondary cidrs = no routes
+run "ipv4_with_secondary_cidrs_deny_all_pairs" {
+  variables {
+    vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    policy = {
+      deny = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+        },
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
+        },
+        {
+          from_vpc = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          to_vpc   = { network_cidr = "192.168.0.0/20" }
+        }
+      ]
+    }
+  }
+
+  assert {
+    condition     = output.ipv4 == run.final_deny.ipv4_deny_all_pairs
+    error_message = "Deny all pairs with secondary cidrs should produce empty route set."
+  }
+}
+
 run "final" {
   module {
     source = "./tests/final"

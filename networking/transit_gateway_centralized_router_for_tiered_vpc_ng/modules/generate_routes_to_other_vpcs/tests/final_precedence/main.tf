@@ -77,6 +77,234 @@ output "ipv4_default_deny_segment_workers" {
   ])
 }
 
+# default=deny with secondary cidrs, allow app <-> cicd only
+# app route tables get 172.16.0.0/20 + 172.17.0.0/20, cicd route tables get 10.0.0.0/20 + 10.1.0.0/20 + 10.2.0.0/20
+# general gets nothing, no one gets general
+output "ipv4_with_secondary_cidrs_default_deny_allow_app_cicd" {
+  value = toset([
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+  ])
+}
+
+# default=deny with secondary cidrs, segment "workers" [app, cicd]
+# app <-> cicd same segment = routes exist (including all secondaries)
+# general is unsegmented, falls through to default=deny = no routes
+output "ipv4_with_secondary_cidrs_default_deny_segment_workers" {
+  value = toset([
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+  ])
+}
+
+# allow overrides segments with secondary cidrs: app in "alpha", cicd in "beta" (cross-segment denied),
+# but allow app <-> cicd punches through (all cidrs including secondaries)
+# general unsegmented, default=allow, so general routes to all
+output "ipv4_with_secondary_cidrs_allow_overrides_segments" {
+  value = toset([
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+  ])
+}
+
 # allow overrides segments: app in "alpha", cicd in "beta" (cross-segment denied),
 # but allow app <-> cicd punches through
 # general unsegmented, default=allow, so general routes to all

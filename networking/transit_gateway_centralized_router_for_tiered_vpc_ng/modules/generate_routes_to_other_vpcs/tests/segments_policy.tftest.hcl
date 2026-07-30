@@ -76,6 +76,44 @@ run "ipv4_all_separate_segments" {
   }
 }
 
+# segments with secondary cidrs: app in "alpha", cicd in "beta", general unsegmented
+# cross-segment denied (including all secondary cidrs), unsegmented routes to all
+run "ipv4_with_secondary_cidrs_two_segments_general_unsegmented" {
+  variables {
+    vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    policy = {
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }]
+        beta  = [{ network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }]
+      }
+    }
+  }
+
+  assert {
+    condition     = output.ipv4 == run.final_segments.ipv4_with_secondary_cidrs_two_segments_general_unsegmented
+    error_message = "Two segments with secondary cidrs should deny cross-segment only:\n[\n${join("   \n", [for route in output.ipv4 : format("{\n  destination_cidr_block = \"%s\"\n  route_table_id = \"%s\"\n},", route.destination_cidr_block, route.route_table_id)])}\n]"
+  }
+}
+
+# segments with secondary cidrs: all separate segments = total isolation
+run "ipv4_with_secondary_cidrs_all_separate_segments" {
+  variables {
+    vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    policy = {
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }]
+        beta  = [{ network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }]
+        gamma = [{ network_cidr = "192.168.0.0/20" }]
+      }
+    }
+  }
+
+  assert {
+    condition     = output.ipv4 == run.final_segments.ipv4_with_secondary_cidrs_all_separate_segments
+    error_message = "All VPCs in separate segments with secondary cidrs should produce empty route set."
+  }
+}
+
 # empty segments = no change (backwards compatibility)
 run "ipv4_empty_segments_unchanged" {
   variables {

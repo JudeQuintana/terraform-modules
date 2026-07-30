@@ -63,3 +63,76 @@ output "ipv4_two_segments_general_unsegmented" {
 output "ipv4_all_separate_segments" {
   value = toset([])
 }
+
+# segments with secondary cidrs: app in "alpha", cicd in "beta", general unsegmented
+# cross-segment: app <-> cicd denied (all cidrs including secondaries)
+# unsegmented: general routes to all
+output "ipv4_with_secondary_cidrs_two_segments_general_unsegmented" {
+  value = toset([
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-04c6baa3a6a0af91e"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-06836f9bc939ebbce"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0c92ed73f355dcc65"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-0094331bdafb627f3"
+    },
+    {
+      destination_cidr_block = "192.168.0.0/20"
+      route_table_id         = "rtb-01e2b1283c7404903"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-066adc27add9a630e"
+    },
+    {
+      destination_cidr_block = "10.0.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "10.1.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "10.2.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "172.16.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+    {
+      destination_cidr_block = "172.17.0.0/20"
+      route_table_id         = "rtb-0989090af3edb78b1"
+    },
+  ])
+}
+
+# segments with secondary cidrs: all separate segments = total isolation
+output "ipv4_with_secondary_cidrs_all_separate_segments" {
+  value = toset([])
+}
