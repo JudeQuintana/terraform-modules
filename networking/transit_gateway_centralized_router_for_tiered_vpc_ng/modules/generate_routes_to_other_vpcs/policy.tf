@@ -25,8 +25,7 @@ locals {
 
   # normalize each segment's VPCs into full CIDR lists
   segment_cidrs = [
-    for name, vpcs in var.policy.segments : {
-      name  = name
+    for vpcs in var.policy.segments : {
       cidrs = flatten([for vpc in vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])
     }
   ]
@@ -36,12 +35,12 @@ locals {
   #
   # produces one deny entry per unique segment pair (A↔B, A↔C, B↔C).
   # slice(list, i+1, end) restricts the inner loop to segments after the current one,
-  # giving the upper-right triangle of the N×N matrix — no self-pairs, no duplicates.
+  # giving the upper-right triangle of the N×N matrix (no self-pairs, no duplicates).
   segment_deny_rules = flatten([
-    for i, seg_a in local.segment_cidrs : [
-      for seg_b in slice(local.segment_cidrs, i + 1, length(local.segment_cidrs)) : {
-        from_cidrs = seg_a.cidrs
-        to_cidrs   = seg_b.cidrs
+    for i, segment_a in local.segment_cidrs : [
+      for segment_b in slice(local.segment_cidrs, i + 1, length(local.segment_cidrs)) : {
+        from_cidrs = segment_a.cidrs
+        to_cidrs   = segment_b.cidrs
       }
     ]
   ])

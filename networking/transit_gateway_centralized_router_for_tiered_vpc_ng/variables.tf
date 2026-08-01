@@ -18,33 +18,6 @@ variable "centralized_router" {
       cidrs      = optional(list(string), [])
       ipv6_cidrs = optional(list(string), [])
     }), {})
-    policy = optional(object({
-      default = optional(string, "allow")
-      deny = optional(list(object({
-        from_vpc = object({
-          network_cidr    = string
-          secondary_cidrs = optional(list(string), [])
-        })
-        to_vpc = object({
-          network_cidr    = string
-          secondary_cidrs = optional(list(string), [])
-        })
-      })), [])
-      allow = optional(list(object({
-        from_vpc = object({
-          network_cidr    = string
-          secondary_cidrs = optional(list(string), [])
-        })
-        to_vpc = object({
-          network_cidr    = string
-          secondary_cidrs = optional(list(string), [])
-        })
-      })), [])
-      segments = optional(map(list(object({
-        network_cidr    = string
-        secondary_cidrs = optional(list(string), [])
-      }))), {})
-    }), {})
     vpcs = optional(map(object({
       account_id                 = string
       region                     = string
@@ -136,6 +109,50 @@ variable "centralized_router" {
       for this in var.centralized_router.vpcs : this.centralized_egress_central
     ]) ? length([for this in var.centralized_router.vpcs : this.centralized_egress_central if this.centralized_egress_central]) == 1 : true
     error_message = "There must be 1 VPC with centralized_egress_central = true."
+  }
+}
+
+variable "policy" {
+  description = "Routing policy for intra-region VPC routes"
+  type = object({
+    default = optional(string, "allow")
+    deny = optional(list(object({
+      from_vpc = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+      to_vpc = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    allow = optional(list(object({
+      from_vpc = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+      to_vpc = object({
+        network_cidr    = string
+        secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    segments = optional(map(list(object({
+      network_cidr    = string
+      secondary_cidrs = optional(list(string), [])
+    }))), {})
+  })
+  default = {}
+
+  validation {
+    condition     = contains(["allow", "deny"], var.policy.default)
+    error_message = "Policy default must be \"allow\" or \"deny\"."
+  }
+
+  validation {
+    condition = length(
+      distinct(flatten([for vpcs in var.policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
   }
 }
 

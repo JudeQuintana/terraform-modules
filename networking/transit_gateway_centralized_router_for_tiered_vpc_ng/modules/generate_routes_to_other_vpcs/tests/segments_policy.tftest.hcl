@@ -126,3 +126,22 @@ run "ipv4_empty_segments_unchanged" {
     error_message = "Empty segments should produce unchanged routes."
   }
 }
+
+# vpc in multiple segments = validation error
+run "ipv4_vpc_in_multiple_segments" {
+  command = plan
+
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    policy = {
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20" }]
+        beta  = [{ network_cidr = "10.0.0.0/20" }, { network_cidr = "172.16.0.0/20" }]
+      }
+    }
+  }
+
+  expect_failures = [
+    var.policy
+  ]
+}
