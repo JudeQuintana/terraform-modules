@@ -12,9 +12,9 @@ resource "aws_ec2_transit_gateway_route_table" "this_local" {
 locals {
   local_tgws_vpc_network_cidrs_and_route_table_ids_with_tgw_id = [
     for this in local.local_tgws : {
-      vpc_network_cidrs      = flatten([for vpc in values(this.vpcs) : concat([vpc.network_cidr], vpc.secondary_cidrs)])
-      vpc_ipv6_network_cidrs = flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])
-      vpc_route_table_ids    = flatten([for vpc in values(this.vpcs) : concat(vpc.private_route_table_ids, vpc.public_route_table_ids)])
+      vpc_network_cidrs      = flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])
+      vpc_ipv6_network_cidrs = flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])
+      vpc_route_table_ids    = flatten([for vpc in this.vpcs : concat(vpc.private_route_table_ids, vpc.public_route_table_ids)])
       transit_gateway_id     = this.id
   }]
 

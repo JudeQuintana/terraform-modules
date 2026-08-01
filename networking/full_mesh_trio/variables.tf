@@ -16,6 +16,7 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpcs = map(object({
+          name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
           ipv6_network_cidr       = optional(string)
@@ -35,6 +36,7 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpcs = map(object({
+          name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
           ipv6_network_cidr       = optional(string)
@@ -54,6 +56,7 @@ variable "full_mesh_trio" {
         region          = string
         route_table_id  = string
         vpcs = map(object({
+          name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
           ipv6_network_cidr       = optional(string)
@@ -86,8 +89,8 @@ variable "full_mesh_trio" {
 
   validation {
     condition = length(
-      distinct(concat(keys(var.full_mesh_trio.one.centralized_router.vpcs), keys(var.full_mesh_trio.two.centralized_router.vpcs), keys(var.full_mesh_trio.three.centralized_router.vpcs)))
-    ) == length(concat(keys(var.full_mesh_trio.one.centralized_router.vpcs), keys(var.full_mesh_trio.two.centralized_router.vpcs), keys(var.full_mesh_trio.three.centralized_router.vpcs)))
+      distinct(concat([for this in var.full_mesh_trio.one.centralized_router.vpcs : this.name], [for this in var.full_mesh_trio.two.centralized_router.vpcs : this.name], [for this in var.full_mesh_trio.three.centralized_router.vpcs : this.name]))
+    ) == length(concat([for this in var.full_mesh_trio.one.centralized_router.vpcs : this.name], [for this in var.full_mesh_trio.two.centralized_router.vpcs : this.name], [for this in var.full_mesh_trio.three.centralized_router.vpcs : this.name]))
     error_message = "All VPC names must be unique across regions."
   }
 
