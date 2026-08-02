@@ -182,57 +182,20 @@ resource "aws_ec2_transit_gateway_route" "this_peer_ipv6" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-locals {
-  # build new peer vpc ipv6 routes to other local tgws
-  peer_vpc_ipv6_routes_to_local_tgws = [
-    for route_table_id_and_peer_tgw_ipv6_network_cidr in setproduct(local.peer_tgws_vpc_route_table_ids, local.local_tgws_vpc_ipv6_network_cidrs) : {
-      route_table_id              = route_table_id_and_peer_tgw_ipv6_network_cidr[0]
-      destination_ipv6_cidr_block = route_table_id_and_peer_tgw_ipv6_network_cidr[1]
-  }]
-
-  peer_tgw_all_new_vpc_ipv6_routes_to_local_tgws = {
-    for this in local.peer_vpc_ipv6_routes_to_local_tgws :
-    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_peer_vpc_ipv6_routes_to_local_tgws" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_vpc_ipv6_routes_to_local_tgws
+  for_each = local.peer_cross_region_ipv6_routes
 
   route_table_id              = each.value.route_table_id
   destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
   transit_gateway_id          = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
-locals {
-  # build new peer vpc ipv6 routes to other peer vpcs
-  peer_vpc_ipv6_routes_to_peer_tgws = [
-    for route_table_id_and_peer_tgw_ipv6_network_cidr in setproduct(local.peer_tgws_vpc_route_table_ids, local.peer_tgws_vpc_ipv6_network_cidrs) : {
-      route_table_id              = route_table_id_and_peer_tgw_ipv6_network_cidr[0]
-      destination_ipv6_cidr_block = route_table_id_and_peer_tgw_ipv6_network_cidr[1]
-  }]
-
-  # generate current existing peer vpc ipv6 routes
-  peer_current_vpc_ipv6_routes = flatten([
-    for this in local.peer_tgws : [
-      for route_table_id_and_vpc_ipv6_network_cidr in setproduct(lookup(local.peer_tgws_vpc_tgw_id_to_route_table_ids, this.id), flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])) : {
-        route_table_id              = route_table_id_and_vpc_ipv6_network_cidr[0]
-        destination_ipv6_cidr_block = route_table_id_and_vpc_ipv6_network_cidr[1]
-  }]])
-
-  # subtract current existing peer vpc ipv6 routes from all peer vpc routes
-  peer_tgw_all_new_vpc_ipv6_routes_to_peer_vpcs = {
-    for this in setsubtract(local.peer_vpc_ipv6_routes_to_peer_tgws, local.peer_current_vpc_ipv6_routes) :
-    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_peer_vpcs_ipv6_routes_to_peer_vpcs" {
   provider = aws.peer
 
-  for_each = local.peer_tgw_all_new_vpc_ipv6_routes_to_peer_vpcs
+  for_each = local.peer_intra_region_ipv6_routes
 
   route_table_id              = each.value.route_table_id
   destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
