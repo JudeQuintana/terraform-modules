@@ -31,27 +31,37 @@ variable "policy" {
     default = optional(string, "allow")
     deny = optional(list(object({
       from_vpc = object({
-        network_cidr    = string
-        secondary_cidrs = optional(list(string), [])
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
       })
       to_vpc = object({
-        network_cidr    = string
-        secondary_cidrs = optional(list(string), [])
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
       })
     })), [])
     allow = optional(list(object({
       from_vpc = object({
-        network_cidr    = string
-        secondary_cidrs = optional(list(string), [])
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
       })
       to_vpc = object({
-        network_cidr    = string
-        secondary_cidrs = optional(list(string), [])
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
       })
     })), [])
     segments = optional(map(list(object({
-      network_cidr    = string
-      secondary_cidrs = optional(list(string), [])
+      network_cidr         = string
+      secondary_cidrs      = optional(list(string), [])
+      ipv6_network_cidr    = optional(string)
+      ipv6_secondary_cidrs = optional(list(string), [])
     }))), {})
   })
   default = {}

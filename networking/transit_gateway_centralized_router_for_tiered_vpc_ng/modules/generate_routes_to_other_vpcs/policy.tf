@@ -5,6 +5,8 @@ locals {
   # 3. segments -> same segment or unsegmented permits (overrides default)
   # 4. default -> fallthrough for anything unmatched ("allow" or "deny")
 
+  # === IPv4 ===
+
   # normalize deny rules into full CIDR lists per side
   # ie { from_vpc = module.vpcs["app"], to_vpc = module.vpcs["cicd"] } becomes
   # { from_cidrs = ["10.0.0.0/20", ...secondaries], to_cidrs = ["172.16.0.0/20", ...secondaries] }
@@ -113,5 +115,94 @@ locals {
         )
       )
     ]
+  }
+
+  # === IPv6 ===
+
+  ipv6_deny_rules = [
+    for rule in var.policy.deny : {
+      from_cidrs = concat(compact([rule.from_vpc.ipv6_network_cidr]), rule.from_vpc.ipv6_secondary_cidrs)
+      to_cidrs   = concat(compact([rule.to_vpc.ipv6_network_cidr]), rule.to_vpc.ipv6_secondary_cidrs)
+    } if rule.from_vpc.ipv6_network_cidr != null && rule.to_vpc.ipv6_network_cidr != null
+  ]
+
+  ipv6_allow_rules = [
+    for rule in var.policy.allow : {
+      from_cidrs = concat(compact([rule.from_vpc.ipv6_network_cidr]), rule.from_vpc.ipv6_secondary_cidrs)
+      to_cidrs   = concat(compact([rule.to_vpc.ipv6_network_cidr]), rule.to_vpc.ipv6_secondary_cidrs)
+    } if rule.from_vpc.ipv6_network_cidr != null && rule.to_vpc.ipv6_network_cidr != null
+  ]
+
+  ipv6_segment_cidrs = [
+    for vpcs in var.policy.segments : {
+      cidrs = flatten([for vpc in vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs) if vpc.ipv6_network_cidr != null])
+    }
+  ]
+
+  ipv6_segment_deny_rules = flatten([
+    for i, segment_a in local.ipv6_segment_cidrs : [
+      for segment_b in slice(local.ipv6_segment_cidrs, i + 1, length(local.ipv6_segment_cidrs)) : {
+        from_cidrs = segment_a.cidrs
+        to_cidrs   = segment_b.cidrs
+      }
+    ] if length(segment_a.cidrs) > 0
+  ])
+
+  ipv6_deny_lookup = {
+    for cidr in toset(flatten(concat(local.ipv6_deny_rules[*].from_cidrs, local.ipv6_deny_rules[*].to_cidrs))) :
+    cidr => flatten([
+      for rule in local.ipv6_deny_rules : concat(
+        contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
+        contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
+      )
+    ])
+  }
+
+  ipv6_allow_lookup = {
+    for cidr in toset(flatten(concat(local.ipv6_allow_rules[*].from_cidrs, local.ipv6_allow_rules[*].to_cidrs))) :
+    cidr => flatten([
+      for rule in local.ipv6_allow_rules : concat(
+        contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
+        contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
+      )
+    ])
+  }
+
+  ipv6_segment_deny_lookup = {
+    for cidr in toset(flatten(concat(local.ipv6_segment_deny_rules[*].from_cidrs, local.ipv6_segment_deny_rules[*].to_cidrs))) :
+    cidr => flatten([
+      for rule in local.ipv6_segment_deny_rules : concat(
+        contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
+        contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
+      )
+    ])
+  }
+
+  ipv6_all_segmented_cidrs = toset(flatten(local.ipv6_segment_cidrs[*].cidrs))
+
+  ipv6_segment_permit_lookup = {
+    for cidr in local.ipv6_all_segmented_cidrs :
+    cidr => flatten([
+      for segment in local.ipv6_segment_cidrs :
+      contains(segment.cidrs, cidr) ? segment.cidrs : []
+    ])
+  }
+
+  ipv6_network_cidr_to_other_ipv6_network_cidrs = {
+    for this in local.network_cidrs_with_route_table_ids :
+    element(this.ipv6_network_cidrs, 0) => [
+      for n in flatten(local.network_cidrs_with_route_table_ids[*].ipv6_network_cidrs) : n
+      if !contains(this.ipv6_network_cidrs, n)
+      && !contains(lookup(local.ipv6_deny_lookup, element(this.ipv6_network_cidrs, 0), []), n)
+      && (
+        contains(lookup(local.ipv6_allow_lookup, element(this.ipv6_network_cidrs, 0), []), n)
+        || contains(lookup(local.ipv6_segment_permit_lookup, element(this.ipv6_network_cidrs, 0), []), n)
+        || (
+          var.policy.default == "allow"
+          && !contains(lookup(local.ipv6_segment_deny_lookup, element(this.ipv6_network_cidrs, 0), []), n)
+        )
+      )
+    ]
+    if length(this.ipv6_network_cidrs) > 0
   }
 }

@@ -1,4 +1,3 @@
-# generate routes to other VPC network_cidrs, secondary_cidrs, ipv6_newtork_cidrs and ipv6_secondaary_cidrs in private and public route tables for each VPC
 locals {
   network_cidrs_with_route_table_ids = [
     for this in var.vpcs : {
@@ -9,7 +8,6 @@ locals {
   ]
 
   # ipv4
-  # policy resolves permitted CIDRs per VPC (deny > allow > segments > default)
   associated_route_table_ids_with_other_network_cidrs = flatten([
     for this in local.network_cidrs_with_route_table_ids : [
       for route_table_id in this.route_table_ids : {
@@ -21,23 +19,23 @@ locals {
   # [{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }...]
   routes = toset(flatten([
     for this in local.associated_route_table_ids_with_other_network_cidrs : [
-      for route_table_id_and_network_cidr in setproduct([this.route_table_id], this.other_network_cidrs) : {
-        route_table_id         = route_table_id_and_network_cidr[0]
-        destination_cidr_block = route_table_id_and_network_cidr[1]
+      for pair in setproduct([this.route_table_id], this.other_network_cidrs) : {
+        route_table_id         = pair[0]
+        destination_cidr_block = pair[1]
   }]]))
 
-  #ipv6
+  # ipv6
   associated_route_table_ids_with_other_ipv6_network_cidrs = flatten([
     for this in local.network_cidrs_with_route_table_ids : [
       for route_table_id in this.route_table_ids : {
         route_table_id           = route_table_id
-        other_ipv6_network_cidrs = [for n in flatten(local.network_cidrs_with_route_table_ids[*].ipv6_network_cidrs) : n if !contains(this.ipv6_network_cidrs, n)]
-  }]])
+        other_ipv6_network_cidrs = lookup(local.ipv6_network_cidr_to_other_ipv6_network_cidrs, element(this.ipv6_network_cidrs, 0), [])
+  }] if length(this.ipv6_network_cidrs) > 0])
 
   ipv6_routes = toset(flatten([
     for this in local.associated_route_table_ids_with_other_ipv6_network_cidrs : [
-      for route_table_id_and_ipv6_network_cidr in setproduct([this.route_table_id], this.other_ipv6_network_cidrs) : {
-        route_table_id              = route_table_id_and_ipv6_network_cidr[0]
-        destination_ipv6_cidr_block = route_table_id_and_ipv6_network_cidr[1]
+      for pair in setproduct([this.route_table_id], this.other_ipv6_network_cidrs) : {
+        route_table_id              = pair[0]
+        destination_ipv6_cidr_block = pair[1]
   }]]))
 }

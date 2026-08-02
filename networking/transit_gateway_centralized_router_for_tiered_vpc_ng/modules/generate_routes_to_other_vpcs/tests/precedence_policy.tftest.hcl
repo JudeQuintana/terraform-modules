@@ -302,3 +302,236 @@ run "ipv4_default_allow_empty_policy" {
     error_message = "Explicit default=allow should produce full mesh."
   }
 }
+
+# === IPv6 ===
+
+# default=deny with no allow/segments = zero IPv6 routes
+run "ipv6_default_deny_no_rules" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      default = "deny"
+    }
+  }
+
+  assert {
+    condition     = output.ipv6 == toset([])
+    error_message = "Default deny with no rules should produce empty IPv6 route set."
+  }
+}
+
+# default=deny with allow app <-> cicd = only those IPv6 routes
+run "ipv6_default_deny_allow_app_cicd" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      default = "deny"
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        }
+      ]
+    }
+  }
+
+  assert {
+    condition = alltrue([
+      for route in output.ipv6 :
+      (contains(["rtb-0c92ed73f355dcc65", "rtb-04c6baa3a6a0af91e", "rtb-06836f9bc939ebbce"], route.route_table_id) && route.destination_ipv6_cidr_block == "2600:1f24:66:c200::/56")
+      || (contains(["rtb-01e2b1283c7404903", "rtb-0094331bdafb627f3"], route.route_table_id) && route.destination_ipv6_cidr_block == "2600:1f24:66:c100::/56")
+    ])
+    error_message = "Default deny + allow app<->cicd should only produce app<->cicd IPv6 routes."
+  }
+
+  assert {
+    condition     = length(output.ipv6) == 5
+    error_message = "Should have 5 IPv6 routes (3 app route tables -> cicd + 2 cicd route tables -> app)."
+  }
+}
+
+# default=deny with segment "workers" [app, cicd] = only app <-> cicd IPv6
+run "ipv6_default_deny_segment_workers" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      default = "deny"
+      segments = {
+        workers = [
+          { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" },
+          { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition = alltrue([
+      for route in output.ipv6 :
+      (contains(["rtb-0c92ed73f355dcc65", "rtb-04c6baa3a6a0af91e", "rtb-06836f9bc939ebbce"], route.route_table_id) && route.destination_ipv6_cidr_block == "2600:1f24:66:c200::/56")
+      || (contains(["rtb-01e2b1283c7404903", "rtb-0094331bdafb627f3"], route.route_table_id) && route.destination_ipv6_cidr_block == "2600:1f24:66:c100::/56")
+    ])
+    error_message = "Default deny + segment workers should only produce app<->cicd IPv6 routes."
+  }
+
+  assert {
+    condition     = length(output.ipv6) == 5
+    error_message = "Should have 5 IPv6 routes (3 app route tables -> cicd + 2 cicd route tables -> app)."
+  }
+}
+
+# deny beats allow for IPv6
+run "ipv6_deny_beats_allow" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      deny = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        }
+      ]
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        }
+      ]
+    }
+  }
+
+  assert {
+    condition = !anytrue([
+      for route in output.ipv6 :
+      contains(["rtb-0c92ed73f355dcc65", "rtb-04c6baa3a6a0af91e", "rtb-06836f9bc939ebbce"], route.route_table_id)
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c200::/56"
+    ])
+    error_message = "Deny should beat allow for IPv6 — app should not reach cicd."
+  }
+
+  assert {
+    condition = !anytrue([
+      for route in output.ipv6 :
+      contains(["rtb-01e2b1283c7404903", "rtb-0094331bdafb627f3"], route.route_table_id)
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c100::/56"
+    ])
+    error_message = "Deny should beat allow for IPv6 — cicd should not reach app."
+  }
+}
+
+# allow overrides segments for IPv6
+run "ipv6_allow_overrides_segments" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        }
+      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }]
+        beta  = [{ network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }]
+      }
+    }
+  }
+
+  assert {
+    condition = anytrue([
+      for route in output.ipv6 :
+      route.route_table_id == "rtb-0c92ed73f355dcc65"
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c200::/56"
+    ])
+    error_message = "Allow should override segment cross-deny for IPv6 — app should reach cicd."
+  }
+
+  assert {
+    condition = anytrue([
+      for route in output.ipv6 :
+      route.route_table_id == "rtb-01e2b1283c7404903"
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c100::/56"
+    ])
+    error_message = "Allow should override segment cross-deny for IPv6 — cicd should reach app."
+  }
+}
+
+# combined precedence for IPv6
+run "ipv6_combined_precedence" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      deny = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "192.168.0.0/20", ipv6_network_cidr = "2600:1f24:66:c300::/56" }
+        }
+      ]
+      allow = [
+        {
+          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+        }
+      ]
+      segments = {
+        alpha = [{ network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }]
+        beta  = [{ network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }]
+      }
+    }
+  }
+
+  # app -> general: denied (explicit deny)
+  assert {
+    condition = !anytrue([
+      for route in output.ipv6 :
+      contains(["rtb-0c92ed73f355dcc65", "rtb-04c6baa3a6a0af91e", "rtb-06836f9bc939ebbce"], route.route_table_id)
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c300::/56"
+    ])
+    error_message = "App should not reach general IPv6 (explicit deny)."
+  }
+
+  # general -> app: denied (explicit deny is bidirectional)
+  assert {
+    condition = !anytrue([
+      for route in output.ipv6 :
+      contains(["rtb-066adc27add9a630e", "rtb-0989090af3edb78b1"], route.route_table_id)
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c100::/56"
+    ])
+    error_message = "General should not reach app IPv6 (explicit deny)."
+  }
+
+  # app -> cicd: allowed (allow overrides cross-segment)
+  assert {
+    condition = anytrue([
+      for route in output.ipv6 :
+      route.route_table_id == "rtb-0c92ed73f355dcc65"
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c200::/56"
+    ])
+    error_message = "App should reach cicd IPv6 (allow overrides segments)."
+  }
+
+  # cicd -> general: allowed (default=allow, general unsegmented)
+  assert {
+    condition = anytrue([
+      for route in output.ipv6 :
+      route.route_table_id == "rtb-01e2b1283c7404903"
+      && route.destination_ipv6_cidr_block == "2600:1f24:66:c300::/56"
+    ])
+    error_message = "Cicd should reach general IPv6 (default=allow, unsegmented)."
+  }
+}
+
+# default=allow with empty policy = full mesh IPv6
+run "ipv6_default_allow_empty_policy" {
+  variables {
+    vpcs = run.setup.ipv6_tiered_vpcs
+    policy = {
+      default = "allow"
+    }
+  }
+
+  assert {
+    condition     = output.ipv6 == run.final.ipv6_set_of_route_objects_to_other_vpcs
+    error_message = "Explicit default=allow should produce full mesh IPv6."
+  }
+}

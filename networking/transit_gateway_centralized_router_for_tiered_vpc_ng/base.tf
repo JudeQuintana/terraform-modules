@@ -15,7 +15,7 @@ locals {
 
   centralized_router_name = format("%s-%s-%s-%s", local.upper_env_prefix, "centralized-router", var.centralized_router.name, local.region_label)
 
-  # add the vpc and it's azs the to the mesh if there's 1 or more AZs with special = true
+  # add the VPC's AZs the to the mesh if there's 1 or more AZs with special = true
   # if there are no AZs with special = true then the VPC is fully removed from the mesh (vpc and tgw routes)
   # making it easier to decomission AZs and VPCs without manual intervention
   vpcs = {
