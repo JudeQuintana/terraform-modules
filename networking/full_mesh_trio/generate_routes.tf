@@ -36,5 +36,24 @@ locals {
     format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
     if contains(local.three_tgw_vpc_route_table_ids, this.route_table_id) && !contains(local.three_tgw_vpc_network_cidrs, this.destination_cidr_block)
   }
+
+  # ipv6
+  one_cross_region_ipv6_routes = {
+    for this in module.this_generate_routes_to_other_vpcs.ipv6 :
+    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
+    if contains(local.one_tgw_vpc_route_table_ids, this.route_table_id) && !contains(local.one_tgw_vpc_ipv6_network_cidrs, this.destination_ipv6_cidr_block)
+  }
+
+  two_cross_region_ipv6_routes = {
+    for this in module.this_generate_routes_to_other_vpcs.ipv6 :
+    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
+    if contains(local.two_tgw_vpc_route_table_ids, this.route_table_id) && !contains(local.two_tgw_vpc_ipv6_network_cidrs, this.destination_ipv6_cidr_block)
+  }
+
+  three_cross_region_ipv6_routes = {
+    for this in module.this_generate_routes_to_other_vpcs.ipv6 :
+    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
+    if contains(local.three_tgw_vpc_route_table_ids, this.route_table_id) && !contains(local.three_tgw_vpc_ipv6_network_cidrs, this.destination_ipv6_cidr_block)
+  }
 }
 
