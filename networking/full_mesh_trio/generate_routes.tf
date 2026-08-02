@@ -8,7 +8,7 @@ locals {
 }
 
 module "this_generate_routes_to_other_vpcs" {
-  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/transit_gateway_centralized_router_for_tiered_vpc_ng/modules/generate_routes_to_other_vpcs?ref=init-deny-policy"
+  source = "git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs?ref=init-deny-policy"
 
   vpcs           = local.all_vpcs
   routing_policy = var.routing_policy
