@@ -8,20 +8,20 @@ locals {
   # === IPv4 ===
 
   # normalize deny rules into full CIDR lists per side
-  # ie { from_vpc = module.vpcs["app"], to_vpc = module.vpcs["cicd"] } becomes
+  # ie { from = module.vpcs["app"], to = module.vpcs["cicd"] } becomes
   # { from_cidrs = ["10.0.0.0/20", ...secondaries], to_cidrs = ["172.16.0.0/20", ...secondaries] }
   deny_rules = [
     for rule in var.routing_policy.deny : {
-      from_cidrs = concat([rule.from_vpc.network_cidr], rule.from_vpc.secondary_cidrs)
-      to_cidrs   = concat([rule.to_vpc.network_cidr], rule.to_vpc.secondary_cidrs)
+      from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
+      to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
     }
   ]
 
   # normalize allow rules into full CIDR lists per side
   allow_rules = [
     for rule in var.routing_policy.allow : {
-      from_cidrs = concat([rule.from_vpc.network_cidr], rule.from_vpc.secondary_cidrs)
-      to_cidrs   = concat([rule.to_vpc.network_cidr], rule.to_vpc.secondary_cidrs)
+      from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
+      to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
     }
   ]
 
@@ -121,16 +121,16 @@ locals {
 
   ipv6_deny_rules = [
     for rule in var.routing_policy.deny : {
-      from_cidrs = concat(compact([rule.from_vpc.ipv6_network_cidr]), rule.from_vpc.ipv6_secondary_cidrs)
-      to_cidrs   = concat(compact([rule.to_vpc.ipv6_network_cidr]), rule.to_vpc.ipv6_secondary_cidrs)
-    } if rule.from_vpc.ipv6_network_cidr != null && rule.to_vpc.ipv6_network_cidr != null
+      from_cidrs = concat(compact([rule.from.ipv6_network_cidr]), rule.from.ipv6_secondary_cidrs)
+      to_cidrs   = concat(compact([rule.to.ipv6_network_cidr]), rule.to.ipv6_secondary_cidrs)
+    } if rule.from.ipv6_network_cidr != null && rule.to.ipv6_network_cidr != null
   ]
 
   ipv6_allow_rules = [
     for rule in var.routing_policy.allow : {
-      from_cidrs = concat(compact([rule.from_vpc.ipv6_network_cidr]), rule.from_vpc.ipv6_secondary_cidrs)
-      to_cidrs   = concat(compact([rule.to_vpc.ipv6_network_cidr]), rule.to_vpc.ipv6_secondary_cidrs)
-    } if rule.from_vpc.ipv6_network_cidr != null && rule.to_vpc.ipv6_network_cidr != null
+      from_cidrs = concat(compact([rule.from.ipv6_network_cidr]), rule.from.ipv6_secondary_cidrs)
+      to_cidrs   = concat(compact([rule.to.ipv6_network_cidr]), rule.to.ipv6_secondary_cidrs)
+    } if rule.from.ipv6_network_cidr != null && rule.to.ipv6_network_cidr != null
   ]
 
   ipv6_segment_cidrs = [

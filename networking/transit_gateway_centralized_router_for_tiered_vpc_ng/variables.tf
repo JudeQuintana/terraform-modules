@@ -117,13 +117,13 @@ variable "routing_policy" {
   type = object({
     default = optional(string, "allow")
     deny = optional(list(object({
-      from_vpc = object({
+      from = object({
         network_cidr         = string
         secondary_cidrs      = optional(list(string), [])
         ipv6_network_cidr    = optional(string)
         ipv6_secondary_cidrs = optional(list(string), [])
       })
-      to_vpc = object({
+      to = object({
         network_cidr         = string
         secondary_cidrs      = optional(list(string), [])
         ipv6_network_cidr    = optional(string)
@@ -131,13 +131,13 @@ variable "routing_policy" {
       })
     })), [])
     allow = optional(list(object({
-      from_vpc = object({
+      from = object({
         network_cidr         = string
         secondary_cidrs      = optional(list(string), [])
         ipv6_network_cidr    = optional(string)
         ipv6_secondary_cidrs = optional(list(string), [])
       })
-      to_vpc = object({
+      to = object({
         network_cidr         = string
         secondary_cidrs      = optional(list(string), [])
         ipv6_network_cidr    = optional(string)

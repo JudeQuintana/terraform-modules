@@ -45,8 +45,8 @@ run "ipv4_default_deny_allow_app_cicd" {
       default = "deny"
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "172.16.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
         }
       ]
     }
@@ -86,14 +86,14 @@ run "ipv4_deny_beats_allow" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "172.16.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "172.16.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
         }
       ]
     }
@@ -113,8 +113,8 @@ run "ipv4_allow_overrides_segments" {
     routing_policy = {
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "172.16.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
         }
       ]
       segments = {
@@ -138,8 +138,8 @@ run "ipv4_with_secondary_cidrs_default_deny_allow_app_cicd" {
       default = "deny"
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
         }
       ]
     }
@@ -179,14 +179,14 @@ run "ipv4_with_secondary_cidrs_deny_beats_allow" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
         }
       ]
     }
@@ -205,8 +205,8 @@ run "ipv4_with_secondary_cidrs_allow_overrides_segments" {
     routing_policy = {
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
         }
       ]
       segments = {
@@ -235,14 +235,14 @@ run "ipv4_combined_precedence" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "192.168.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "192.168.0.0/20" }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20" }
-          to_vpc   = { network_cidr = "172.16.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
         }
       ]
       segments = {
@@ -265,14 +265,14 @@ run "ipv4_with_secondary_cidrs_combined_precedence" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "192.168.0.0/20" }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "192.168.0.0/20" }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
-          to_vpc   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
+          from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
+          to   = { network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }
         }
       ]
       segments = {
@@ -328,8 +328,8 @@ run "ipv6_default_deny_allow_app_cicd" {
       default = "deny"
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
         }
       ]
     }
@@ -387,14 +387,14 @@ run "ipv6_deny_beats_allow" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
         }
       ]
     }
@@ -426,8 +426,8 @@ run "ipv6_allow_overrides_segments" {
     routing_policy = {
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
         }
       ]
       segments = {
@@ -463,14 +463,14 @@ run "ipv6_combined_precedence" {
     routing_policy = {
       deny = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "192.168.0.0/20", ipv6_network_cidr = "2600:1f24:66:c300::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "192.168.0.0/20", ipv6_network_cidr = "2600:1f24:66:c300::/56" }
         }
       ]
       allow = [
         {
-          from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
-          to_vpc   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
+          from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
+          to   = { network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }
         }
       ]
       segments = {
