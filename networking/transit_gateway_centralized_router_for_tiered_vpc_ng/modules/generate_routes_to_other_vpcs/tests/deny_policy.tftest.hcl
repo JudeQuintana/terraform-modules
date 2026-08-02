@@ -14,7 +14,7 @@ run "final_deny" {
 run "ipv4_deny_app_to_cicd" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = { network_cidr = "10.0.0.0/20" }
@@ -34,7 +34,7 @@ run "ipv4_deny_app_to_cicd" {
 run "ipv4_with_secondary_cidrs_deny_app_to_cicd" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = {
@@ -60,7 +60,7 @@ run "ipv4_with_secondary_cidrs_deny_app_to_cicd" {
 run "ipv4_deny_all_pairs" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = { network_cidr = "10.0.0.0/20" }
@@ -88,7 +88,7 @@ run "ipv4_deny_all_pairs" {
 run "ipv4_with_secondary_cidrs_deny_all_pairs" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
@@ -122,7 +122,7 @@ run "final" {
 run "ipv4_empty_deny_unchanged" {
   variables {
     vpcs   = run.setup.ipv4_tiered_vpcs
-    policy = { deny = [] }
+    routing_policy = { deny = [] }
   }
 
   assert {
@@ -149,7 +149,7 @@ run "ipv4_default_policy_unchanged" {
 run "ipv6_deny_app_to_cicd" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
@@ -191,7 +191,7 @@ run "ipv6_deny_app_to_cicd" {
 run "ipv6_with_secondary_cidrs_deny_app_to_cicd" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs_with_secondary_cidrs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = {
@@ -232,7 +232,7 @@ run "ipv6_with_secondary_cidrs_deny_app_to_cicd" {
 run "ipv6_deny_all_pairs" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
-    policy = {
+    routing_policy = {
       deny = [
         {
           from_vpc = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
@@ -260,7 +260,7 @@ run "ipv6_deny_all_pairs" {
 run "ipv6_empty_deny_unchanged" {
   variables {
     vpcs   = run.setup.ipv6_tiered_vpcs
-    policy = { deny = [] }
+    routing_policy = { deny = [] }
   }
 
   assert {

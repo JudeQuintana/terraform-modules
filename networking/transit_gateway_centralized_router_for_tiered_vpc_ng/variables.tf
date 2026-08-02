@@ -112,7 +112,7 @@ variable "centralized_router" {
   }
 }
 
-variable "policy" {
+variable "routing_policy" {
   description = "Routing policy for intra-region VPC routes"
   type = object({
     default = optional(string, "allow")
@@ -154,14 +154,14 @@ variable "policy" {
   default = {}
 
   validation {
-    condition     = contains(["allow", "deny"], var.policy.default)
+    condition     = contains(["allow", "deny"], var.routing_policy.default)
     error_message = "Policy default must be \"allow\" or \"deny\"."
   }
 
   validation {
     condition = length(
-      distinct(flatten([for vpcs in var.policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
-    ) == length(flatten([for vpcs in var.policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+      distinct(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
   }
 }
