@@ -124,7 +124,7 @@ locals {
   # generate current existing peer tgw routes for its peer vpcs
   peer_current_tgw_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_network_cidr in setproduct([this.route_table_id], flatten([for vpc in values(this.vpcs) : concat([vpc.network_cidr], vpc.secondary_cidrs)])) : {
+      for route_table_id_and_network_cidr in setproduct([this.route_table_id], flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])) : {
         route_table_id         = route_table_id_and_network_cidr[0]
         destination_cidr_block = route_table_id_and_network_cidr[1]
   }]])
@@ -237,7 +237,7 @@ locals {
   # generate current existing peer tgw ipv6 routes for its peer vpcs
   peer_current_tgw_ipv6_routes = flatten([
     for this in local.peer_tgws : [
-      for route_table_id_and_ipv6_network_cidr in setproduct([this.route_table_id], flatten([for vpc in values(this.vpcs) : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])) : {
+      for route_table_id_and_ipv6_network_cidr in setproduct([this.route_table_id], flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])) : {
         route_table_id              = route_table_id_and_ipv6_network_cidr[0]
         destination_ipv6_cidr_block = route_table_id_and_ipv6_network_cidr[1]
   }]])
