@@ -1,12 +1,3 @@
-# one route table for all vpc network_cidrs
-resource "aws_ec2_transit_gateway_route_table" "this" {
-  transit_gateway_id = aws_ec2_transit_gateway.this.id
-  tags = merge(
-    local.default_tags,
-    { Name = local.centralized_router_name }
-  )
-}
-
 # ipv4
 resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   for_each = local.vpc_routes_to_other_vpcs
