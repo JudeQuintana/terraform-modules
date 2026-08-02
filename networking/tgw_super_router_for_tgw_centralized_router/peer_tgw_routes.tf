@@ -67,26 +67,6 @@ resource "aws_ec2_transit_gateway_route" "this_peer" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
 }
 
-resource "aws_route" "this_peer_vpc_routes_to_local_tgws" {
-  provider = aws.peer
-
-  for_each = local.peer_cross_region_ipv4_routes
-
-  route_table_id         = each.value.route_table_id
-  destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
-resource "aws_route" "this_peer_vpcs_routes_to_peer_vpcs" {
-  provider = aws.peer
-
-  for_each = local.peer_intra_region_ipv4_routes
-
-  route_table_id         = each.value.route_table_id
-  destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
 locals {
   peer_tgw_route_table_id_to_peer_tgw_id = zipmap(local.peer_tgws_route_table_ids, local.peer_tgws_ids)
 
@@ -180,26 +160,6 @@ resource "aws_ec2_transit_gateway_route" "this_peer_ipv6" {
 
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_peer_to_peers]
-}
-
-resource "aws_route" "this_peer_vpc_ipv6_routes_to_local_tgws" {
-  provider = aws.peer
-
-  for_each = local.peer_cross_region_ipv6_routes
-
-  route_table_id              = each.value.route_table_id
-  destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
-  transit_gateway_id          = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
-resource "aws_route" "this_peer_vpcs_ipv6_routes_to_peer_vpcs" {
-  provider = aws.peer
-
-  for_each = local.peer_intra_region_ipv6_routes
-
-  route_table_id              = each.value.route_table_id
-  destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
-  transit_gateway_id          = lookup(local.peer_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {

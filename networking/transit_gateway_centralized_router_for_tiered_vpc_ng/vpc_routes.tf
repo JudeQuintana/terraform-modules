@@ -1,3 +1,13 @@
+# one route table for all vpc network_cidrs
+resource "aws_ec2_transit_gateway_route_table" "this" {
+  transit_gateway_id = aws_ec2_transit_gateway.this.id
+  tags = merge(
+    local.default_tags,
+    { Name = local.centralized_router_name }
+  )
+}
+
+# ipv4
 resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   for_each = local.vpc_routes_to_other_vpcs
 
@@ -10,13 +20,6 @@ resource "aws_route" "this_vpc_routes_to_other_vpcs" {
 }
 
 # ipv6
-locals {
-  ipv6_vpc_routes_to_other_vpcs = {
-    for this in module.this_generate_routes_to_other_vpcs.ipv6 :
-    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_ipv6_vpc_routes_to_other_vpcs" {
   for_each = local.ipv6_vpc_routes_to_other_vpcs
 

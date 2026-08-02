@@ -67,26 +67,6 @@ resource "aws_ec2_transit_gateway_route" "this_local" {
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals]
 }
 
-resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
-  provider = aws.local
-
-  for_each = local.local_cross_region_ipv4_routes
-
-  route_table_id         = each.value.route_table_id
-  destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
-resource "aws_route" "this_local_vpcs_routes_to_local_vpcs" {
-  provider = aws.local
-
-  for_each = local.local_intra_region_ipv4_routes
-
-  route_table_id         = each.value.route_table_id
-  destination_cidr_block = each.value.destination_cidr_block
-  transit_gateway_id     = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
 locals {
   local_tgw_route_table_id_to_local_tgw_id = zipmap(local.local_tgws_route_table_ids, local.local_tgws_ids)
 
@@ -180,26 +160,6 @@ resource "aws_ec2_transit_gateway_route" "this_local_ipv6" {
 
   # make sure the peer links are up before adding the route.
   depends_on = [aws_ec2_transit_gateway_peering_attachment_accepter.this_local_to_locals]
-}
-
-resource "aws_route" "this_local_vpc_ipv6_routes_to_peer_tgws" {
-  provider = aws.local
-
-  for_each = local.local_cross_region_ipv6_routes
-
-  route_table_id              = each.value.route_table_id
-  destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
-  transit_gateway_id          = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
-}
-
-resource "aws_route" "this_local_vpcs_ipv6_routes_to_local_vpcs" {
-  provider = aws.local
-
-  for_each = local.local_intra_region_ipv6_routes
-
-  route_table_id              = each.value.route_table_id
-  destination_ipv6_cidr_block = each.value.destination_ipv6_cidr_block
-  transit_gateway_id          = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
 locals {
