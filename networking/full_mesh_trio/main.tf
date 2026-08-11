@@ -1,8 +1,19 @@
 /*
-* Full Mesh Trio module builds peering links (red) between existing hub spoke tgws (Centralized Routers) and adds proper routes to all TGWs and their attached VPCs, etc.
+* # Full Mesh Trio
 *
-* The resulting architecture is a full mesh configurion between 3 hub spoke topologies.
-* See it in action in the [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo)
+* Cross-region full mesh between three Centralized Routers. Builds TGW peering
+* attachments and static routes across all three TGWs, then compiles an optional
+* routing policy (deny > allow > segments > default) into cross-region VPC route
+* table entries. Operates as the Global IR, evaluating policy across all regions
+* in a single declaration.
+*
+* `v1.10.0`:
+* - Breaking change: cross-region VPC routes now use policy compilation instead of VPC aggregate setproduct.
+* - Route resource names are consolidated and renamed.
+* - New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
+* - Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
+* - Scope-invariant: same policy evaluation as Centralized Router and Super Router.
+* - Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared compilation unit.
 *
 * `v1.9.0`:
 * - reorganize files

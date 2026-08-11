@@ -1,6 +1,16 @@
 /*
 * # Transit Gateway Centralized Router
-* - Creates hub and spoke topology from VPCs.
+*
+* Regional hub-and-spoke topology for Tiered VPC-NG. A single TGW with one shared
+* route table connects all VPC attachments, then compiles an optional routing policy
+* (deny > allow > segments > default) into per-VPC route table entries. Operates as
+* the Regional IR, the smallest policy evaluation scope.
+*
+* `v1.10.0`
+* - Routing policy language integration.
+* - New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
+* - Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
+* - Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared scope-agnostic compilation unit.
 *
 * `v1.9.4`
 * - remove legacy output `vpc.routes`. will rebuild super router at a later time but no need to keep this around.

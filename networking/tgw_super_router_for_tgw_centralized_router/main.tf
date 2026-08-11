@@ -1,5 +1,20 @@
 /*
-* # Super Router Description
+* # Super Router
+*
+* Decentralized cross-region peering between two sets of Centralized Routers.
+* Builds a dedicated TGW pair (local and peer) with peering attachments and
+* static routes, then compiles an optional routing policy (deny > allow > segments > default)
+* into cross-region VPC route table entries. Operates as the Domain IR, evaluating
+* policy across an arbitrary number of Centralized Routers on each side.
+*
+* v1.10.0:
+* - Breaking change: cross-region VPC routes now use policy compilation instead of VPC aggregate setproduct.
+* - Route resource names are consolidated and renamed.
+* - New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
+* - Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
+* - Scope-invariant: same policy evaluation as Centralized Router and Full Mesh Trio.
+* - Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared compilation unit.
+*
 * v1.9.6 (v1.0.1):
 * Super Router now fully interprets AWS TGW network intent across address space, topology, and egress semantics, with no special cases.
 *

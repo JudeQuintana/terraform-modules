@@ -1,4 +1,19 @@
-# Super Router Description
+# Super Router
+
+Decentralized cross-region peering between two sets of Centralized Routers.
+Builds a dedicated TGW pair (local and peer) with peering attachments and
+static routes, then compiles an optional routing policy (deny > allow > segments > default)
+into cross-region VPC route table entries. Operates as the Domain IR, evaluating
+policy across an arbitrary number of Centralized Routers on each side.
+
+v1.10.0:
+- Breaking change: cross-region VPC routes now use policy compilation instead of VPC aggregate setproduct.
+- Route resource names are consolidated and renamed.
+- New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
+- Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
+- Scope-invariant: same policy evaluation as Centralized Router and Full Mesh Trio.
+- Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared compilation unit.
+
 v1.9.6 (v1.0.1):
 Super Router now fully interprets AWS TGW network intent across address space, topology, and egress semantics, with no special cases.
 
@@ -89,25 +104,27 @@ The resulting architecture is a decentralized hub spoke topology:
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws.local"></a> [aws.local](#provider\_aws.local) | >=4.20 |
 | <a name="provider_aws.peer"></a> [aws.peer](#provider\_aws.peer) | >=4.20 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+| ---- | ------ | ------- |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | init-deny-policy |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_ec2_transit_gateway.this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway) | resource |
 | [aws_ec2_transit_gateway.this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway) | resource |
 | [aws_ec2_transit_gateway_peering_attachment.this_local_to_locals](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_peering_attachment) | resource |
@@ -160,16 +177,17 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
-| <a name="input_super_router"></a> [super\_router](#input\_super\_router) | Super Router configuration | <pre>object({<br/>    name = string<br/>    local = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })), {})<br/>    })<br/>    peer = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpc = object({<br/>          names                   = list(string)<br/>          network_cidrs           = list(string)<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidrs      = list(string)<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        })<br/>      })), {})<br/>    })<br/>  })</pre> | n/a | yes |
+| <a name="input_routing_policy"></a> [routing\_policy](#input\_routing\_policy) | Routing policy for cross-region and intra-region VPC routes | <pre>object({<br/>    default = optional(string, "allow")<br/>    deny = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    allow = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    segments = optional(map(list(object({<br/>      network_cidr         = string<br/>      secondary_cidrs      = optional(list(string), [])<br/>      ipv6_network_cidr    = optional(string)<br/>      ipv6_secondary_cidrs = optional(list(string), [])<br/>    }))), {})<br/>  })</pre> | `{}` | no |
+| <a name="input_super_router"></a> [super\_router](#input\_super\_router) | Super Router configuration | <pre>object({<br/>    name = string<br/>    local = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpcs = map(object({<br/>          name                    = string<br/>          network_cidr            = string<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidr       = string<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        }))<br/>      })), {})<br/>    })<br/>    peer = object({<br/>      amazon_side_asn = number<br/>      blackhole = optional(object({<br/>        cidrs      = optional(list(string), [])<br/>        ipv6_cidrs = optional(list(string), [])<br/>      }), {})<br/>      centralized_routers = optional(map(object({<br/>        account_id      = string<br/>        amazon_side_asn = string<br/>        full_name       = string<br/>        id              = string<br/>        name            = string<br/>        region          = string<br/>        route_table_id  = string<br/>        vpcs = map(object({<br/>          name                    = string<br/>          network_cidr            = string<br/>          secondary_cidrs         = list(string)<br/>          ipv6_network_cidr       = string<br/>          ipv6_secondary_cidrs    = list(string)<br/>          private_route_table_ids = list(string)<br/>          public_route_table_ids  = list(string)<br/>        }))<br/>      })), {})<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_local"></a> [local](#output\_local) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_peer"></a> [peer](#output\_peer) | n/a |
