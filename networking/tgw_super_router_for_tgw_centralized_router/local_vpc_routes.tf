@@ -9,7 +9,7 @@ resource "aws_route" "this_local_vpc_routes_to_peer_tgws" {
   transit_gateway_id     = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
-resource "aws_route" "this_local_vpcs_routes_to_local_vpcs" {
+resource "aws_route" "this_local_vpc_routes_to_local_vpcs" {
   provider = aws.local
 
   for_each = local.local_intra_region_ipv4_routes
@@ -30,7 +30,7 @@ resource "aws_route" "this_local_vpc_ipv6_routes_to_peer_tgws" {
   transit_gateway_id          = lookup(local.local_tgws_vpc_route_table_id_to_tgw_id, each.value.route_table_id)
 }
 
-resource "aws_route" "this_local_vpcs_ipv6_routes_to_local_vpcs" {
+resource "aws_route" "this_local_vpc_ipv6_routes_to_local_vpcs" {
   provider = aws.local
 
   for_each = local.local_intra_region_ipv6_routes

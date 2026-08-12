@@ -26,15 +26,17 @@ variable "super_router" {
         name            = string
         region          = string
         route_table_id  = string
-        vpcs = map(object({
+        vpcs = optional(map(object({
+          id                      = string
           name                    = string
+          full_name               = string
           network_cidr            = string
           secondary_cidrs         = list(string)
           ipv6_network_cidr       = string
           ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        }))
+        })), {})
       })), {})
     })
     peer = object({
@@ -51,15 +53,17 @@ variable "super_router" {
         name            = string
         region          = string
         route_table_id  = string
-        vpcs = map(object({
+        vpcs = optional(map(object({
+          id                      = string
           name                    = string
+          full_name               = string
           network_cidr            = string
           secondary_cidrs         = list(string)
           ipv6_network_cidr       = string
           ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        }))
+        })), {})
       })), {})
     })
   })

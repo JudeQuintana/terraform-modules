@@ -4,8 +4,8 @@ locals {
     merge([for this in local.peer_tgws : this.vpcs]...)
   )
 
-  # vpc routes within the same tgw are already managed by the centralized router
-  # these will be used to filter out routes that already exist
+  # ipv4 self-route exclusion sets
+  # will be used to remove anything the centralized router's scope already owns, regardless of whether that scope permits or denies it.
   local_tgw_vpc_routes = toset(flatten([
     for this in local.local_tgws : [
       for pair in setproduct(
@@ -60,8 +60,8 @@ module "this_generate_routes_to_other_vpcs" {
   #source = "git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs?ref=v1.10.0"
   source = "git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs?ref=init-deny-policy"
 
-  vpcs           = local.all_vpcs
   routing_policy = var.routing_policy
+  vpcs           = local.all_vpcs
 }
 
 locals {

@@ -15,7 +15,8 @@ variable "full_mesh_trio" {
         name            = string
         region          = string
         route_table_id  = string
-        vpcs = map(object({
+        vpcs = optional(map(object({
+          id                      = string
           name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
@@ -23,7 +24,7 @@ variable "full_mesh_trio" {
           ipv6_secondary_cidrs    = optional(list(string), [])
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        }))
+        })), {})
       })
     })
     two = object({
@@ -35,7 +36,8 @@ variable "full_mesh_trio" {
         name            = string
         region          = string
         route_table_id  = string
-        vpcs = map(object({
+        vpcs = optional(map(object({
+          id                      = string
           name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
@@ -43,7 +45,7 @@ variable "full_mesh_trio" {
           ipv6_secondary_cidrs    = optional(list(string), [])
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        }))
+        })), {})
       })
     })
     three = object({
@@ -55,7 +57,8 @@ variable "full_mesh_trio" {
         name            = string
         region          = string
         route_table_id  = string
-        vpcs = map(object({
+        vpcs = optional(map(object({
+          id                      = string
           name                    = string
           network_cidr            = string
           secondary_cidrs         = optional(list(string), [])
@@ -63,7 +66,7 @@ variable "full_mesh_trio" {
           ipv6_secondary_cidrs    = optional(list(string), [])
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        }))
+        })), {})
       })
     })
   })

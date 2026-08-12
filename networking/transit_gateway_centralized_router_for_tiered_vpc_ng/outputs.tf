@@ -38,7 +38,9 @@ output "vpcs" {
   value = {
     for this in local.vpcs :
     this.name => {
+      id                      = this.id
       name                    = this.name
+      full_name               = this.full_name
       network_cidr            = this.network_cidr
       secondary_cidrs         = this.secondary_cidrs
       ipv6_network_cidr       = this.ipv6_network_cidr

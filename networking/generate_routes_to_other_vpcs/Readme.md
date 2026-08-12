@@ -100,6 +100,16 @@ Success! 66 passed, 0 failed.
 - 51 new policy tests (deny, segments, precedence) added to existing 15 route generation tests.
 - See [docs/routing-policy-language.md](docs/routing-policy-language.md) for full specification.
 
+```hcl
+# snippet
+module "generate_routes_to_other_vpcs" {
+ source = "git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs?ref=v1.10.0"
+
+  routing_policy = var.routing_policy
+  vpcs           = var.vpcs
+}
+```
+
 `v1.9.0`
 - supportes generating VPC routes for IPv6 secondary cidrs across vpcs.
 
