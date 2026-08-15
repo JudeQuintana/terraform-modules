@@ -7,90 +7,90 @@ This is a function-type module (no resources). It takes a map of Tiered VPC-NG o
 and an optional `routing_policy`, then emits filtered route sets consumed by route resources
 in Centralized Router (Regional IR), Full Mesh Trio (Global IR), and Super Router (Domain IR).
 
-Run the test suites with `terraform test` in the top level directory in the repo.
+Run the test suites with `terraform init`, then `terraform test` in the top level directory in the repo.
 ```
-```
-tests/deny\_policy.tftest.hcl... in progress
+tests/deny_policy.tftest.hcl... in progress
   run "setup"... pass
-  run "final\_deny"... pass
-  run "ipv4\_deny\_app\_to\_cicd"... pass
-  run "ipv4\_with\_secondary\_cidrs\_deny\_app\_to\_cicd"... pass
-  run "ipv4\_deny\_all\_pairs"... pass
-  run "ipv4\_with\_secondary\_cidrs\_deny\_all\_pairs"... pass
+  run "final_deny"... pass
+  run "ipv4_deny_app_to_cicd"... pass
+  run "ipv4_with_secondary_cidrs_deny_app_to_cicd"... pass
+  run "ipv4_deny_all_pairs"... pass
+  run "ipv4_with_secondary_cidrs_deny_all_pairs"... pass
   run "final"... pass
-  run "ipv4\_empty\_deny\_unchanged"... pass
-  run "ipv4\_default\_policy\_unchanged"... pass
-  run "ipv6\_deny\_app\_to\_cicd"... pass
-  run "ipv6\_with\_secondary\_cidrs\_deny\_app\_to\_cicd"... pass
-  run "ipv6\_deny\_all\_pairs"... pass
-  run "ipv6\_empty\_deny\_unchanged"... pass
-  run "ipv6\_default\_policy\_unchanged"... pass
-tests/deny\_policy.tftest.hcl... tearing down
-tests/deny\_policy.tftest.hcl... pass
-tests/generate\_routes.tftest.hcl... in progress
+  run "ipv4_empty_deny_unchanged"... pass
+  run "ipv4_default_policy_unchanged"... pass
+  run "ipv6_deny_app_to_cicd"... pass
+  run "ipv6_with_secondary_cidrs_deny_app_to_cicd"... pass
+  run "ipv6_deny_all_pairs"... pass
+  run "ipv6_empty_deny_unchanged"... pass
+  run "ipv6_default_policy_unchanged"... pass
+tests/deny_policy.tftest.hcl... tearing down
+tests/deny_policy.tftest.hcl... pass
+tests/generate_routes.tftest.hcl... in progress
   run "setup"... pass
   run "final"... pass
-  run "ipv4\_call\_with\_n\_greater\_than\_one"... pass
-  run "ipv4\_call\_with\_n\_equal\_to\_one"... pass
-  run "ipv4\_call\_with\_n\_equal\_to\_zero"... pass
-  run "ipv4\_cidr\_validation"... pass
-  run "ipv4\_with\_secondary\_cidrs\_call\_with\_n\_greater\_than\_one"... pass
-  run "ipv4\_with\_secondary\_cidrs\_call\_with\_n\_equal\_to\_one"... pass
-  run "ipv4\_with\_secondary\_cidrs\_call\_with\_n\_equal\_to\_zero"... pass
-  run "ipv6\_call\_with\_n\_greater\_than\_one"... pass
-  run "ipv6\_call\_with\_n\_equal\_to\_one"... pass
-  run "ipv6\_call\_with\_n\_equal\_to\_zero"... pass
-  run "ipv6\_call\_with\_ipv6\_secondary\_cidrs\_with\_n\_greater\_than\_zero"... pass
-  run "ipv6\_with\_secondary\_cidrs\_call\_with\_n\_equal\_to\_one"... pass
-  run "ipv6\_with\_ipv6\_secondary\_cidrs\_call\_with\_n\_equal\_to\_zero"... pass
-tests/generate\_routes.tftest.hcl... tearing down
-tests/generate\_routes.tftest.hcl... pass
-tests/precedence\_policy.tftest.hcl... in progress
+  run "ipv4_call_with_n_greater_than_one"... pass
+  run "ipv4_call_with_n_equal_to_one"... pass
+  run "ipv4_call_with_n_equal_to_zero"... pass
+  run "ipv4_cidr_validation"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_one"... pass
+  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
+  run "ipv6_call_with_n_greater_than_one"... pass
+  run "ipv6_call_with_n_equal_to_one"... pass
+  run "ipv6_call_with_n_equal_to_zero"... pass
+  run "ipv6_call_with_ipv6_secondary_cidrs_with_n_greater_than_zero"... pass
+  run "ipv6_with_secondary_cidrs_call_with_n_equal_to_one"... pass
+  run "ipv6_with_ipv6_secondary_cidrs_call_with_n_equal_to_zero"... pass
+tests/generate_routes.tftest.hcl... tearing down
+tests/generate_routes.tftest.hcl... pass
+tests/precedence_policy.tftest.hcl... in progress
   run "setup"... pass
-  run "final\_precedence"... pass
-  run "final\_deny"... pass
+  run "final_precedence"... pass
+  run "final_deny"... pass
   run "final"... pass
-  run "ipv4\_default\_deny\_no\_rules"... pass
-  run "ipv4\_default\_deny\_allow\_app\_cicd"... pass
-  run "ipv4\_default\_deny\_segment\_workers"... pass
-  run "ipv4\_deny\_beats\_allow"... pass
-  run "ipv4\_allow\_overrides\_segments"... pass
-  run "ipv4\_with\_secondary\_cidrs\_default\_deny\_allow\_app\_cicd"... pass
-  run "ipv4\_with\_secondary\_cidrs\_default\_deny\_segment\_workers"... pass
-  run "ipv4\_with\_secondary\_cidrs\_deny\_beats\_allow"... pass
-  run "ipv4\_with\_secondary\_cidrs\_allow\_overrides\_segments"... pass
-  run "ipv4\_combined\_precedence"... pass
-  run "ipv4\_with\_secondary\_cidrs\_combined\_precedence"... pass
-  run "ipv4\_default\_allow\_empty\_policy"... pass
-  run "ipv6\_default\_deny\_no\_rules"... pass
-  run "ipv6\_default\_deny\_allow\_app\_cicd"... pass
-  run "ipv6\_default\_deny\_segment\_workers"... pass
-  run "ipv6\_deny\_beats\_allow"... pass
-  run "ipv6\_allow\_overrides\_segments"... pass
-  run "ipv6\_combined\_precedence"... pass
-  run "ipv6\_default\_allow\_empty\_policy"... pass
-tests/precedence\_policy.tftest.hcl... tearing down
-tests/precedence\_policy.tftest.hcl... pass
-tests/segments\_policy.tftest.hcl... in progress
+  run "ipv4_default_deny_no_rules"... pass
+  run "ipv4_default_deny_allow_app_cicd"... pass
+  run "ipv4_default_deny_segment_workers"... pass
+  run "ipv4_deny_beats_allow"... pass
+  run "ipv4_allow_overrides_segments"... pass
+  run "ipv4_with_secondary_cidrs_default_deny_allow_app_cicd"... pass
+  run "ipv4_with_secondary_cidrs_default_deny_segment_workers"... pass
+  run "ipv4_with_secondary_cidrs_deny_beats_allow"... pass
+  run "ipv4_with_secondary_cidrs_allow_overrides_segments"... pass
+  run "ipv4_combined_precedence"... pass
+  run "ipv4_with_secondary_cidrs_combined_precedence"... pass
+  run "ipv4_default_allow_empty_policy"... pass
+  run "ipv6_default_deny_no_rules"... pass
+  run "ipv6_default_deny_allow_app_cicd"... pass
+  run "ipv6_default_deny_segment_workers"... pass
+  run "ipv6_deny_beats_allow"... pass
+  run "ipv6_allow_overrides_segments"... pass
+  run "ipv6_combined_precedence"... pass
+  run "ipv6_default_allow_empty_policy"... pass
+tests/precedence_policy.tftest.hcl... tearing down
+tests/precedence_policy.tftest.hcl... pass
+tests/segments_policy.tftest.hcl... in progress
   run "setup"... pass
-  run "final\_segments"... pass
+  run "final_segments"... pass
   run "final"... pass
-  run "ipv4\_one\_segment\_general\_unsegmented"... pass
-  run "ipv4\_two\_segments\_general\_unsegmented"... pass
-  run "ipv4\_all\_separate\_segments"... pass
-  run "ipv4\_with\_secondary\_cidrs\_two\_segments\_general\_unsegmented"... pass
-  run "ipv4\_with\_secondary\_cidrs\_all\_separate\_segments"... pass
-  run "ipv4\_empty\_segments\_unchanged"... pass
-  run "ipv4\_vpc\_in\_multiple\_segments"... pass
-  run "ipv6\_two\_segments\_general\_unsegmented"... pass
-  run "ipv6\_all\_separate\_segments"... pass
-  run "ipv6\_with\_secondary\_cidrs\_two\_segments\_general\_unsegmented"... pass
-  run "ipv6\_empty\_segments\_unchanged"... pass
-tests/segments\_policy.tftest.hcl... tearing down
-tests/segments\_policy.tftest.hcl... pass
+  run "ipv4_one_segment_general_unsegmented"... pass
+  run "ipv4_two_segments_general_unsegmented"... pass
+  run "ipv4_all_separate_segments"... pass
+  run "ipv4_with_secondary_cidrs_two_segments_general_unsegmented"... pass
+  run "ipv4_with_secondary_cidrs_all_separate_segments"... pass
+  run "ipv4_empty_segments_unchanged"... pass
+  run "ipv4_vpc_in_multiple_segments"... pass
+  run "ipv6_two_segments_general_unsegmented"... pass
+  run "ipv6_all_separate_segments"... pass
+  run "ipv6_with_secondary_cidrs_two_segments_general_unsegmented"... pass
+  run "ipv6_empty_segments_unchanged"... pass
+tests/segments_policy.tftest.hcl... tearing down
+tests/segments_policy.tftest.hcl... pass
 
 Success! 66 passed, 0 failed.
  The test suite will help when refactoring is needed.
+```
 
 `v1.10.0`
 - Routing policy language integration.

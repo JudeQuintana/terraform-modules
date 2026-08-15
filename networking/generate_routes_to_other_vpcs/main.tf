@@ -8,8 +8,7 @@
 * and an optional `routing_policy`, then emits filtered route sets consumed by route resources
 * in Centralized Router (Regional IR), Full Mesh Trio (Global IR), and Super Router (Domain IR).
 *
-* Run the test suites with `terraform test` in the top level directory in the repo.
-* ```
+* Run the test suites with `terraform init`, then `terraform test` in the top level directory in the repo.
 * ```
 * tests/deny_policy.tftest.hcl... in progress
 *   run "setup"... pass
@@ -92,6 +91,7 @@
 *
 * Success! 66 passed, 0 failed.
 *  The test suite will help when refactoring is needed.
+* ```
 *
 * `v1.10.0`
 * - Routing policy language integration.
