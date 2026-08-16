@@ -60,6 +60,9 @@
 * }
 * ```
 *
+* The resulting architecture is a decentralized hub spoke topology:
+* ![super-router-revamped](https://jq1-io.s3.amazonaws.com/super-router/super-router-revamped.png)
+*
 * v1.7.5 (v1.0.0):
 * This is a follow up to the [generating routes post](https://jq1.io/posts/generating_routes/).
 *

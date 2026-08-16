@@ -13,6 +13,7 @@ in a single declaration.
 - Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
 - Scope-invariant: same policy evaluation as Centralized Router and Super Router.
 - Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared compilation unit.
+![centralized-egress-dual-stack-full-mesh-trio](https://jq1-io.s3.us-east-1.amazonaws.com/dual-stack/centralized-egress-dual-stack-full-mesh-trio-v3-3.png)
 
 `v1.9.0`:
 - reorganize files
@@ -79,7 +80,7 @@ output "full_mesh_trio" {
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | init-deny-policy |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | v1.10.0 |
 
 ## Resources
 

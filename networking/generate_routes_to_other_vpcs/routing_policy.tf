@@ -14,23 +14,20 @@ locals {
     for rule in var.routing_policy.deny : {
       from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
       to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
-    }
-  ]
+  }]
 
   # normalize allow rules into full CIDR lists per side
   allow_rules = [
     for rule in var.routing_policy.allow : {
       from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
       to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
-    }
-  ]
+  }]
 
   # normalize each segment's VPCs into full CIDR lists
   segment_cidrs = [
     for vpcs in var.routing_policy.segments : {
       cidrs = flatten([for vpc in vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])
-    }
-  ]
+  }]
 
   # generate cross-segment deny rules: VPCs in different segments cannot reach each other.
   # unsegmented VPCs are not affected (they route to everything).
@@ -43,9 +40,7 @@ locals {
       for segment_b in slice(local.segment_cidrs, i + 1, length(local.segment_cidrs)) : {
         from_cidrs = segment_a.cidrs
         to_cidrs   = segment_b.cidrs
-      }
-    ]
-  ])
+  }]])
 
   # build the deny graph from explicit deny rules (highest precedence)
   deny_lookup = {
@@ -54,9 +49,7 @@ locals {
       for rule in local.deny_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   # build the allow graph (overrides segments + default)
   allow_lookup = {
@@ -65,9 +58,7 @@ locals {
       for rule in local.allow_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   # build the segment deny graph (cross-segment blocking, below allow in precedence)
   segment_deny_lookup = {
@@ -76,9 +67,7 @@ locals {
       for rule in local.segment_deny_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   all_segmented_cidrs = toset(flatten(local.segment_cidrs[*].cidrs))
 
@@ -89,8 +78,7 @@ locals {
     cidr => flatten([
       for segment in local.segment_cidrs :
       contains(segment.cidrs, cidr) ? segment.cidrs : []
-    ])
-  }
+  ]) }
 
   # resolve the full precedence per VPC's primary CIDR.
   # for each VPC, compute the list of other CIDRs it is permitted to reach.
@@ -113,12 +101,9 @@ locals {
           var.routing_policy.default == "allow"
           && !contains(lookup(local.segment_deny_lookup, element(this.network_cidrs, 0), []), n)
         )
-      )
-    ]
-  }
+  )] }
 
   # === IPv6 ===
-
   ipv6_deny_rules = [
     for rule in var.routing_policy.deny : {
       from_cidrs = concat(compact([rule.from.ipv6_network_cidr]), rule.from.ipv6_secondary_cidrs)
@@ -136,17 +121,14 @@ locals {
   ipv6_segment_cidrs = [
     for vpcs in var.routing_policy.segments : {
       cidrs = flatten([for vpc in vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs) if vpc.ipv6_network_cidr != null])
-    }
-  ]
+  }]
 
   ipv6_segment_deny_rules = flatten([
     for i, segment_a in local.ipv6_segment_cidrs : [
       for segment_b in slice(local.ipv6_segment_cidrs, i + 1, length(local.ipv6_segment_cidrs)) : {
         from_cidrs = segment_a.cidrs
         to_cidrs   = segment_b.cidrs
-      }
-    ] if length(segment_a.cidrs) > 0
-  ])
+  }] if length(segment_a.cidrs) > 0])
 
   ipv6_deny_lookup = {
     for cidr in toset(flatten(concat(local.ipv6_deny_rules[*].from_cidrs, local.ipv6_deny_rules[*].to_cidrs))) :
@@ -154,9 +136,7 @@ locals {
       for rule in local.ipv6_deny_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   ipv6_allow_lookup = {
     for cidr in toset(flatten(concat(local.ipv6_allow_rules[*].from_cidrs, local.ipv6_allow_rules[*].to_cidrs))) :
@@ -164,9 +144,7 @@ locals {
       for rule in local.ipv6_allow_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   ipv6_segment_deny_lookup = {
     for cidr in toset(flatten(concat(local.ipv6_segment_deny_rules[*].from_cidrs, local.ipv6_segment_deny_rules[*].to_cidrs))) :
@@ -174,9 +152,7 @@ locals {
       for rule in local.ipv6_segment_deny_rules : concat(
         contains(rule.from_cidrs, cidr) ? rule.to_cidrs : [],
         contains(rule.to_cidrs, cidr) ? rule.from_cidrs : []
-      )
-    ])
-  }
+  )]) }
 
   ipv6_all_segmented_cidrs = toset(flatten(local.ipv6_segment_cidrs[*].cidrs))
 
@@ -185,8 +161,7 @@ locals {
     cidr => flatten([
       for segment in local.ipv6_segment_cidrs :
       contains(segment.cidrs, cidr) ? segment.cidrs : []
-    ])
-  }
+  ]) }
 
   ipv6_network_cidr_to_other_ipv6_network_cidrs = {
     for this in local.network_cidrs_with_route_table_ids :
@@ -202,7 +177,5 @@ locals {
           && !contains(lookup(local.ipv6_segment_deny_lookup, element(this.ipv6_network_cidrs, 0), []), n)
         )
       )
-    ]
-    if length(this.ipv6_network_cidrs) > 0
-  }
+  ] if length(this.ipv6_network_cidrs) > 0 }
 }

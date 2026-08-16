@@ -59,6 +59,9 @@ module "super_router_usw2_to_use1" {
 }
 ```
 
+The resulting architecture is a decentralized hub spoke topology:
+![super-router-revamped](https://jq1-io.s3.amazonaws.com/super-router/super-router-revamped.png)
+
 v1.7.5 (v1.0.0):
 This is a follow up to the [generating routes post](https://jq1.io/posts/generating_routes/).
 
@@ -119,7 +122,7 @@ The resulting architecture is a decentralized hub spoke topology:
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | init-deny-policy |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | v1.10.0 |
 
 ## Resources
 

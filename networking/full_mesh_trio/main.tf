@@ -14,6 +14,7 @@
 * - Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
 * - Scope-invariant: same policy evaluation as Centralized Router and Super Router.
 * - Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared compilation unit.
+* ![centralized-egress-dual-stack-full-mesh-trio](https://jq1-io.s3.us-east-1.amazonaws.com/dual-stack/centralized-egress-dual-stack-full-mesh-trio-v3-3.png)
 *
 * `v1.9.0`:
 * - reorganize files
