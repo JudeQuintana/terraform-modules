@@ -1,18 +1,4 @@
-# Create routes to other VPC network_cidrs in private and public route tables for each VPC
-module "this_generate_routes_to_other_vpcs" {
-  source = "./modules/generate_routes_to_other_vpcs"
-
-  vpcs = local.vpcs
-}
-
-locals {
-  route_format = "%s|%s"
-  vpc_routes_to_other_vpcs = {
-    for this in module.this_generate_routes_to_other_vpcs.ipv4 :
-    format(local.route_format, this.route_table_id, this.destination_cidr_block) => this
-  }
-}
-
+# ipv4
 resource "aws_route" "this_vpc_routes_to_other_vpcs" {
   for_each = local.vpc_routes_to_other_vpcs
 
@@ -25,13 +11,6 @@ resource "aws_route" "this_vpc_routes_to_other_vpcs" {
 }
 
 # ipv6
-locals {
-  ipv6_vpc_routes_to_other_vpcs = {
-    for this in module.this_generate_routes_to_other_vpcs.ipv6 :
-    format(local.route_format, this.route_table_id, this.destination_ipv6_cidr_block) => this
-  }
-}
-
 resource "aws_route" "this_ipv6_vpc_routes_to_other_vpcs" {
   for_each = local.ipv6_vpc_routes_to_other_vpcs
 

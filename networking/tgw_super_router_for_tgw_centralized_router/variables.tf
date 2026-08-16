@@ -26,15 +26,17 @@ variable "super_router" {
         name            = string
         region          = string
         route_table_id  = string
-        vpc = object({
-          names                   = list(string)
-          network_cidrs           = list(string)
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          full_name               = string
+          network_cidr            = string
           secondary_cidrs         = list(string)
-          ipv6_network_cidrs      = list(string)
+          ipv6_network_cidr       = string
           ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        })
+        })), {})
       })), {})
     })
     peer = object({
@@ -51,15 +53,17 @@ variable "super_router" {
         name            = string
         region          = string
         route_table_id  = string
-        vpc = object({
-          names                   = list(string)
-          network_cidrs           = list(string)
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          full_name               = string
+          network_cidr            = string
           secondary_cidrs         = list(string)
-          ipv6_network_cidrs      = list(string)
+          ipv6_network_cidr       = string
           ipv6_secondary_cidrs    = list(string)
           private_route_table_ids = list(string)
           public_route_table_ids  = list(string)
-        })
+        })), {})
       })), {})
     })
   })
@@ -133,22 +137,22 @@ variable "super_router" {
   # cross region checks
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.names])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : this.vpc.names]), flatten([for this in var.super_router.peer.centralized_routers : this.vpc.names])))
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : [for vpc in this.vpcs : vpc.name]]), flatten([for this in var.super_router.peer.centralized_routers : [for vpc in this.vpcs : vpc.name]])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : [for vpc in this.vpcs : vpc.name]]), flatten([for this in var.super_router.peer.centralized_routers : [for vpc in this.vpcs : vpc.name]])))
     error_message = "All VPC names must be unique across regions."
   }
 
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.network_cidrs, this.vpc.secondary_cidrs)])))
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])]), flatten([for this in var.super_router.peer.centralized_routers : flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])]), flatten([for this in var.super_router.peer.centralized_routers : flatten([for vpc in this.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])])))
     error_message = "All VPC IPv4 network and secondary CIDRs must be unique across regions."
   }
 
   validation {
     condition = length(
-      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
-    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)]), flatten([for this in var.super_router.peer.centralized_routers : concat(this.vpc.ipv6_network_cidrs, this.vpc.ipv6_secondary_cidrs)])))
+      distinct(concat(flatten([for this in var.super_router.local.centralized_routers : flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])]), flatten([for this in var.super_router.peer.centralized_routers : flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])])))
+    ) == length(concat(flatten([for this in var.super_router.local.centralized_routers : flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])]), flatten([for this in var.super_router.peer.centralized_routers : flatten([for vpc in this.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)])])))
     error_message = "All VPC IPv6 network and secondary CIDRs must be unique across regions."
   }
 
@@ -164,6 +168,60 @@ variable "super_router" {
       distinct(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [var.super_router.local.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn], [var.super_router.peer.amazon_side_asn]))
     ) == length(concat([for this in var.super_router.local.centralized_routers : this.amazon_side_asn], [var.super_router.local.amazon_side_asn], [for this in var.super_router.peer.centralized_routers : this.amazon_side_asn], [var.super_router.peer.amazon_side_asn]))
     error_message = "All Centralized Routers and Super Router amazon side ASNs must be unique across regions."
+  }
+}
+
+variable "routing_policy" {
+  description = "Routing policy for cross-region and intra-region VPC routes"
+  type = object({
+    default = optional(string, "allow")
+    deny = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    allow = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    segments = optional(map(list(object({
+      network_cidr         = string
+      secondary_cidrs      = optional(list(string), [])
+      ipv6_network_cidr    = optional(string)
+      ipv6_secondary_cidrs = optional(list(string), [])
+    }))), {})
+  })
+  default = {}
+
+  validation {
+    condition     = contains(["allow", "deny"], var.routing_policy.default)
+    error_message = "Policy default must be \"allow\" or \"deny\"."
+  }
+
+  validation {
+    condition = length(
+      distinct(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
   }
 }
 

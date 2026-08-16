@@ -1,5 +1,15 @@
 # Transit Gateway Centralized Router
-- Creates hub and spoke topology from VPCs.
+
+Regional hub-and-spoke topology for Tiered VPC-NG. A single TGW with one shared
+route table connects all VPC attachments, then compiles an optional routing policy
+(deny > allow > segments > default) into per-VPC route table entries. Operates as
+the Regional IR, the smallest policy evaluation scope.
+
+`v1.10.0`
+- Routing policy language integration.
+- New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
+- Dual-stack support: one policy declaration controls both IPv4 and IPv6 route generation.
+- Uses `generate_routes_to_other_vpcs` v1.10.0 as the shared scope-agnostic compilation unit.
 
 `v1.9.4`
 - remove legacy output `vpc.routes`. will rebuild super router at a later time but no need to keep this around.
@@ -108,26 +118,26 @@ Main:
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.61 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | ./modules/generate_routes_to_other_vpcs | n/a |
+| ---- | ------ | ------- |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | v1.10.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_ec2_transit_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway) | resource |
 | [aws_ec2_transit_gateway_route.this_blackholes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
 | [aws_ec2_transit_gateway_route.this_centralized_egress_tgw_central_vpc_route_any](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
@@ -146,16 +156,17 @@ Main:
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      region                     = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      public_natgw_az_to_eip     = map(string)<br/>      centralized_egress_private = bool<br/>      centralized_egress_central = bool<br/>    })), {})<br/>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
+| <a name="input_routing_policy"></a> [routing\_policy](#input\_routing\_policy) | Routing policy for intra-region VPC routes | <pre>object({<br/>    default = optional(string, "allow")<br/>    deny = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    allow = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    segments = optional(map(list(object({<br/>      network_cidr         = string<br/>      secondary_cidrs      = optional(list(string), [])<br/>      ipv6_network_cidr    = optional(string)<br/>      ipv6_secondary_cidrs = optional(list(string), [])<br/>    }))), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | n/a |
 | <a name="output_amazon_side_asn"></a> [amazon\_side\_asn](#output\_amazon\_side\_asn) | n/a |
 | <a name="output_blackhole_cidrs"></a> [blackhole\_cidrs](#output\_blackhole\_cidrs) | n/a |
@@ -165,4 +176,4 @@ Main:
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 | <a name="output_region"></a> [region](#output\_region) | n/a |
 | <a name="output_route_table_id"></a> [route\_table\_id](#output\_route\_table\_id) | n/a |
-| <a name="output_vpc"></a> [vpc](#output\_vpc) | n/a |
+| <a name="output_vpcs"></a> [vpcs](#output\_vpcs) | n/a |

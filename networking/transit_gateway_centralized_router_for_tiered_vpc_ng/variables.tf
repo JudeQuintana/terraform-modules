@@ -112,6 +112,60 @@ variable "centralized_router" {
   }
 }
 
+variable "routing_policy" {
+  description = "Routing policy for intra-region VPC routes"
+  type = object({
+    default = optional(string, "allow")
+    deny = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    allow = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    segments = optional(map(list(object({
+      network_cidr         = string
+      secondary_cidrs      = optional(list(string), [])
+      ipv6_network_cidr    = optional(string)
+      ipv6_secondary_cidrs = optional(list(string), [])
+    }))), {})
+  })
+  default = {}
+
+  validation {
+    condition     = contains(["allow", "deny"], var.routing_policy.default)
+    error_message = "Policy default must be \"allow\" or \"deny\"."
+  }
+
+  validation {
+    condition = length(
+      distinct(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
+  }
+}
+
 variable "tags" {
   description = "Additional Tags"
   type        = map(string)

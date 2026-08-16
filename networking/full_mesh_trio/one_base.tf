@@ -11,7 +11,7 @@ locals {
   one_provider_region_name = data.aws_region.this_one.name
 
   one_tgw                        = var.full_mesh_trio.one.centralized_router
-  one_tgw_vpc_network_cidrs      = toset(concat(local.one_tgw.vpc.network_cidrs, local.one_tgw.vpc.secondary_cidrs))
-  one_tgw_vpc_ipv6_network_cidrs = toset(concat(local.one_tgw.vpc.ipv6_network_cidrs, local.one_tgw.vpc.ipv6_secondary_cidrs))
-  one_tgw_vpc_route_table_ids    = toset(concat(local.one_tgw.vpc.private_route_table_ids, local.one_tgw.vpc.public_route_table_ids))
+  one_tgw_vpc_network_cidrs      = toset(flatten([for vpc in local.one_tgw.vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)]))
+  one_tgw_vpc_ipv6_network_cidrs = toset(flatten([for vpc in local.one_tgw.vpcs : concat(compact([vpc.ipv6_network_cidr]), vpc.ipv6_secondary_cidrs)]))
+  one_tgw_vpc_route_table_ids    = toset(flatten([for vpc in local.one_tgw.vpcs : concat(vpc.private_route_table_ids, vpc.public_route_table_ids)]))
 }
