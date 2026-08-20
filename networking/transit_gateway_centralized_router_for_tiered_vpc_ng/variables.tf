@@ -166,6 +166,14 @@ variable "routing_policy" {
   }
 }
 
+variable "debug" {
+  description = "Debug options for compiler toolchain inspection"
+  type = object({
+    reachability_matrix = optional(bool, false)
+  })
+  default = {}
+}
+
 variable "tags" {
   description = "Additional Tags"
   type        = map(string)

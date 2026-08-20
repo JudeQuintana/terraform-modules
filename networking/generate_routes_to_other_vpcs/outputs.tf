@@ -8,3 +8,10 @@ output "ipv4" {
 output "ipv6" {
   value = local.ipv6_routes
 }
+
+output "reachability" {
+  value = {
+    ipv4 = local.reachability
+    ipv6 = local.ipv6_reachability
+  }
+}
