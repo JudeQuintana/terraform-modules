@@ -9,16 +9,16 @@ resource "aws_ec2_transit_gateway_route_table" "this" {
 
 # ipv4
 locals {
-  ipv4_network_cidr_to_vpc_id = merge([
+  ipv4_network_cidr_to_vpc_name = merge([
     for this in local.vpcs : {
       for network_cidr in concat([this.network_cidr], this.secondary_cidrs) :
-      network_cidr => this.id
+      network_cidr => this.name
       if !contains(var.centralized_router.blackhole.cidrs, network_cidr)
   }]...)
 }
 
 resource "aws_ec2_transit_gateway_route" "this_tgw_routes_to_vpcs" {
-  for_each = local.ipv4_network_cidr_to_vpc_id
+  for_each = local.ipv4_network_cidr_to_vpc_name
 
   destination_cidr_block         = each.key
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
@@ -36,7 +36,7 @@ locals {
 }
 
 resource "aws_ec2_transit_gateway_route" "this_tgw_ipv6_routes_to_vpcs" {
-  for_each = local.ipv6_network_cidr_to_vpc_id
+  for_each = local.ipv6_network_cidr_to_vpc_name
 
   destination_cidr_block         = each.key
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
