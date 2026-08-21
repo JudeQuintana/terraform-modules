@@ -27,10 +27,10 @@ resource "aws_ec2_transit_gateway_route" "this_tgw_routes_to_vpcs" {
 
 # ipv6
 locals {
-  ipv6_network_cidr_to_vpc_id = merge([
+  ipv6_network_cidr_to_vpc_name = merge([
     for this in local.vpcs : {
       for ipv6_network_cidr in concat(compact([this.ipv6_network_cidr]), this.ipv6_secondary_cidrs) :
-      ipv6_network_cidr => this.id
+      ipv6_network_cidr => this.name
       if !contains(var.centralized_router.blackhole.ipv6_cidrs, ipv6_network_cidr)
   }]...)
 }
