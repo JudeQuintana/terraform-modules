@@ -30,10 +30,10 @@ locals {
   ipv6_vpc_pairs = flatten([
     for name, this in var.vpcs : [
       for other_name, other_this in var.vpcs : {
-        key       = "${name}:${other_name}"
+        key       = format("%s:%s", name, other_name)
         from_cidr = this.ipv6_network_cidr
         to_cidr   = other_this.ipv6_network_cidr
-      } if name != other_name && other_vpc.ipv6_network_cidr != null
+      } if name != other_name && other_this.ipv6_network_cidr != null
     ] if this.ipv6_network_cidr != null
   ])
 
