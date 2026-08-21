@@ -1,6 +1,6 @@
 locals {
   vpc_attachment_format = "%s <-> %s"
-  vpc_id_to_vpc_attachment = {
+  vpc_name_to_vpc_attachment = {
     for this in local.vpcs :
     this.name => {
       full_name    = this.full_name

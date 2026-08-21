@@ -20,7 +20,7 @@ locals {
   # making it easier to decomission AZs and VPCs without manual intervention
   vpcs = {
     for this in var.centralized_router.vpcs :
-    this.id => this
+    this.name => this
     if length(concat(this.private_special_subnet_ids, this.public_special_subnet_ids)) > 0
   }
 }
