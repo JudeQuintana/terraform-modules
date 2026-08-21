@@ -3,7 +3,7 @@ locals {
   route_table_to_vpc_name = merge([
     for name, vpc in var.vpcs : {
       for route_table_id in concat(vpc.private_route_table_ids, vpc.public_route_table_ids) :
-      route_table_id_id => name
+      route_table_id => name
     }
   ]...)
 
