@@ -1,8 +1,7 @@
-
 locals {
   reachability_matrix = { for this in [var.debug.reachability_matrix] : this => this if var.debug.reachability_matrix }
-
 }
+
 resource "local_file" "reachability_matrix" {
   for_each = local.reachability_matrix
 
