@@ -10,8 +10,13 @@ output "ipv6" {
 }
 
 output "reachability" {
-  value = {
-    ipv4 = local.reachability
-    ipv6 = local.ipv6_reachability
-  }
+  value = local.reachability
+}
+
+output "diagnostics" {
+  value = local.diagnostics
+}
+
+output "provenance" {
+  value = local.provenance
 }

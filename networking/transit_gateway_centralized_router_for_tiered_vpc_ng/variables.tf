@@ -170,6 +170,8 @@ variable "debug" {
   description = "Debug options for compiler toolchain inspection"
   type = object({
     reachability_matrix = optional(bool, false)
+    diagnostics         = optional(bool, false)
+    provenance          = optional(bool, false)
   })
   default = {}
 }
