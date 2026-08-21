@@ -127,8 +127,8 @@ run "non_equivalent_shows_mismatches" {
   }
 
   assert {
-    condition     = length(output.equivalence.mismatches) == 6
-    error_message = "All 6 pairs should be mismatched."
+    condition     = length(output.equivalence.mismatches) == 3
+    error_message = "All 3 deduplicated pairs should be mismatched."
   }
 }
 
@@ -154,8 +154,8 @@ run "partial_mismatch" {
   }
 
   assert {
-    condition     = length(output.equivalence.mismatches) == 2
-    error_message = "Bidirectional deny should produce 2 mismatches (app:cicd and cicd:app)."
+    condition     = length(output.equivalence.mismatches) == 1
+    error_message = "Bidirectional deny should produce 1 deduplicated mismatch."
   }
 
   assert {

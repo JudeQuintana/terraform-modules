@@ -77,11 +77,14 @@ locals {
   } : {}
 
   # compare: same permit/deny outcome for every pair (verdict reason is irrelevant)
+  # deduplicate bidirectional pairs: keep lexicographically-first key only
   eq_mismatches = {
     for k, v in local.reachability : k => {
       routing_policy            = v
       equivalent_routing_policy = lookup(local.eq_reachability, k, "missing")
-    } if local.has_equivalent && startswith(v, "permitted") != startswith(lookup(local.eq_reachability, k, "denied:"), "permitted")
+    } if local.has_equivalent
+    && startswith(v, "permitted") != startswith(lookup(local.eq_reachability, k, "denied:"), "permitted")
+    && k == join(":", sort(split(":", k)))
   }
 
   equivalence = local.has_equivalent ? {

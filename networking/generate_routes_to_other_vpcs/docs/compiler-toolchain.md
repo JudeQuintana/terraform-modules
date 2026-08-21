@@ -128,6 +128,8 @@ When policies differ:
 }
 ```
 
+Mismatches are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown.
+
 Pass the second policy via `equivalent_routing_policy`:
 
 ```hcl
