@@ -1,0 +1,143 @@
+run "setup" {
+  module {
+    source = "./tests/setup"
+  }
+}
+
+# no previous reachability -> empty diff
+run "no_previous_empty_diff" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "allow"
+    }
+  }
+
+  assert {
+    condition     = length(output.policy_diff) == 0
+    error_message = "No previous reachability should produce empty diff."
+  }
+}
+
+# full mesh -> deny all = all pairs removed
+run "full_mesh_to_deny_all" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "deny"
+    }
+    previous_reachability = {
+      "app:cicd"      = "permitted:default"
+      "app:general"   = "permitted:default"
+      "cicd:app"      = "permitted:default"
+      "cicd:general"  = "permitted:default"
+      "general:app"   = "permitted:default"
+      "general:cicd"  = "permitted:default"
+    }
+  }
+
+  assert {
+    condition     = length(output.policy_diff.removed) == 6
+    error_message = "All 6 pairs should be removed."
+  }
+
+  assert {
+    condition     = length(output.policy_diff.added) == 0
+    error_message = "No pairs should be added."
+  }
+}
+
+# deny all -> full mesh = all pairs added
+run "deny_all_to_full_mesh" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "allow"
+    }
+    previous_reachability = {
+      "app:cicd"      = "denied:default"
+      "app:general"   = "denied:default"
+      "cicd:app"      = "denied:default"
+      "cicd:general"  = "denied:default"
+      "general:app"   = "denied:default"
+      "general:cicd"  = "denied:default"
+    }
+  }
+
+  assert {
+    condition     = length(output.policy_diff.added) == 6
+    error_message = "All 6 pairs should be added."
+  }
+
+  assert {
+    condition     = length(output.policy_diff.removed) == 0
+    error_message = "No pairs should be removed."
+  }
+}
+
+# add a segment: full mesh -> segment [app, cicd] under deny
+run "add_segment_selective" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "deny"
+      segments = {
+        workers = [
+          { network_cidr = "10.0.0.0/20" },
+          { network_cidr = "172.16.0.0/20" }
+        ]
+      }
+    }
+    previous_reachability = {
+      "app:cicd"      = "denied:default"
+      "app:general"   = "denied:default"
+      "cicd:app"      = "denied:default"
+      "cicd:general"  = "denied:default"
+      "general:app"   = "denied:default"
+      "general:cicd"  = "denied:default"
+    }
+  }
+
+  assert {
+    condition     = toset(output.policy_diff.added) == toset(["app:cicd", "cicd:app"])
+    error_message = "Only app<->cicd should be added."
+  }
+
+  assert {
+    condition     = length(output.policy_diff.removed) == 0
+    error_message = "No pairs should be removed."
+  }
+}
+
+# unchanged: same policy, same result
+run "no_change" {
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "allow"
+    }
+    previous_reachability = {
+      "app:cicd"      = "permitted:default"
+      "app:general"   = "permitted:default"
+      "cicd:app"      = "permitted:default"
+      "cicd:general"  = "permitted:default"
+      "general:app"   = "permitted:default"
+      "general:cicd"  = "permitted:default"
+    }
+  }
+
+  assert {
+    condition     = length(output.policy_diff.added) == 0
+    error_message = "No pairs should be added."
+  }
+
+  assert {
+    condition     = length(output.policy_diff.removed) == 0
+    error_message = "No pairs should be removed."
+  }
+
+  assert {
+    condition     = length(output.policy_diff.unchanged) == 6
+    error_message = "All 6 pairs should be unchanged."
+  }
+}

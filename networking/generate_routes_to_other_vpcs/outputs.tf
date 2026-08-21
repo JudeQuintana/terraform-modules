@@ -20,3 +20,11 @@ output "diagnostics" {
 output "provenance" {
   value = local.provenance
 }
+
+output "policy_diff" {
+  value = local.policy_diff
+}
+
+output "equivalence" {
+  value = local.equivalence
+}

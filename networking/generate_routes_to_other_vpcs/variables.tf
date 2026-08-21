@@ -79,3 +79,51 @@ variable "vpcs" {
   }
 }
 
+variable "previous_reachability" {
+  description = "Previous reachability matrix for computing policy diff. Pass the output from a prior run to see what changed."
+  type        = map(string)
+  default     = {}
+}
+
+variable "equivalent_routing_policy" {
+  description = "A second routing policy to compare against. When provided, the equivalence output shows whether both policies produce identical reachability."
+  type = object({
+    default = optional(string, "allow")
+    deny = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    allow = optional(list(object({
+      from = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+      to = object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      })
+    })), [])
+    segments = optional(map(list(object({
+      network_cidr         = string
+      secondary_cidrs      = optional(list(string), [])
+      ipv6_network_cidr    = optional(string)
+      ipv6_secondary_cidrs = optional(list(string), [])
+    }))), {})
+  })
+  default = null
+}
+
