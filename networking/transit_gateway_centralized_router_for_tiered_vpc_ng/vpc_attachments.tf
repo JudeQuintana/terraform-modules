@@ -3,6 +3,7 @@ locals {
   vpc_name_to_vpc_attachment = {
     for this in local.vpcs :
     this.name => {
+      id           = this.id
       full_name    = this.full_name
       subnet_ids   = concat(this.private_special_subnet_ids, this.public_special_subnet_ids)
       ipv6_support = this.ipv6_network_cidr != null ? "enable" : "disable"
@@ -18,7 +19,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
   transit_gateway_id                              = aws_ec2_transit_gateway.this.id
   transit_gateway_default_route_table_association = false
   transit_gateway_default_route_table_propagation = false
-  vpc_id                                          = each.key
+  vpc_id                                          = each.value.id
   ipv6_support                                    = each.value.ipv6_support
   tags = merge(
     local.default_tags,
