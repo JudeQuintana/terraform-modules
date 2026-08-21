@@ -16,21 +16,22 @@ locals {
   ]...)
 
   # route provenance: for each emitted route, trace back to source pair and verdict
-  unknown = "unknown"
-  provenance = {
-    for route in local.routes :
-    format("%s|%s", route.route_table_id, route.destination_cidr_block) => format(
-      "%s -> %s (%s)",
-      lookup(local.route_table_to_vpc_name, route.route_table_id, local.unknown),
-      lookup(local.any_cidr_to_vpc_name, route.destination_cidr_block, local.unknown),
-      lookup(
-        local.reachability,
-        format("%s:%s",
-          lookup(local.route_table_to_vpc_name, route.route_table_id, local.unknown),
-          lookup(local.any_cidr_to_vpc_name, route.destination_cidr_block, local.unknown)
-        ),
-        local.unknown
+  provenance = [
+    for route in local.routes : {
+      route_table_id         = route.route_table_id
+      destination_cidr_block = route.destination_cidr_block
+      reason = format("%s -> %s (%s)",
+        lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
+        lookup(local.any_cidr_to_vpc_name, route.destination_cidr_block, "unknown"),
+        lookup(
+          local.reachability,
+          format("%s:%s",
+            lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
+            lookup(local.any_cidr_to_vpc_name, route.destination_cidr_block, "unknown")
+          ),
+          "unknown"
+        )
       )
-    )
-  }
+    }
+  ]
 }
