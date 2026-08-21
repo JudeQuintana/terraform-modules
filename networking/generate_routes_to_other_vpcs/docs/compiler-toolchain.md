@@ -26,12 +26,12 @@ The algebra's per-pair verdict as structured data. For every VPC pair, shows whe
 ```
 
 Six possible verdicts mapping directly to the precedence chain:
-- `permitted:allow` — explicit allow rule fired
-- `permitted:segment` — same-segment membership
-- `permitted:default` — default="allow" fallthrough
-- `denied:deny` — explicit deny rule (highest precedence)
-- `denied:cross-segment` — different segments under default="allow"
-- `denied:default` — default="deny" fallthrough
+- `permitted:allow` - explicit allow rule fired
+- `permitted:segment` - same-segment membership
+- `permitted:default` - default="allow" fallthrough
+- `denied:deny` - explicit deny rule (highest precedence)
+- `denied:cross-segment` - different segments under default="allow"
+- `denied:default` - default="deny" fallthrough
 
 This is the compiled intermediate representation made inspectable. It separates "what the policy decided" from "what routes were emitted" and makes the algebra's output auditable without understanding route tables.
 
@@ -48,9 +48,9 @@ Compiler warnings for policy states that are valid but likely unintentional.
 ```
 
 Three classes of warnings:
-- **Zero connectivity** — a VPC with no outbound reachability (unsegmented under default="deny" with no allow rules)
-- **Single-member segment** — a segment with one VPC has no routing effect under default="deny" (algebraically equivalent to unsegmented)
-- **Redundant deny** — a deny rule on a pair that would already be denied without it (default="deny" with no allow or segment for that pair)
+- **Zero connectivity** - a VPC with no outbound reachability (unsegmented under default="deny" with no allow rules)
+- **Single-member segment** - a segment with one VPC has no routing effect under default="deny" (algebraically equivalent to unsegmented)
+- **Redundant deny** - a deny rule on a pair that would already be denied without it (default="deny" with no allow or segment for that pair)
 
 This is `-Wall` for network policy. The compiler tells you when your program is technically valid but probably wrong.
 
@@ -81,11 +81,13 @@ Incremental compilation preview. Given the previous reachability matrix (from a 
 
 ```json
 {
-  "added": ["monitor:app", "monitor:web"],
+  "added": ["app:monitor"],
   "removed": ["app:db"],
-  "unchanged": ["app:api", "web:api"]
+  "unchanged": ["api:app", "api:web"]
 }
 ```
+
+Pairs are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown, no redundant mirror entries.
 
 Pass the previous reachability via the `previous_reachability` variable:
 
@@ -94,10 +96,10 @@ previous_reachability = jsondecode(file("debug-myrouter-reachability.json"))
 ```
 
 The workflow:
-1. Enable `debug.reachability = true` — dumps the reachability matrix to a JSON file
+1. Enable `debug.reachability = true` to dump the reachability matrix to a JSON file
 2. Change the routing policy
 3. Pass the previous JSON file as `previous_reachability`
-4. Enable `debug.policy_diff = true` — dumps the diff showing added/removed/unchanged pairs
+4. Enable `debug.policy_diff = true` to dump the diff showing added/removed/unchanged pairs
 
 This answers "what did this policy change actually do?" at the semantic level. `terraform plan` shows route additions/removals (assembly diff). Policy diff shows reachability changes (source-level diff).
 
@@ -143,7 +145,7 @@ equivalent_routing_policy = {
 }
 ```
 
-Equivalence compares permit/deny outcomes only — the verdict reason (which rule caused it) is irrelevant. Two policies are equivalent if every VPC pair has the same reachability regardless of how it was derived.
+Equivalence compares permit/deny outcomes only. The verdict reason (which rule caused it) is irrelevant. Two policies are equivalent if every VPC pair has the same reachability regardless of how it was derived.
 
 Use cases:
 - Migration proof: rewriting from allow-with-denies to deny-with-allows without changing behavior

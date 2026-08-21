@@ -37,8 +37,8 @@ run "full_mesh_to_deny_all" {
   }
 
   assert {
-    condition     = length(output.policy_diff.removed) == 6
-    error_message = "All 6 pairs should be removed."
+    condition     = length(output.policy_diff.removed) == 3
+    error_message = "All 3 deduplicated pairs should be removed."
   }
 
   assert {
@@ -65,8 +65,8 @@ run "deny_all_to_full_mesh" {
   }
 
   assert {
-    condition     = length(output.policy_diff.added) == 6
-    error_message = "All 6 pairs should be added."
+    condition     = length(output.policy_diff.added) == 3
+    error_message = "All 3 deduplicated pairs should be added."
   }
 
   assert {
@@ -99,8 +99,8 @@ run "add_segment_selective" {
   }
 
   assert {
-    condition     = toset(output.policy_diff.added) == toset(["app:cicd", "cicd:app"])
-    error_message = "Only app<->cicd should be added."
+    condition     = toset(output.policy_diff.added) == toset(["app:cicd"])
+    error_message = "Only app:cicd (deduplicated) should be added."
   }
 
   assert {
@@ -137,7 +137,7 @@ run "no_change" {
   }
 
   assert {
-    condition     = length(output.policy_diff.unchanged) == 6
-    error_message = "All 6 pairs should be unchanged."
+    condition     = length(output.policy_diff.unchanged) == 3
+    error_message = "All 3 deduplicated pairs should be unchanged."
   }
 }
