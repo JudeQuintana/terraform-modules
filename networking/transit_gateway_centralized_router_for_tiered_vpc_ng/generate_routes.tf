@@ -4,8 +4,8 @@ module "this_generate_routes_to_other_vpcs" {
 
   routing_policy            = var.routing_policy
   vpcs                      = local.vpcs
-  previous_reachability     = var.previous_reachability
-  equivalent_routing_policy = var.equivalent_routing_policy
+  previous_reachability     = try(var.inspect.policy_diff.previous_reachability, {})
+  equivalent_routing_policy = try(var.inspect.equivalence.equivalent_routing_policy, null)
 }
 
 locals {
