@@ -173,11 +173,11 @@ variable "inspect" {
     diagnostics  = optional(bool, false)
     provenance   = optional(bool, false)
     policy_diff = optional(object({
-      previous_reachability = map(string)
-    }))
+      previous_reachability = optional(map(string), {})
+    }), {})
     equivalence = optional(object({
-      equivalent_routing_policy = object({
-        default = optional(string, "allow")
+      equivalent_routing_policy = optional(object({
+        default = string
         deny = optional(list(object({
           from = object({
             network_cidr         = string
@@ -212,7 +212,7 @@ variable "inspect" {
           ipv6_network_cidr    = optional(string)
           ipv6_secondary_cidrs = optional(list(string), [])
         }))), {})
-      })
+      }))
     }))
   })
   default = {}

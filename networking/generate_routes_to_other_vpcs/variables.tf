@@ -1,7 +1,7 @@
 variable "routing_policy" {
   description = "routing policy constraints"
   type = object({
-    default = optional(string, "allow")
+    default = string
     deny = optional(list(object({
       from = object({
         network_cidr         = string
@@ -88,7 +88,7 @@ variable "previous_reachability" {
 variable "equivalent_routing_policy" {
   description = "A second routing policy to compare against. When provided, the equivalence output shows whether both policies produce identical reachability."
   type = object({
-    default = optional(string, "allow")
+    default = string
     deny = optional(list(object({
       from = object({
         network_cidr         = string
