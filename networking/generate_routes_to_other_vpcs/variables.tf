@@ -37,7 +37,6 @@ variable "routing_policy" {
       ipv6_secondary_cidrs = optional(list(string), [])
     }))), {})
   })
-  default = {}
 
   validation {
     condition     = contains(["allow", "deny"], var.routing_policy.default)

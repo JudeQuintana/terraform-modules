@@ -115,7 +115,7 @@ variable "centralized_router" {
 variable "routing_policy" {
   description = "Routing policy for intra-region VPC routes"
   type = object({
-    default = optional(string, "allow")
+    default = string
     deny = optional(list(object({
       from = object({
         network_cidr         = string
@@ -151,7 +151,6 @@ variable "routing_policy" {
       ipv6_secondary_cidrs = optional(list(string), [])
     }))), {})
   })
-  default = {}
 
   validation {
     condition     = contains(["allow", "deny"], var.routing_policy.default)
