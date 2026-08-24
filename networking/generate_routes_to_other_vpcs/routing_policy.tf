@@ -1,4 +1,25 @@
 locals {
+  # validate: all CIDRs referenced in allow/deny rules must exist in var.vpcs
+  vpc_network_cidrs = toset([for vpc in var.vpcs : vpc.network_cidr])
+  out_of_scope_rules = distinct(concat(
+    flatten([for rule in var.routing_policy.deny : concat(
+      !contains(local.vpc_network_cidrs, rule.from.network_cidr) ? [
+        format("%s (in deny rule: ? -> %s)", rule.from.network_cidr, lookup(local.cidr_to_vpc_name, rule.to.network_cidr, "?"))
+      ] : [],
+      !contains(local.vpc_network_cidrs, rule.to.network_cidr) ? [
+        format("%s (in deny rule: %s -> ?)", rule.to.network_cidr, lookup(local.cidr_to_vpc_name, rule.from.network_cidr, "?"))
+      ] : [],
+    )]),
+    flatten([for rule in var.routing_policy.allow : concat(
+      !contains(local.vpc_network_cidrs, rule.from.network_cidr) ? [
+        format("%s (in allow rule: ? -> %s)", rule.from.network_cidr, lookup(local.cidr_to_vpc_name, rule.to.network_cidr, "?"))
+      ] : [],
+      !contains(local.vpc_network_cidrs, rule.to.network_cidr) ? [
+        format("%s (in allow rule: %s -> ?)", rule.to.network_cidr, lookup(local.cidr_to_vpc_name, rule.from.network_cidr, "?"))
+      ] : [],
+    )]),
+  ))
+
   # precedence (high to low):
   # 1. deny  -> always blocks
   # 2. allow -> always permits (overrides segments + default)

@@ -1,11 +1,4 @@
 locals {
-  # cidr (primary or secondary) -> vpc name
-  cidr_to_vpc_name = merge([
-    for name, vpc in var.vpcs : {
-      for cidr in concat([vpc.network_cidr], vpc.secondary_cidrs) :
-      cidr => name
-  }]...)
-
   # route_table_id -> vpc name (reverse lookup)
   route_table_to_vpc_name = merge([
     for name, vpc in var.vpcs : {

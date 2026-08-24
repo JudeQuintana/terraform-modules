@@ -69,6 +69,50 @@ run "redundant_deny_warning" {
   }
 }
 
+# out-of-scope CIDR in allow rule
+run "out_of_scope_allow_cidr" {
+  command = plan
+
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "allow"
+      allow = [
+        {
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "10.99.0.0/20" }
+        }
+      ]
+    }
+  }
+
+  expect_failures = [
+    output.ipv4,
+  ]
+}
+
+# out-of-scope CIDR in deny rule
+run "out_of_scope_deny_cidr" {
+  command = plan
+
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "allow"
+      deny = [
+        {
+          from = { network_cidr = "10.99.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
+        }
+      ]
+    }
+  }
+
+  expect_failures = [
+    output.ipv4,
+  ]
+}
+
 # no warnings: clean policy
 run "no_warnings_full_mesh" {
   variables {

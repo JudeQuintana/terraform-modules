@@ -3,6 +3,11 @@
 # toset([{ route_table_id = "rtb-12345678", destination_cidr_block = "x.x.x.x/x" }, ...])
 output "ipv4" {
   value = local.routes
+
+  precondition {
+    condition     = length(local.out_of_scope_rules) == 0
+    error_message = "Routing policy references CIDRs not in var.vpcs: ${join(", ", local.out_of_scope_rules)}. Allow/deny rules can only reference VPCs in this router's scope."
+  }
 }
 
 output "ipv6" {
