@@ -84,7 +84,6 @@ locals {
       equivalent_routing_policy = lookup(local.eq_reachability, k, "missing")
     } if local.has_equivalent
     && startswith(v, "permitted") != startswith(lookup(local.eq_reachability, k, "denied:"), "permitted")
-    && k == join(":", sort(split(":", k)))
   }
 
   equivalence = local.has_equivalent ? {

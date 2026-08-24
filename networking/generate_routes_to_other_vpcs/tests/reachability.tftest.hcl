@@ -15,12 +15,9 @@ run "ipv4_full_mesh_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "permitted:default"
-      "app:general"   = "permitted:default"
-      "cicd:app"      = "permitted:default"
-      "cicd:general"  = "permitted:default"
-      "general:app"   = "permitted:default"
-      "general:cicd"  = "permitted:default"
+      "app:cicd"     = "permitted:default"
+      "app:general"  = "permitted:default"
+      "cicd:general" = "permitted:default"
     }
     error_message = "Default allow should show all pairs permitted via default."
   }
@@ -37,12 +34,9 @@ run "ipv4_zero_trust_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "denied:default"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "denied:default"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+      "app:cicd"     = "denied:default"
+      "app:general"  = "denied:default"
+      "cicd:general" = "denied:default"
     }
     error_message = "Default deny with no rules should show all pairs denied via default."
   }
@@ -65,12 +59,9 @@ run "ipv4_allow_pair_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "permitted:allow"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "permitted:allow"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+      "app:cicd"     = "permitted:allow"
+      "app:general"  = "denied:default"
+      "cicd:general" = "denied:default"
     }
     error_message = "Allow app<->cicd should show only that pair permitted via allow."
   }
@@ -93,12 +84,9 @@ run "ipv4_segment_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "permitted:segment"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "permitted:segment"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+      "app:cicd"     = "permitted:segment"
+      "app:general"  = "denied:default"
+      "cicd:general" = "denied:default"
     }
     error_message = "Segment workers [app,cicd] should show same-segment pairs permitted via segment."
   }
@@ -127,12 +115,9 @@ run "ipv4_deny_beats_allow_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "denied:deny"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "denied:deny"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+      "app:cicd"     = "denied:deny"
+      "app:general"  = "denied:default"
+      "cicd:general" = "denied:default"
     }
     error_message = "Deny should beat allow for the same pair."
   }
@@ -157,12 +142,9 @@ run "ipv4_cross_segment_reachability" {
 
   assert {
     condition = output.reachability == {
-      "app:cicd"      = "denied:cross-segment"
-      "app:general"   = "permitted:default"
-      "cicd:app"      = "denied:cross-segment"
-      "cicd:general"  = "permitted:default"
-      "general:app"   = "permitted:default"
-      "general:cicd"  = "permitted:default"
+      "app:cicd"     = "denied:cross-segment"
+      "app:general"  = "permitted:default"
+      "cicd:general" = "permitted:default"
     }
     error_message = "Cross-segment pairs should be denied:cross-segment, unsegmented should be permitted:default."
   }

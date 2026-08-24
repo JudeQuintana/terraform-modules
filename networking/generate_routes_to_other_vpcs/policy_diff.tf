@@ -7,7 +7,6 @@ locals {
       for k, v in local.reachability : k
       if startswith(v, "permitted")
       && !startswith(lookup(var.previous_reachability, k, "denied:"), "permitted")
-      && k == join(":", sort(split(":", k)))
     ]
     removed = [
       for k, v in var.previous_reachability : k
@@ -18,7 +17,6 @@ locals {
     unchanged = [
       for k, v in local.reachability : k
       if v == lookup(var.previous_reachability, k, "")
-      && k == join(":", sort(split(":", k)))
     ]
   } : {}
 }
