@@ -81,7 +81,7 @@ variable "vpcs" {
 variable "previous_reachability" {
   description = "Previous reachability matrix for computing policy diff. Pass the output from a prior run to see what changed."
   type        = map(string)
-  default     = {}
+  default     = null
 }
 
 variable "equivalent_routing_policy" {

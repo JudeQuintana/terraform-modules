@@ -1,5 +1,5 @@
 locals {
-  has_previous = length(var.previous_reachability) > 0
+  has_previous = var.previous_reachability != null
 
   # deduplicate bidirectional pairs: keep lexicographically-first key only ("a:b", not "b:a")
   policy_diff = local.has_previous ? {
