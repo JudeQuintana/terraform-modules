@@ -1,11 +1,11 @@
 locals {
-  reachability                           = { for this in [var.inspect.reachability] : this => this if var.inspect.reachability }
-  diagnostics                            = { for this in [var.inspect.diagnostics] : this => this if var.inspect.diagnostics }
-  provenance                             = { for this in [var.inspect.provenance] : this => this if var.inspect.provenance }
-  policy_diff_is_populated               = length(var.inspect.policy_diff) > 0
-  policy_diff                            = { for this in [local.policy_diff_is_populated] : this => this if local.policy_diff_is_populated }
-  equivalent_routing_policy_is_populated = var.inspect.equivalence.equivalent_routing_policy != null
-  equivalence                            = { for this in [local.equivalent_routing_policy_is_populated] : this => this if local.equivalent_routing_policy_is_populated }
+  reachability              = { for this in [var.inspect.reachability] : this => this if var.inspect.reachability }
+  diagnostics               = { for this in [var.inspect.diagnostics] : this => this if var.inspect.diagnostics }
+  provenance                = { for this in [var.inspect.provenance] : this => this if var.inspect.provenance }
+  previous_reachability     = var.inspect.policy_diff.previous_reachability != null
+  policy_diff               = { for this in [local.previous_reachability] : this => this if local.previous_reachability }
+  equivalent_routing_policy = var.inspect.equivalence.equivalent_routing_policy != null
+  equivalence               = { for this in [local.equivalent_routing_policy] : this => this if local.equivalent_routing_policy }
 }
 
 resource "local_file" "this_reachability" {

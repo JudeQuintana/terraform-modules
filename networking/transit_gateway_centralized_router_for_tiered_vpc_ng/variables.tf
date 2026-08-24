@@ -173,7 +173,7 @@ variable "inspect" {
     provenance   = optional(bool, false)
     policy_diff = optional(object({
       previous_reachability = optional(map(string), {})
-    }), {})
+    }))
     equivalence = optional(object({
       equivalent_routing_policy = optional(object({
         default = string
