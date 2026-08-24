@@ -10,7 +10,8 @@ locals {
   ]])
 
   # evaluate verdict per pair: deny > allow > segments > default
-  reachability_with_duplicates = {
+  # contiains bidirectional duplicates: "app:db" is equal to "db:app"
+  reachability_with_bidirectional_duplicates = {
     for pair in local.vpc_pairs : pair.key => (
       contains(lookup(local.deny_lookup, pair.from_cidr, []), pair.to_cidr)
       ? "denied:deny"
@@ -28,7 +29,7 @@ locals {
 
   # deduplicated: keep lexicographically-first key only ("app:db", not "db:app")
   reachability = {
-    for k, v in local.reachability_with_duplicates : k => v
+    for k, v in local.reachability_with_bidirectional_duplicates : k => v
     if k == join(":", sort(split(":", k)))
   }
 }

@@ -1,4 +1,10 @@
 locals {
+  cidr_to_vpc_name = merge([
+    for name, vpc in var.vpcs : {
+      for cidr in concat([vpc.network_cidr], vpc.secondary_cidrs) :
+      cidr => name
+  }]...)
+
   # validate: all CIDRs referenced in allow/deny/segments rules must exist in var.vpcs
   vpc_network_cidrs = toset([for vpc in var.vpcs : vpc.network_cidr])
   out_of_scope_rules = distinct(concat(

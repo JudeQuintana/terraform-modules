@@ -3,7 +3,7 @@ locals {
   zero_connectivity_vpcs = [
     for name, vpc in var.vpcs : name
     if alltrue([
-      for pair_key, verdict in local.reachability_with_duplicates : startswith(verdict, "denied")
+      for pair_key, verdict in local.reachability_with_bidirectional_duplicates : startswith(verdict, "denied")
       if startswith(pair_key, format("%s:", name))
     ]) && length(var.vpcs) > 1
   ]
