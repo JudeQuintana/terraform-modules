@@ -13,7 +13,8 @@ run "final" {
 # ipv4
 run "ipv4_call_with_n_greater_than_one" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
+    vpcs           = run.setup.ipv4_tiered_vpcs
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -24,7 +25,8 @@ run "ipv4_call_with_n_greater_than_one" {
 
 run "ipv4_call_with_n_equal_to_one" {
   variables {
-    vpcs = run.setup.ipv4_one_tiered_vpc
+    vpcs           = run.setup.ipv4_one_tiered_vpc
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -35,7 +37,8 @@ run "ipv4_call_with_n_equal_to_one" {
 
 run "ipv4_call_with_n_equal_to_zero" {
   variables {
-    vpcs = {}
+    vpcs           = {}
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -48,7 +51,8 @@ run "ipv4_cidr_validation" {
   command = plan
 
   variables {
-    vpcs = run.setup.ipv4_one_tiered_vpc_with_invalid_cidr
+    vpcs           = run.setup.ipv4_one_tiered_vpc_with_invalid_cidr
+    routing_policy = { default = "allow" }
   }
 
   expect_failures = [var.vpcs]
@@ -57,7 +61,8 @@ run "ipv4_cidr_validation" {
 # ipv4 with secondary network cidrs
 run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one" {
   variables {
-    vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    vpcs           = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
+    routing_policy = { default = "allow" }
   }
 
   # error message doesnt support showing a set of objects so must build a string to see what's inside the structure
@@ -69,7 +74,8 @@ run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one" {
 
 run "ipv4_with_secondary_cidrs_call_with_n_equal_to_one" {
   variables {
-    vpcs = run.setup.ipv4_with_secondary_cidrs_one_tiered_vpc
+    vpcs           = run.setup.ipv4_with_secondary_cidrs_one_tiered_vpc
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -80,7 +86,8 @@ run "ipv4_with_secondary_cidrs_call_with_n_equal_to_one" {
 
 run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero" {
   variables {
-    vpcs = {}
+    vpcs           = {}
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -92,7 +99,8 @@ run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero" {
 # ipv6
 run "ipv6_call_with_n_greater_than_one" {
   variables {
-    vpcs = run.setup.ipv6_tiered_vpcs
+    vpcs           = run.setup.ipv6_tiered_vpcs
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -103,7 +111,8 @@ run "ipv6_call_with_n_greater_than_one" {
 
 run "ipv6_call_with_n_equal_to_one" {
   variables {
-    vpcs = run.setup.ipv6_one_tiered_vpc
+    vpcs           = run.setup.ipv6_one_tiered_vpc
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -114,7 +123,8 @@ run "ipv6_call_with_n_equal_to_one" {
 
 run "ipv6_call_with_n_equal_to_zero" {
   variables {
-    vpcs = {}
+    vpcs           = {}
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -125,7 +135,8 @@ run "ipv6_call_with_n_equal_to_zero" {
 
 run "ipv6_call_with_ipv6_secondary_cidrs_with_n_greater_than_zero" {
   variables {
-    vpcs = run.setup.ipv6_tiered_vpcs_with_secondary_cidrs
+    vpcs           = run.setup.ipv6_tiered_vpcs_with_secondary_cidrs
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -136,7 +147,8 @@ run "ipv6_call_with_ipv6_secondary_cidrs_with_n_greater_than_zero" {
 
 run "ipv6_with_secondary_cidrs_call_with_n_equal_to_one" {
   variables {
-    vpcs = run.setup.ipv6_with_ipv6_secondary_cidrs_one_tiered_vpc
+    vpcs           = run.setup.ipv6_with_ipv6_secondary_cidrs_one_tiered_vpc
+    routing_policy = { default = "allow" }
   }
 
   assert {
@@ -147,7 +159,8 @@ run "ipv6_with_secondary_cidrs_call_with_n_equal_to_one" {
 
 run "ipv6_with_ipv6_secondary_cidrs_call_with_n_equal_to_zero" {
   variables {
-    vpcs = {}
+    vpcs           = {}
+    routing_policy = { default = "allow" }
   }
 
   assert {

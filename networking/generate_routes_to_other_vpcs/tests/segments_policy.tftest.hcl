@@ -23,6 +23,7 @@ run "ipv4_one_segment_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         workers = [
           { network_cidr = "10.0.0.0/20" },
@@ -44,6 +45,7 @@ run "ipv4_two_segments_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20" }]
         beta  = [{ network_cidr = "172.16.0.0/20" }]
@@ -62,6 +64,7 @@ run "ipv4_all_separate_segments" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20" }]
         beta  = [{ network_cidr = "172.16.0.0/20" }]
@@ -82,6 +85,7 @@ run "ipv4_with_secondary_cidrs_two_segments_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }]
         beta  = [{ network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }]
@@ -100,6 +104,7 @@ run "ipv4_with_secondary_cidrs_all_separate_segments" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }]
         beta  = [{ network_cidr = "172.16.0.0/20", secondary_cidrs = ["172.17.0.0/20"] }]
@@ -118,7 +123,7 @@ run "ipv4_with_secondary_cidrs_all_separate_segments" {
 run "ipv4_empty_segments_unchanged" {
   variables {
     vpcs   = run.setup.ipv4_tiered_vpcs
-    routing_policy = { segments = {} }
+    routing_policy = { default = "allow", segments = {} }
   }
 
   assert {
@@ -134,6 +139,7 @@ run "ipv4_vpc_in_multiple_segments" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20" }]
         beta  = [{ network_cidr = "10.0.0.0/20" }, { network_cidr = "172.16.0.0/20" }]
@@ -154,6 +160,7 @@ run "ipv6_two_segments_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }]
         beta  = [{ network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }]
@@ -203,6 +210,7 @@ run "ipv6_all_separate_segments" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }]
         beta  = [{ network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56" }]
@@ -222,6 +230,7 @@ run "ipv6_with_secondary_cidrs_two_segments_general_unsegmented" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs_with_secondary_cidrs
     routing_policy = {
+      default = "allow"
       segments = {
         alpha = [{ network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56", ipv6_secondary_cidrs = ["2600:1f24:66:c800::/56"] }]
         beta  = [{ network_cidr = "172.16.0.0/20", ipv6_network_cidr = "2600:1f24:66:c200::/56", ipv6_secondary_cidrs = ["2600:1f24:66:c600::/56"] }]
@@ -252,7 +261,7 @@ run "ipv6_with_secondary_cidrs_two_segments_general_unsegmented" {
 run "ipv6_empty_segments_unchanged" {
   variables {
     vpcs   = run.setup.ipv6_tiered_vpcs
-    routing_policy = { segments = {} }
+    routing_policy = { default = "allow", segments = {} }
   }
 
   assert {

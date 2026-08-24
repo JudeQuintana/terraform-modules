@@ -84,6 +84,7 @@ run "ipv4_deny_beats_allow" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20" }
@@ -111,6 +112,7 @@ run "ipv4_allow_overrides_segments" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       allow = [
         {
           from = { network_cidr = "10.0.0.0/20" }
@@ -177,6 +179,7 @@ run "ipv4_with_secondary_cidrs_deny_beats_allow" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
@@ -203,6 +206,7 @@ run "ipv4_with_secondary_cidrs_allow_overrides_segments" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
     routing_policy = {
+      default = "allow"
       allow = [
         {
           from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
@@ -233,6 +237,7 @@ run "ipv4_combined_precedence" {
   variables {
     vpcs = run.setup.ipv4_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20" }
@@ -263,6 +268,7 @@ run "ipv4_with_secondary_cidrs_combined_precedence" {
   variables {
     vpcs = run.setup.ipv4_with_secondary_cidrs_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20", secondary_cidrs = ["10.1.0.0/20", "10.2.0.0/20"] }
@@ -385,6 +391,7 @@ run "ipv6_deny_beats_allow" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
@@ -424,6 +431,7 @@ run "ipv6_allow_overrides_segments" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
     routing_policy = {
+      default = "allow"
       allow = [
         {
           from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
@@ -461,6 +469,7 @@ run "ipv6_combined_precedence" {
   variables {
     vpcs = run.setup.ipv6_tiered_vpcs
     routing_policy = {
+      default = "allow"
       deny = [
         {
           from = { network_cidr = "10.0.0.0/20", ipv6_network_cidr = "2600:1f24:66:c100::/56" }
