@@ -15,7 +15,7 @@ locals {
         lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
         lookup(local.cidr_to_vpc_name, route.destination_cidr_block, "unknown"),
         lookup(
-          local.reachability_with_bidrectional_duplicates,
+          local.reachability_with_bidirectional_duplicates,
           format("%s:%s",
             lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
             lookup(local.cidr_to_vpc_name, route.destination_cidr_block, "unknown")
