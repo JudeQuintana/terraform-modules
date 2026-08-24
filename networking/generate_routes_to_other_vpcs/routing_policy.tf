@@ -1,5 +1,5 @@
 locals {
-  # validate: all CIDRs referenced in allow/deny rules must exist in var.vpcs
+  # validate: all CIDRs referenced in allow/deny/segments rules must exist in var.vpcs
   vpc_network_cidrs = toset([for vpc in var.vpcs : vpc.network_cidr])
   out_of_scope_rules = distinct(concat(
     flatten([for rule in var.routing_policy.deny : concat(
@@ -18,6 +18,10 @@ locals {
         format("%s (in allow rule: %s -> ?)", rule.to.network_cidr, lookup(local.cidr_to_vpc_name, rule.from.network_cidr, "?"))
       ] : [],
     )]),
+    flatten([for segment_name, vpcs in var.routing_policy.segments : [
+      for vpc in vpcs : format("%s (in segment: %s)", vpc.network_cidr, segment_name)
+      if !contains(local.vpc_network_cidrs, vpc.network_cidr)
+    ]]),
   ))
 
   # precedence (high to low):

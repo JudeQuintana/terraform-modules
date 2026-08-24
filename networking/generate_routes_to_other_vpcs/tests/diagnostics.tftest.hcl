@@ -113,6 +113,28 @@ run "out_of_scope_deny_cidr" {
   ]
 }
 
+# out-of-scope CIDR in segment
+run "out_of_scope_segment_cidr" {
+  command = plan
+
+  variables {
+    vpcs = run.setup.ipv4_tiered_vpcs
+    routing_policy = {
+      default = "deny"
+      segments = {
+        workers = [
+          { network_cidr = "10.0.0.0/20" },
+          { network_cidr = "10.99.0.0/20" }
+        ]
+      }
+    }
+  }
+
+  expect_failures = [
+    output.ipv4,
+  ]
+}
+
 # no warnings: clean policy
 run "no_warnings_full_mesh" {
   variables {

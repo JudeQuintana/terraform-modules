@@ -6,7 +6,7 @@ output "ipv4" {
 
   precondition {
     condition     = length(local.out_of_scope_rules) == 0
-    error_message = "Routing policy references CIDRs not in var.vpcs: ${join(", ", local.out_of_scope_rules)}. Allow/deny rules can only reference VPCs in this router's scope."
+    error_message = format("Routing policy references CIDRs not in var.vpcs: %s. Allow/deny rules can only reference VPCs in this router's scope.", join(", ", local.out_of_scope_rules))
   }
 }
 
