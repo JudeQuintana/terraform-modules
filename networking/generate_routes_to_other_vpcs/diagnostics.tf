@@ -1,7 +1,4 @@
 locals {
-  # reverse lookups for diagnostics
-  cidr_to_vpc_name = { for name, vpc in var.vpcs : vpc.network_cidr => name }
-
   # VPCs with zero connectivity: all outbound verdicts are denied
   zero_connectivity_vpcs = [
     for name, vpc in var.vpcs : name
