@@ -1,14 +1,18 @@
 # Compiler Toolchain
 
-Debug outputs that make the compiler's decisions inspectable. Enable via the `debug` variable on IR modules (Centralized Router, Full Mesh Trio, Super Router) to dump artifacts to JSON files.
+Debug outputs that make the compiler's decisions inspectable. Enable via the `inspect` variable on IR modules (Centralized Router, Full Mesh Trio, Super Router) to dump artifacts to JSON files.
 
 ```hcl
-debug = {
+inspect = {
   reachability = true
   diagnostics  = true
   provenance   = true
-  policy_diff  = true
-  equivalence  = true
+  policy_diff = {
+    previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+  }
+  equivalence = {
+    equivalent_routing_policy = { ... }
+  }
 }
 ```
 
@@ -89,17 +93,21 @@ Incremental compilation preview. Given the previous reachability matrix (from a 
 
 Pairs are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown, no redundant mirror entries.
 
-Pass the previous reachability via the `previous_reachability` variable:
+Pass the previous reachability via `inspect.policy_diff.previous_reachability`:
 
 ```hcl
-previous_reachability = jsondecode(file("debug-myrouter-reachability.json"))
+inspect = {
+  policy_diff = {
+    previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+  }
+}
 ```
 
 The workflow:
-1. Enable `debug.reachability = true` to dump the reachability matrix to a JSON file
+1. Enable `inspect.reachability = true` to dump the reachability matrix to a JSON file
 2. Change the routing policy
-3. Pass the previous JSON file as `previous_reachability`
-4. Enable `debug.policy_diff = true` to dump the diff showing added/removed/unchanged pairs
+3. Pass the previous JSON file via `inspect.policy_diff.previous_reachability`
+4. The diff output shows added/removed/unchanged pairs
 
 This answers "what did this policy change actually do?" at the semantic level. `terraform plan` shows route additions/removals (assembly diff). Policy diff shows reachability changes (source-level diff).
 
@@ -130,7 +138,7 @@ When policies differ:
 
 Mismatches are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown.
 
-Pass the second policy via `equivalent_routing_policy`:
+Pass the second policy via `inspect.equivalence.equivalent_routing_policy`:
 
 ```hcl
 routing_policy = {
@@ -138,12 +146,16 @@ routing_policy = {
   deny    = [{ from = vpcs["app"], to = vpcs["db"] }]
 }
 
-equivalent_routing_policy = {
-  default = "deny"
-  allow = [
-    { from = vpcs["app"], to = vpcs["web"] },
-    { from = vpcs["db"], to = vpcs["web"] },
-  ]
+inspect = {
+  equivalence = {
+    equivalent_routing_policy = {
+      default = "deny"
+      allow = [
+        { from = vpcs["app"], to = vpcs["web"] },
+        { from = vpcs["db"], to = vpcs["web"] },
+      ]
+    }
+  }
 }
 ```
 
