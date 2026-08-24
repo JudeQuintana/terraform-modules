@@ -212,7 +212,7 @@ variable "inspect" {
           ipv6_secondary_cidrs = optional(list(string), [])
         }))), {})
       }))
-    }))
+    }), {})
   })
   default = {}
 }
