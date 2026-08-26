@@ -7,15 +7,17 @@ run "setup" {
 # provenance traces each route back to its VPC pair and verdict
 run "provenance_allow_pair" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      allow = [
-        {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
-        }
-      ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        allow = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+      }
     }
   }
 
@@ -46,14 +48,16 @@ run "provenance_allow_pair" {
 # provenance with segments
 run "provenance_segment" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      segments = {
-        workers = [
-          { network_cidr = "10.0.0.0/20" },
-          { network_cidr = "172.16.0.0/20" }
-        ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
       }
     }
   }
@@ -77,9 +81,11 @@ run "provenance_segment" {
 # empty provenance under full deny
 run "provenance_empty_deny" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+      }
     }
   }
 

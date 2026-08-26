@@ -7,9 +7,11 @@ run "setup" {
 # default=allow (full mesh) -> all pairs permitted via default
 run "ipv4_full_mesh_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
     }
   }
 
@@ -26,9 +28,11 @@ run "ipv4_full_mesh_reachability" {
 # default=deny with no rules -> all pairs denied via default
 run "ipv4_zero_trust_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+      }
     }
   }
 
@@ -45,15 +49,17 @@ run "ipv4_zero_trust_reachability" {
 # default=deny with allow app <-> cicd -> only that pair permitted via allow
 run "ipv4_allow_pair_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      allow = [
-        {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
-        }
-      ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        allow = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+      }
     }
   }
 
@@ -70,14 +76,16 @@ run "ipv4_allow_pair_reachability" {
 # default=deny with segment [app, cicd] -> same-segment permitted
 run "ipv4_segment_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      segments = {
-        workers = [
-          { network_cidr = "10.0.0.0/20" },
-          { network_cidr = "172.16.0.0/20" }
-        ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
       }
     }
   }
@@ -95,21 +103,23 @@ run "ipv4_segment_reachability" {
 # deny beats allow -> denied pair shows denied:deny
 run "ipv4_deny_beats_allow_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      deny = [
-        {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
-        }
-      ]
-      allow = [
-        {
-          from = { network_cidr = "10.0.0.0/20" }
-          to   = { network_cidr = "172.16.0.0/20" }
-        }
-      ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        deny = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+        allow = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+      }
     }
   }
 
@@ -126,16 +136,18 @@ run "ipv4_deny_beats_allow_reachability" {
 # default=allow with two segments -> cross-segment pairs denied
 run "ipv4_cross_segment_reachability" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-      segments = {
-        workers = [
-          { network_cidr = "10.0.0.0/20" }
-        ]
-        infra = [
-          { network_cidr = "172.16.0.0/20" }
-        ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" }
+          ]
+          infra = [
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
       }
     }
   }

@@ -7,9 +7,11 @@ run "setup" {
 # no equivalent policy -> empty output
 run "no_equivalent_empty" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
     }
   }
 
@@ -22,20 +24,22 @@ run "no_equivalent_empty" {
 # same policy is equivalent to itself
 run "identical_policies_are_equivalent" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-      deny = [{
-        from = { network_cidr = "10.0.0.0/20" }
-        to   = { network_cidr = "172.16.0.0/20" }
-      }]
-    }
-    equivalent_routing_policy = {
-      default = "allow"
-      deny = [{
-        from = { network_cidr = "10.0.0.0/20" }
-        to   = { network_cidr = "172.16.0.0/20" }
-      }]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        deny = [{
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
+        }]
+      }
+      equivalent_routing_policy = {
+        default = "allow"
+        deny = [{
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
+        }]
+      }
     }
   }
 
@@ -54,23 +58,25 @@ run "identical_policies_are_equivalent" {
 # deny/allow rules are bidirectional, so deny {app->cicd} blocks both directions
 run "allow_with_deny_equals_deny_with_allows" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    # policy A: allow everything except app <-> cicd (bidirectional deny)
-    routing_policy = {
-      default = "allow"
-      deny = [{
-        from = { network_cidr = "10.0.0.0/20" }
-        to   = { network_cidr = "172.16.0.0/20" }
-      }]
-    }
-    # policy B: deny everything, explicitly allow the pairs that were permitted
-    # rules are bidirectional so only need app<->general and cicd<->general
-    equivalent_routing_policy = {
-      default = "deny"
-      allow = [
-        { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "192.168.0.0/20" } },
-        { from = { network_cidr = "172.16.0.0/20" }, to = { network_cidr = "192.168.0.0/20" } },
-      ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      # policy A: allow everything except app <-> cicd (bidirectional deny)
+      routing_policy = {
+        default = "allow"
+        deny = [{
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
+        }]
+      }
+      # policy B: deny everything, explicitly allow the pairs that were permitted
+      # rules are bidirectional so only need app<->general and cicd<->general
+      equivalent_routing_policy = {
+        default = "deny"
+        allow = [
+          { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "192.168.0.0/20" } },
+          { from = { network_cidr = "172.16.0.0/20" }, to = { network_cidr = "192.168.0.0/20" } },
+        ]
+      }
     }
   }
 
@@ -83,23 +89,25 @@ run "allow_with_deny_equals_deny_with_allows" {
 # segments == explicit allows (proves segment is sugar for allow pairs)
 run "segment_equals_explicit_allows" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    # policy A: deny default, segment [app, cicd]
-    routing_policy = {
-      default = "deny"
-      segments = {
-        workers = [
-          { network_cidr = "10.0.0.0/20" },
-          { network_cidr = "172.16.0.0/20" }
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      # policy A: deny default, segment [app, cicd]
+      routing_policy = {
+        default = "deny"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
+      }
+      # policy B: deny default, explicit allow app <-> cicd
+      equivalent_routing_policy = {
+        default = "deny"
+        allow = [
+          { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "172.16.0.0/20" } },
         ]
       }
-    }
-    # policy B: deny default, explicit allow app <-> cicd
-    equivalent_routing_policy = {
-      default = "deny"
-      allow = [
-        { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "172.16.0.0/20" } },
-      ]
     }
   }
 
@@ -112,12 +120,14 @@ run "segment_equals_explicit_allows" {
 # non-equivalent policies show mismatches
 run "non_equivalent_shows_mismatches" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-    }
-    equivalent_routing_policy = {
-      default = "deny"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
+      equivalent_routing_policy = {
+        default = "deny"
+      }
     }
   }
 
@@ -135,16 +145,18 @@ run "non_equivalent_shows_mismatches" {
 # partial mismatch: one deny difference
 run "partial_mismatch" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-    }
-    equivalent_routing_policy = {
-      default = "allow"
-      deny = [{
-        from = { network_cidr = "10.0.0.0/20" }
-        to   = { network_cidr = "172.16.0.0/20" }
-      }]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
+      equivalent_routing_policy = {
+        default = "allow"
+        deny = [{
+          from = { network_cidr = "10.0.0.0/20" }
+          to   = { network_cidr = "172.16.0.0/20" }
+        }]
+      }
     }
   }
 

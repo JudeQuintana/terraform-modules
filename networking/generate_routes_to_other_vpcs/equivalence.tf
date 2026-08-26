@@ -1,21 +1,21 @@
 locals {
-  has_equivalent = var.equivalent_routing_policy != null
+  has_equivalent = var.generate_routes_to_other_vpcs.equivalent_routing_policy != null
 
   # recompute lookups for equivalent policy (same algebra, different input)
   eq_deny_rules = local.has_equivalent ? [
-    for rule in var.equivalent_routing_policy.deny : {
+    for rule in var.generate_routes_to_other_vpcs.equivalent_routing_policy.deny : {
       from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
       to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
   }] : []
 
   eq_allow_rules = local.has_equivalent ? [
-    for rule in var.equivalent_routing_policy.allow : {
+    for rule in var.generate_routes_to_other_vpcs.equivalent_routing_policy.allow : {
       from_cidrs = concat([rule.from.network_cidr], rule.from.secondary_cidrs)
       to_cidrs   = concat([rule.to.network_cidr], rule.to.secondary_cidrs)
   }] : []
 
   eq_segment_cidrs = local.has_equivalent ? [
-    for vpcs in var.equivalent_routing_policy.segments : {
+    for vpcs in var.generate_routes_to_other_vpcs.equivalent_routing_policy.segments : {
       cidrs = flatten([for vpc in vpcs : concat([vpc.network_cidr], vpc.secondary_cidrs)])
   }] : []
 
@@ -68,7 +68,7 @@ locals {
       ? "permitted:allow"
       : contains(lookup(local.eq_segment_permit_lookup, pair.from_cidr, []), pair.to_cidr)
       ? "permitted:segment"
-      : var.equivalent_routing_policy.default == "allow"
+      : var.generate_routes_to_other_vpcs.equivalent_routing_policy.default == "allow"
       ? (contains(lookup(local.eq_segment_deny_lookup, pair.from_cidr, []), pair.to_cidr)
         ? "denied:cross-segment"
       : "permitted:default")

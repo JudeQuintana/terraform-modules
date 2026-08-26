@@ -1,8 +1,8 @@
 locals {
   # all VPC pairs (cartesian product, excluding self)
   vpc_pairs = flatten([
-    for name, this in var.vpcs : [
-      for other_name, other_this in var.vpcs : {
+    for name, this in var.generate_routes_to_other_vpcs.vpcs : [
+      for other_name, other_this in var.generate_routes_to_other_vpcs.vpcs : {
         key       = format("%s:%s", name, other_name)
         from_cidr = this.network_cidr
         to_cidr   = other_this.network_cidr
@@ -19,7 +19,7 @@ locals {
       ? "permitted:allow"
       : contains(lookup(local.segment_permit_lookup, pair.from_cidr, []), pair.to_cidr)
       ? "permitted:segment"
-      : var.routing_policy.default == "allow"
+      : var.generate_routes_to_other_vpcs.routing_policy.default == "allow"
       ? (contains(lookup(local.segment_deny_lookup, pair.from_cidr, []), pair.to_cidr)
         ? "denied:cross-segment"
       : "permitted:default")

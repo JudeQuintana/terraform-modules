@@ -7,9 +7,11 @@ run "setup" {
 # no previous reachability -> empty diff
 run "no_previous_empty_diff" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
     }
   }
 
@@ -22,17 +24,19 @@ run "no_previous_empty_diff" {
 # full mesh -> deny all = all pairs removed
 run "full_mesh_to_deny_all" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-    }
-    previous_reachability = {
-      "app:cicd"      = "permitted:default"
-      "app:general"   = "permitted:default"
-      "cicd:app"      = "permitted:default"
-      "cicd:general"  = "permitted:default"
-      "general:app"   = "permitted:default"
-      "general:cicd"  = "permitted:default"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+      }
+      previous_reachability = {
+        "app:cicd"      = "permitted:default"
+        "app:general"   = "permitted:default"
+        "cicd:app"      = "permitted:default"
+        "cicd:general"  = "permitted:default"
+        "general:app"   = "permitted:default"
+        "general:cicd"  = "permitted:default"
+      }
     }
   }
 
@@ -50,17 +54,19 @@ run "full_mesh_to_deny_all" {
 # deny all -> full mesh = all pairs added
 run "deny_all_to_full_mesh" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-    }
-    previous_reachability = {
-      "app:cicd"      = "denied:default"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "denied:default"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
+      previous_reachability = {
+        "app:cicd"      = "denied:default"
+        "app:general"   = "denied:default"
+        "cicd:app"      = "denied:default"
+        "cicd:general"  = "denied:default"
+        "general:app"   = "denied:default"
+        "general:cicd"  = "denied:default"
+      }
     }
   }
 
@@ -78,23 +84,25 @@ run "deny_all_to_full_mesh" {
 # add a segment: full mesh -> segment [app, cicd] under deny
 run "add_segment_selective" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "deny"
-      segments = {
-        workers = [
-          { network_cidr = "10.0.0.0/20" },
-          { network_cidr = "172.16.0.0/20" }
-        ]
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
       }
-    }
-    previous_reachability = {
-      "app:cicd"      = "denied:default"
-      "app:general"   = "denied:default"
-      "cicd:app"      = "denied:default"
-      "cicd:general"  = "denied:default"
-      "general:app"   = "denied:default"
-      "general:cicd"  = "denied:default"
+      previous_reachability = {
+        "app:cicd"      = "denied:default"
+        "app:general"   = "denied:default"
+        "cicd:app"      = "denied:default"
+        "cicd:general"  = "denied:default"
+        "general:app"   = "denied:default"
+        "general:cicd"  = "denied:default"
+      }
     }
   }
 
@@ -112,17 +120,19 @@ run "add_segment_selective" {
 # unchanged: same policy, same result
 run "no_change" {
   variables {
-    vpcs = run.setup.ipv4_tiered_vpcs
-    routing_policy = {
-      default = "allow"
-    }
-    previous_reachability = {
-      "app:cicd"      = "permitted:default"
-      "app:general"   = "permitted:default"
-      "cicd:app"      = "permitted:default"
-      "cicd:general"  = "permitted:default"
-      "general:app"   = "permitted:default"
-      "general:cicd"  = "permitted:default"
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+      }
+      previous_reachability = {
+        "app:cicd"      = "permitted:default"
+        "app:general"   = "permitted:default"
+        "cicd:app"      = "permitted:default"
+        "cicd:general"  = "permitted:default"
+        "general:app"   = "permitted:default"
+        "general:cicd"  = "permitted:default"
+      }
     }
   }
 

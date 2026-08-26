@@ -1,6 +1,6 @@
 locals {
   network_cidrs_with_route_table_ids = [
-    for this in var.vpcs : {
+    for this in var.generate_routes_to_other_vpcs.vpcs : {
       network_cidrs      = concat([this.network_cidr], this.secondary_cidrs)
       ipv6_network_cidrs = concat(compact([this.ipv6_network_cidr]), this.ipv6_secondary_cidrs)
       route_table_ids    = concat(this.private_route_table_ids, this.public_route_table_ids)

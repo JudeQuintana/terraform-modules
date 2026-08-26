@@ -1,28 +1,28 @@
 locals {
   # VPCs with zero connectivity: all outbound verdicts are denied
   zero_connectivity_vpcs = [
-    for name, vpc in var.vpcs : name
+    for name, vpc in var.generate_routes_to_other_vpcs.vpcs : name
     if alltrue([
       for pair_key, verdict in local.reachability_with_bidirectional_duplicates : startswith(verdict, "denied")
       if startswith(pair_key, format("%s:", name))
-    ]) && length(var.vpcs) > 1
+    ]) && length(var.generate_routes_to_other_vpcs.vpcs) > 1
   ]
 
   # single-member segments
   single_member_segments = [
-    for segment_name, vpcs in var.routing_policy.segments : segment_name
+    for segment_name, vpcs in var.generate_routes_to_other_vpcs.routing_policy.segments : segment_name
     if length(vpcs) == 1
   ]
 
   # redundant deny rules: deny on a pair that would already be denied without it
   redundant_deny_rules = [
-    for rule in var.routing_policy.deny : format(
+    for rule in var.generate_routes_to_other_vpcs.routing_policy.deny : format(
       "%s -> %s",
       lookup(local.cidr_to_vpc_name, rule.from.network_cidr, rule.from.network_cidr),
       lookup(local.cidr_to_vpc_name, rule.to.network_cidr, rule.to.network_cidr)
     )
     if(
-      var.routing_policy.default == "deny"
+      var.generate_routes_to_other_vpcs.routing_policy.default == "deny"
       && !contains(lookup(local.allow_lookup, rule.from.network_cidr, []), rule.to.network_cidr)
       && !contains(lookup(local.segment_permit_lookup, rule.from.network_cidr, []), rule.to.network_cidr)
     )
