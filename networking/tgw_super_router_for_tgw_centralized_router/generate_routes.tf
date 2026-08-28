@@ -54,8 +54,8 @@ module "this_generate_routes_to_other_vpcs" {
   generate_routes_to_other_vpcs = {
     routing_policy            = var.super_router.routing_policy
     vpcs                      = local.all_vpcs
-    previous_reachability     = null
-    equivalent_routing_policy = null
+    previous_reachability     = var.super_router.inspect.policy_diff.previous_reachability
+    equivalent_routing_policy = var.super_router.inspect.equivalence.equivalent_routing_policy
   }
 }
 

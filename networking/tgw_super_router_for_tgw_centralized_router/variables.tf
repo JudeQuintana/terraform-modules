@@ -66,8 +66,8 @@ variable "super_router" {
         })), {})
       })), {})
     })
-    routing_policy = optional(object({
-      default = optional(string, "allow")
+    routing_policy = object({
+      default = string
       deny = optional(list(object({
         from = object({
           network_cidr         = string
@@ -102,6 +102,53 @@ variable "super_router" {
         ipv6_network_cidr    = optional(string)
         ipv6_secondary_cidrs = optional(list(string), [])
       }))), {})
+    })
+    inspect = optional(object({
+      reachability = optional(bool, false)
+      diagnostics  = optional(bool, false)
+      provenance   = optional(bool, false)
+      policy_diff = optional(object({
+        previous_reachability = optional(map(string))
+      }), {})
+      equivalence = optional(object({
+        equivalent_routing_policy = optional(object({
+          default = string
+          deny = optional(list(object({
+            from = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+            to = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+          })), [])
+          allow = optional(list(object({
+            from = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+            to = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+          })), [])
+          segments = optional(map(list(object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          }))), {})
+        }))
+      }), {})
     }), {})
   })
 
@@ -216,7 +263,13 @@ variable "super_router" {
     condition = length(
       distinct(flatten([for vpcs in var.super_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     ) == length(flatten([for vpcs in var.super_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
-    error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
+    error_message = format(
+      "Routing policy has VPCs in multiple segments: %s. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments.",
+      join(", ", [
+        for cidr in distinct(flatten([for vpcs in var.super_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : cidr
+        if length(flatten([for vpcs in var.super_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr if vpc.network_cidr == cidr]])) > 1
+      ])
+    )
   }
 
   validation {
@@ -230,13 +283,54 @@ variable "super_router" {
       ]]),
     ))
     error_message = format(
-      "Routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this IR's scope.",
+      "Routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this router's scope.",
       join(", ", distinct(concat(
         [for rule in var.super_router.routing_policy.deny : rule.from.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
         [for rule in var.super_router.routing_policy.deny : rule.to.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
         [for rule in var.super_router.routing_policy.allow : rule.from.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
         [for rule in var.super_router.routing_policy.allow : rule.to.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
         flatten([for vpcs in var.super_router.routing_policy.segments : [
+          for vpc in vpcs : vpc.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for v in cr.vpcs : v.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for v in cr.vpcs : v.network_cidr]])), vpc.network_cidr)
+        ]]),
+    ))))
+  }
+
+  validation {
+    condition     = var.super_router.inspect.equivalence.equivalent_routing_policy != null ? contains(["allow", "deny"], var.super_router.inspect.equivalence.equivalent_routing_policy.default) : true
+    error_message = "Equivalent routing policy default must be \"allow\" or \"deny\"."
+  }
+
+  validation {
+    condition = var.super_router.inspect.equivalence.equivalent_routing_policy != null ? length(
+      distinct(flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : true
+    error_message = format(
+      "Equivalent routing policy has VPCs in multiple segments: %s. Each VPC (network_cidr) must appear in only one segment.",
+      join(", ", [
+        for cidr in distinct(flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : cidr
+        if length(flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr if vpc.network_cidr == cidr]])) > 1
+      ])
+    )
+  }
+
+  validation {
+    condition = var.super_router.inspect.equivalence.equivalent_routing_policy != null ? alltrue(concat(
+      [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.deny : contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
+      [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.deny : contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
+      [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.allow : contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
+      [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.allow : contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
+      flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [
+        for vpc in vpcs : contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for v in cr.vpcs : v.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for v in cr.vpcs : v.network_cidr]])), vpc.network_cidr)
+      ]]),
+    )) : true
+    error_message = format(
+      "Equivalent routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this router's scope.",
+      join(", ", distinct(concat(
+        [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.deny : rule.from.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
+        [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.deny : rule.to.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
+        [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.allow : rule.from.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.from.network_cidr)],
+        [for rule in var.super_router.inspect.equivalence.equivalent_routing_policy.allow : rule.to.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for vpc in cr.vpcs : vpc.network_cidr]])), rule.to.network_cidr)],
+        flatten([for vpcs in var.super_router.inspect.equivalence.equivalent_routing_policy.segments : [
           for vpc in vpcs : vpc.network_cidr if !contains(concat(flatten([for cr in var.super_router.local.centralized_routers : [for v in cr.vpcs : v.network_cidr]]), flatten([for cr in var.super_router.peer.centralized_routers : [for v in cr.vpcs : v.network_cidr]])), vpc.network_cidr)
         ]]),
     ))))

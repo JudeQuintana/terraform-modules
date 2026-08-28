@@ -204,7 +204,13 @@ variable "centralized_router" {
     condition = length(
       distinct(flatten([for vpcs in var.centralized_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     ) == length(flatten([for vpcs in var.centralized_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
-    error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
+    error_message = format(
+      "Routing policy has VPCs in multiple segments: %s. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments.",
+      join(", ", [
+        for cidr in distinct(flatten([for vpcs in var.centralized_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : cidr
+        if length(flatten([for vpcs in var.centralized_router.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr if vpc.network_cidr == cidr]])) > 1
+      ])
+    )
   }
 
   validation {
@@ -239,7 +245,13 @@ variable "centralized_router" {
     condition = var.centralized_router.inspect.equivalence.equivalent_routing_policy != null ? length(
       distinct(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     ) == length(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : true
-    error_message = "A VPC cannot belong to multiple segments in equivalent_routing_policy. Each VPC (network_cidr) must appear in only one segment."
+    error_message = format(
+      "Equivalent routing policy has VPCs in multiple segments: %s. Each VPC (network_cidr) must appear in only one segment.",
+      join(", ", [
+        for cidr in distinct(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : cidr
+        if length(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr if vpc.network_cidr == cidr]])) > 1
+      ])
+    )
   }
 
   validation {
