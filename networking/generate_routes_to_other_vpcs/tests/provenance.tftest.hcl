@@ -21,12 +21,12 @@ run "provenance_allow_pair" {
     }
   }
 
-  # all routes should trace back to "permitted:allow"
+  # all routes should trace back to verdict=permitted, reason=allow
   assert {
     condition = alltrue([
-      for entry in output.provenance : strcontains(entry.reason, "permitted:allow")
+      for entry in output.provenance : entry.verdict == "permitted" && entry.reason == "allow"
     ])
-    error_message = "All provenance entries should show permitted:allow."
+    error_message = "All provenance entries should show verdict=permitted, reason=allow."
   }
 
   # provenance count should match route count
@@ -39,9 +39,9 @@ run "provenance_allow_pair" {
   assert {
     condition = alltrue([
       for entry in output.provenance :
-      entry.route_table_id != "" && entry.destination_cidr_block != "" && entry.reason != ""
+      entry.route_table_id != "" && entry.destination_cidr_block != "" && entry.from != "" && entry.to != ""
     ])
-    error_message = "Each provenance entry should have route_table_id, destination_cidr_block, and reason."
+    error_message = "Each provenance entry should have route_table_id, destination_cidr_block, from, and to."
   }
 }
 
@@ -64,15 +64,15 @@ run "provenance_segment" {
 
   assert {
     condition = alltrue([
-      for entry in output.provenance : strcontains(entry.reason, "permitted:segment")
+      for entry in output.provenance : entry.verdict == "permitted" && entry.reason == "segment"
     ])
-    error_message = "All provenance entries should show permitted:segment."
+    error_message = "All provenance entries should show verdict=permitted, reason=segment."
   }
 
   assert {
     condition = alltrue([
       for entry in output.provenance :
-      strcontains(entry.reason, "app -> cicd") || strcontains(entry.reason, "cicd -> app")
+      (entry.from == "app" && entry.to == "cicd") || (entry.from == "cicd" && entry.to == "app")
     ])
     error_message = "Provenance should trace back to app<->cicd pair."
   }

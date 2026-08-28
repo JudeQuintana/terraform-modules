@@ -1,22 +1,22 @@
 locals {
   has_previous = var.generate_routes_to_other_vpcs.previous_reachability != null
 
-  # deduplicate bidirectional pairs: keep lexicographically-first key only ("a:b", not "b:a")
   policy_diff = local.has_previous ? {
     added = [
-      for k, v in local.reachability : k
-      if startswith(v, "permitted")
-      && !startswith(lookup(var.generate_routes_to_other_vpcs.previous_reachability, k, "denied:"), "permitted")
+      for vpc_name_pair, verdict_and_reason in local.reachability : vpc_name_pair
+      if startswith(verdict_and_reason, "permitted")
+      && !startswith(lookup(var.generate_routes_to_other_vpcs.previous_reachability, vpc_name_pair, "denied:"), "permitted")
     ]
     removed = [
-      for k, v in var.generate_routes_to_other_vpcs.previous_reachability : k
-      if startswith(v, "permitted")
-      && !startswith(lookup(local.reachability, k, "denied:"), "permitted")
-      && k == join(":", sort(split(":", k)))
+      for vpc_name_pair, verdict_and_reason in var.generate_routes_to_other_vpcs.previous_reachability : vpc_name_pair
+      if startswith(verdict_and_reason, "permitted")
+      && !startswith(lookup(local.reachability, vpc_name_pair, "denied:"), "permitted")
+      # deduplicated: keep lexicographically-first key only ("app:db", not "db:app")
+      && vpc_name_pair == join(":", sort(split(":", vpc_name_pair)))
     ]
     unchanged = [
-      for k, v in local.reachability : k
-      if v == lookup(var.generate_routes_to_other_vpcs.previous_reachability, k, "")
+      for vpc_name_pair, verdict_and_reason in local.reachability : vpc_name_pair
+      if verdict_and_reason == lookup(var.generate_routes_to_other_vpcs.previous_reachability, vpc_name_pair, "")
     ]
   } : {}
 }

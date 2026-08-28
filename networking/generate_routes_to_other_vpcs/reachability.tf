@@ -29,7 +29,7 @@ locals {
 
   # deduplicated: keep lexicographically-first key only ("app:db", not "db:app")
   reachability = {
-    for k, v in local.reachability_with_bidirectional_duplicates : k => v
-    if k == join(":", sort(split(":", k)))
+    for vpc_name_pair, verdict_and_reason in local.reachability_with_bidirectional_duplicates : vpc_name_pair => verdict_and_reason
+    if vpc_name_pair == join(":", sort(split(":", vpc_name_pair)))
   }
 }

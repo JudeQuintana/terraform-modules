@@ -147,6 +147,102 @@ run "out_of_scope_segment_cidr" {
   ]
 }
 
+# redundant allow rule warning
+run "redundant_allow_warning" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        allow = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition     = contains(output.diagnostics, "Allow rule { app -> cicd } is redundant: this pair would already be permitted without it.")
+    error_message = "Should warn about redundant allow rule under default=allow."
+  }
+}
+
+# redundant allow is NOT redundant when it overrides cross-segment deny
+run "allow_overrides_cross_segment_no_warning" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        segments = {
+          workers = [{ network_cidr = "10.0.0.0/20" }]
+          infra   = [{ network_cidr = "172.16.0.0/20" }]
+        }
+        allow = [
+          {
+            from = { network_cidr = "10.0.0.0/20" }
+            to   = { network_cidr = "172.16.0.0/20" }
+          }
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition     = !contains(output.diagnostics, "Allow rule { app -> cicd } is redundant")
+    error_message = "Allow that overrides cross-segment deny should NOT be flagged as redundant."
+  }
+}
+
+# single segment under default=allow has no effect
+run "single_segment_default_allow_no_effect" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = contains(output.diagnostics, "Policy has 1 segment under default=\"allow\". A single segment has no routing effect when there is no other segment to deny against.")
+    error_message = "Should warn about single segment under default=allow having no effect."
+  }
+}
+
+# single segment under default=deny should NOT trigger this warning
+run "single_segment_default_deny_no_warning" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        segments = {
+          workers = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "172.16.0.0/20" }
+          ]
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = !contains(output.diagnostics, "A single segment has no routing effect")
+    error_message = "Single segment under default=deny should NOT trigger the no-effect warning."
+  }
+}
+
 # no warnings: clean policy
 run "no_warnings_full_mesh" {
   variables {
