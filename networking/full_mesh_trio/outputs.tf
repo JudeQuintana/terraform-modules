@@ -1,3 +1,7 @@
+output "name" {
+  value = local.full_mesh_trio_name
+}
+
 output "peering" {
   value = {
     one = {
