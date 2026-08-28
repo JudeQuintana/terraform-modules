@@ -1,17 +1,20 @@
 # Compiler Toolchain
 
-Inspection outputs that make the compiler's decisions inspectable. Enable via the `inspect` variable on IR modules (Centralized Router, Full Mesh Trio, Super Router) to dump artifacts to JSON files.
+Inspection outputs that make the compiler's decisions inspectable. Enable via the `inspect` field nested inside each IR module's config object (`centralized_router.inspect`, `full_mesh_trio.inspect`, `super_router.inspect`) to dump artifacts to JSON files.
 
 ```hcl
-inspect = {
-  reachability = true
-  diagnostics  = true
-  provenance   = true
-  policy_diff = {
-    previous_reachability = jsondecode(file("inspect-centralized-router-name-reachability.json"))
-  }
-  equivalence = {
-    equivalent_routing_policy = { ... }
+centralized_router = {
+  # ...
+  inspect = {
+    reachability = true
+    diagnostics  = true
+    provenance   = true
+    policy_diff = {
+      previous_reachability = jsondecode(file("inspect-centralized-router-name-reachability.json"))
+    }
+    equivalence = {
+      equivalent_routing_policy = { ... }
+    }
   }
 }
 ```
@@ -105,12 +108,15 @@ Incremental compilation preview. Given the previous reachability matrix (from a 
 
 Pairs are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown, no redundant mirror entries.
 
-Pass the previous reachability via `inspect.policy_diff.previous_reachability`:
+Pass the previous reachability via `inspect.policy_diff.previous_reachability` nested inside the IR module's config object:
 
 ```hcl
-inspect = {
-  policy_diff = {
-    previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+centralized_router = {
+  # ...
+  inspect = {
+    policy_diff = {
+      previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+    }
   }
 }
 ```
@@ -150,7 +156,7 @@ When policies differ:
 
 Mismatches are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown.
 
-Pass the second policy via `inspect.equivalence.equivalent_routing_policy`:
+Pass the second policy via `inspect.equivalence.equivalent_routing_policy` nested inside the IR module's config object:
 
 ```hcl
 centralized_router = {
@@ -159,16 +165,15 @@ centralized_router = {
     default = "allow"
     deny    = [{ from = vpcs["app"], to = vpcs["db"] }]
   }
-}
-
-inspect = {
-  equivalence = {
-    equivalent_routing_policy = {
-      default = "deny"
-      allow = [
-        { from = vpcs["app"], to = vpcs["web"] },
-        { from = vpcs["db"], to = vpcs["web"] },
-      ]
+  inspect = {
+    equivalence = {
+      equivalent_routing_policy = {
+        default = "deny"
+        allow = [
+          { from = vpcs["app"], to = vpcs["web"] },
+          { from = vpcs["db"], to = vpcs["web"] },
+        ]
+      }
     }
   }
 }

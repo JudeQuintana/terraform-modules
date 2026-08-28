@@ -414,23 +414,29 @@ topology scope invokes it:
 ```hcl
 # Regional IR: Centralized Router (intra-region)
 module "centralized_router" {
-  source         = "..."
-  routing_policy = local.regional_policy
-  # ...
+  source = "..."
+  centralized_router = {
+    # ...
+    routing_policy = local.regional_policy
+  }
 }
 
 # Global IR: Full Mesh Trio (cross-region, 3 regions)
 module "full_mesh_trio" {
-  source         = "..."
-  routing_policy = local.global_policy
-  # ...
+  source = "..."
+  full_mesh_trio = {
+    # ...
+    routing_policy = local.global_policy
+  }
 }
 
 # Domain IR: Super Router (cross-region + intra-region, peered routers)
 module "super_router" {
-  source         = "..."
-  routing_policy = local.domain_policy
-  # ...
+  source = "..."
+  super_router = {
+    # ...
+    routing_policy = local.domain_policy
+  }
 }
 ```
 
