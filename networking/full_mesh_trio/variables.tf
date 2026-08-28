@@ -69,6 +69,43 @@ variable "full_mesh_trio" {
         })), {})
       })
     })
+    routing_policy = optional(object({
+      default = optional(string, "allow")
+      deny = optional(list(object({
+        from = object({
+          network_cidr         = string
+          secondary_cidrs      = optional(list(string), [])
+          ipv6_network_cidr    = optional(string)
+          ipv6_secondary_cidrs = optional(list(string), [])
+        })
+        to = object({
+          network_cidr         = string
+          secondary_cidrs      = optional(list(string), [])
+          ipv6_network_cidr    = optional(string)
+          ipv6_secondary_cidrs = optional(list(string), [])
+        })
+      })), [])
+      allow = optional(list(object({
+        from = object({
+          network_cidr         = string
+          secondary_cidrs      = optional(list(string), [])
+          ipv6_network_cidr    = optional(string)
+          ipv6_secondary_cidrs = optional(list(string), [])
+        })
+        to = object({
+          network_cidr         = string
+          secondary_cidrs      = optional(list(string), [])
+          ipv6_network_cidr    = optional(string)
+          ipv6_secondary_cidrs = optional(list(string), [])
+        })
+      })), [])
+      segments = optional(map(list(object({
+        network_cidr         = string
+        secondary_cidrs      = optional(list(string), [])
+        ipv6_network_cidr    = optional(string)
+        ipv6_secondary_cidrs = optional(list(string), [])
+      }))), {})
+    }), {})
   })
 
   validation {
@@ -124,59 +161,40 @@ variable "full_mesh_trio" {
     ) == length(concat(flatten([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.ipv6_secondary_cidrs]), flatten([for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.ipv6_secondary_cidrs]), flatten([for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.ipv6_secondary_cidrs])))
     error_message = "All VPC IPv6 secondary CIDRs must be unique across regions."
   }
-}
-
-variable "routing_policy" {
-  description = "cross-region routing policy constraints"
-  type = object({
-    default = optional(string, "allow")
-    deny = optional(list(object({
-      from = object({
-        network_cidr         = string
-        secondary_cidrs      = optional(list(string), [])
-        ipv6_network_cidr    = optional(string)
-        ipv6_secondary_cidrs = optional(list(string), [])
-      })
-      to = object({
-        network_cidr         = string
-        secondary_cidrs      = optional(list(string), [])
-        ipv6_network_cidr    = optional(string)
-        ipv6_secondary_cidrs = optional(list(string), [])
-      })
-    })), [])
-    allow = optional(list(object({
-      from = object({
-        network_cidr         = string
-        secondary_cidrs      = optional(list(string), [])
-        ipv6_network_cidr    = optional(string)
-        ipv6_secondary_cidrs = optional(list(string), [])
-      })
-      to = object({
-        network_cidr         = string
-        secondary_cidrs      = optional(list(string), [])
-        ipv6_network_cidr    = optional(string)
-        ipv6_secondary_cidrs = optional(list(string), [])
-      })
-    })), [])
-    segments = optional(map(list(object({
-      network_cidr         = string
-      secondary_cidrs      = optional(list(string), [])
-      ipv6_network_cidr    = optional(string)
-      ipv6_secondary_cidrs = optional(list(string), [])
-    }))), {})
-  })
-  default = {}
 
   validation {
-    condition     = contains(["allow", "deny"], var.routing_policy.default)
+    condition     = contains(["allow", "deny"], var.full_mesh_trio.routing_policy.default)
     error_message = "Policy default must be \"allow\" or \"deny\"."
   }
 
   validation {
     condition = length(
-      distinct(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
-    ) == length(flatten([for vpcs in var.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+      distinct(flatten([for vpcs in var.full_mesh_trio.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.full_mesh_trio.routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     error_message = "A VPC cannot belong to multiple segments. Each VPC (network_cidr) must appear in only one segment or use allow = [] to create explicit allows across segments."
+  }
+
+  validation {
+    condition = alltrue(concat(
+      [for rule in var.full_mesh_trio.routing_policy.deny : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+      [for rule in var.full_mesh_trio.routing_policy.deny : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+      [for rule in var.full_mesh_trio.routing_policy.allow : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+      [for rule in var.full_mesh_trio.routing_policy.allow : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+      flatten([for vpcs in var.full_mesh_trio.routing_policy.segments : [
+        for vpc in vpcs : contains(concat([for v in var.full_mesh_trio.one.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.two.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.three.centralized_router.vpcs : v.network_cidr]), vpc.network_cidr)
+      ]]),
+    ))
+    error_message = format(
+      "Routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this IR's scope.",
+      join(", ", distinct(concat(
+        [for rule in var.full_mesh_trio.routing_policy.deny : rule.from.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+        [for rule in var.full_mesh_trio.routing_policy.deny : rule.to.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+        [for rule in var.full_mesh_trio.routing_policy.allow : rule.from.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+        [for rule in var.full_mesh_trio.routing_policy.allow : rule.to.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+        flatten([for vpcs in var.full_mesh_trio.routing_policy.segments : [
+          for vpc in vpcs : vpc.network_cidr if !contains(concat([for v in var.full_mesh_trio.one.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.two.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.three.centralized_router.vpcs : v.network_cidr]), vpc.network_cidr)
+        ]]),
+    ))))
   }
 }
 

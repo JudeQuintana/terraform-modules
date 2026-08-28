@@ -27,7 +27,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "this" {
       Name = format(
         local.vpc_attachment_format,
         each.value.full_name,
-        local.centralized_router_name
+        local.centralized_router_full_name
       )
     }
   )

@@ -73,6 +73,53 @@ variable "centralized_router" {
         ipv6_secondary_cidrs = optional(list(string), [])
       }))), {})
     })
+    inspect = optional(object({
+      reachability = optional(bool, false)
+      diagnostics  = optional(bool, false)
+      provenance   = optional(bool, false)
+      policy_diff = optional(object({
+        previous_reachability = optional(map(string))
+      }), {})
+      equivalence = optional(object({
+        equivalent_routing_policy = optional(object({
+          default = string
+          deny = optional(list(object({
+            from = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+            to = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+          })), [])
+          allow = optional(list(object({
+            from = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+            to = object({
+              network_cidr         = string
+              secondary_cidrs      = optional(list(string), [])
+              ipv6_network_cidr    = optional(string)
+              ipv6_secondary_cidrs = optional(list(string), [])
+            })
+          })), [])
+          segments = optional(map(list(object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          }))), {})
+        }))
+      }), {})
+    }), {})
   })
 
   validation {
@@ -171,7 +218,7 @@ variable "centralized_router" {
       ]]),
     ))
     error_message = format(
-      "Routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this router's scope.",
+      "Routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this IR's scope.",
       join(", ", distinct(concat(
         [for rule in var.centralized_router.routing_policy.deny : rule.from.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.from.network_cidr)],
         [for rule in var.centralized_router.routing_policy.deny : rule.to.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.to.network_cidr)],
@@ -182,58 +229,41 @@ variable "centralized_router" {
         ]]),
     ))))
   }
-}
 
-variable "inspect" {
-  description = "Compiler toolchain inspection options"
-  type = object({
-    reachability = optional(bool, false)
-    diagnostics  = optional(bool, false)
-    provenance   = optional(bool, false)
-    policy_diff = optional(object({
-      previous_reachability = optional(map(string))
-    }), {})
-    equivalence = optional(object({
-      equivalent_routing_policy = optional(object({
-        default = string
-        deny = optional(list(object({
-          from = object({
-            network_cidr         = string
-            secondary_cidrs      = optional(list(string), [])
-            ipv6_network_cidr    = optional(string)
-            ipv6_secondary_cidrs = optional(list(string), [])
-          })
-          to = object({
-            network_cidr         = string
-            secondary_cidrs      = optional(list(string), [])
-            ipv6_network_cidr    = optional(string)
-            ipv6_secondary_cidrs = optional(list(string), [])
-          })
-        })), [])
-        allow = optional(list(object({
-          from = object({
-            network_cidr         = string
-            secondary_cidrs      = optional(list(string), [])
-            ipv6_network_cidr    = optional(string)
-            ipv6_secondary_cidrs = optional(list(string), [])
-          })
-          to = object({
-            network_cidr         = string
-            secondary_cidrs      = optional(list(string), [])
-            ipv6_network_cidr    = optional(string)
-            ipv6_secondary_cidrs = optional(list(string), [])
-          })
-        })), [])
-        segments = optional(map(list(object({
-          network_cidr         = string
-          secondary_cidrs      = optional(list(string), [])
-          ipv6_network_cidr    = optional(string)
-          ipv6_secondary_cidrs = optional(list(string), [])
-        }))), {})
-      }))
-    }), {})
-  })
-  default = {}
+  validation {
+    condition     = var.centralized_router.inspect.equivalence.equivalent_routing_policy != null ? contains(["allow", "deny"], var.centralized_router.inspect.equivalence.equivalent_routing_policy.default) : true
+    error_message = "Equivalent routing policy default must be \"allow\" or \"deny\"."
+  }
+
+  validation {
+    condition = var.centralized_router.inspect.equivalence.equivalent_routing_policy != null ? length(
+      distinct(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
+    ) == length(flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : true
+    error_message = "A VPC cannot belong to multiple segments in equivalent_routing_policy. Each VPC (network_cidr) must appear in only one segment."
+  }
+
+  validation {
+    condition = var.centralized_router.inspect.equivalence.equivalent_routing_policy != null ? alltrue(concat(
+      [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.deny : contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.from.network_cidr)],
+      [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.deny : contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.to.network_cidr)],
+      [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.allow : contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.from.network_cidr)],
+      [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.allow : contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.to.network_cidr)],
+      flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [
+        for vpc in vpcs : contains([for v in var.centralized_router.vpcs : v.network_cidr], vpc.network_cidr)
+      ]]),
+    )) : true
+    error_message = format(
+      "Equivalent routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this router's scope.",
+      join(", ", distinct(concat(
+        [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.deny : rule.from.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.from.network_cidr)],
+        [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.deny : rule.to.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.to.network_cidr)],
+        [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.allow : rule.from.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.from.network_cidr)],
+        [for rule in var.centralized_router.inspect.equivalence.equivalent_routing_policy.allow : rule.to.network_cidr if !contains([for vpc in var.centralized_router.vpcs : vpc.network_cidr], rule.to.network_cidr)],
+        flatten([for vpcs in var.centralized_router.inspect.equivalence.equivalent_routing_policy.segments : [
+          for vpc in vpcs : vpc.network_cidr if !contains([for v in var.centralized_router.vpcs : v.network_cidr], vpc.network_cidr)
+        ]]),
+    ))))
+  }
 }
 
 variable "tags" {
