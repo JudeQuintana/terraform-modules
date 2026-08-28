@@ -1,6 +1,6 @@
 # Compiler Toolchain
 
-Debug outputs that make the compiler's decisions inspectable. Enable via the `inspect` variable on IR modules (Centralized Router, Full Mesh Trio, Super Router) to dump artifacts to JSON files.
+Inspection outputs that make the compiler's decisions inspectable. Enable via the `inspect` variable on IR modules (Centralized Router, Full Mesh Trio, Super Router) to dump artifacts to JSON files.
 
 ```hcl
 inspect = {
@@ -8,7 +8,7 @@ inspect = {
   diagnostics  = true
   provenance   = true
   policy_diff = {
-    previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+    previous_reachability = jsondecode(file("inspect-centralized-router-name-reachability.json"))
   }
   equivalence = {
     equivalent_routing_policy = { ... }
@@ -29,6 +29,8 @@ The algebra's per-pair verdict as structured data. For every VPC pair, shows whe
 }
 ```
 
+Pairs are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown.
+
 Six possible verdicts mapping directly to the precedence chain:
 - `permitted:allow` - explicit allow rule fired
 - `permitted:segment` - same-segment membership
@@ -47,14 +49,18 @@ Compiler warnings for policy states that are valid but likely unintentional.
 [
   "VPC \"monitoring\" has zero connectivity. It is unsegmented under default=\"deny\" with no allow rules.",
   "Segment \"isolated\" contains only 1 VPC. Single-member segments have no routing effect under default=\"deny\".",
-  "Deny rule { app -> db } is redundant: this pair would already be denied without it."
+  "Deny rule { app -> db } is redundant: this pair would already be denied without it.",
+  "Allow rule { app -> db } is redundant: this pair would already be permitted without it.",
+  "Policy has 1 segment under default=\"allow\". A single segment has no routing effect when there is no other segment to deny against."
 ]
 ```
 
-Three classes of warnings:
+Five classes of warnings:
 - **Zero connectivity** - a VPC with no outbound reachability (unsegmented under default="deny" with no allow rules)
 - **Single-member segment** - a segment with one VPC has no routing effect under default="deny" (algebraically equivalent to unsegmented)
 - **Redundant deny** - a deny rule on a pair that would already be denied without it (default="deny" with no allow or segment for that pair)
+- **Redundant allow** - an allow rule on a pair that would already be permitted without it (default="allow" with no cross-segment deny for that pair)
+- **Single segment no effect** - one segment under default="allow" has no routing effect (cross-segment denies require at least two segments)
 
 This is `-Wall` for network policy. The compiler tells you when your program is technically valid but probably wrong.
 
@@ -67,12 +73,18 @@ Debug symbols for emitted routes. Each route carries metadata tracing it back to
   {
     "route_table_id": "rtb-abc",
     "destination_cidr_block": "10.0.64.0/18",
-    "reason": "app -> db (permitted:segment)"
+    "from": "app",
+    "to": "db",
+    "verdict": "permitted",
+    "reason": "segment"
   },
   {
     "route_table_id": "rtb-def",
     "destination_cidr_block": "172.18.0.0/18",
-    "reason": "app -> cache (permitted:allow)"
+    "from": "app",
+    "to": "cache",
+    "verdict": "permitted",
+    "reason": "allow"
   }
 ]
 ```
@@ -141,9 +153,12 @@ Mismatches are deduplicated since rules are bidirectional. `"app:db"` implicitly
 Pass the second policy via `inspect.equivalence.equivalent_routing_policy`:
 
 ```hcl
-routing_policy = {
-  default = "allow"
-  deny    = [{ from = vpcs["app"], to = vpcs["db"] }]
+centralized_router = {
+  # ...
+  routing_policy = {
+    default = "allow"
+    deny    = [{ from = vpcs["app"], to = vpcs["db"] }]
+  }
 }
 
 inspect = {
