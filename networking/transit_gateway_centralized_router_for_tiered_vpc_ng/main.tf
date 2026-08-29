@@ -13,7 +13,7 @@
 *   Enables cross-field validation between `equivalent_routing_policy` and the in-scope VPC set.
 * - Three new validations for `equivalent_routing_policy`: default must be allow or deny,
 *   segment uniqueness with inline duplicate CIDRs, out-of-scope CIDRs with inline error.
-* - Compiler toolchain outputs (reachability, diagnostics, provenance, policy_diff, equivalence)
+* - Compiler inspection toolchain outputs (reachability, diagnostics, provenance, policy_diff, equivalence)
 *   now reference `var.centralized_router.inspect.*`.
 *
 * `v1.10.0`

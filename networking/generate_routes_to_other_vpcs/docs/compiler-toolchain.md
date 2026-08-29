@@ -1,4 +1,4 @@
-# Compiler Toolchain
+# Compiler Inspection Toolchain
 
 Inspection outputs that make the compiler's decisions inspectable. Enable via the `inspect` field nested inside each IR module's config object (`centralized_router.inspect`, `full_mesh_trio.inspect`, `super_router.inspect`) to dump artifacts to JSON files.
 

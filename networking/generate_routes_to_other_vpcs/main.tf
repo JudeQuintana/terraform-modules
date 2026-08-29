@@ -14,9 +14,9 @@
 * Success! 103 passed, 0 failed.
 * ```
 * `v1.11.0`
-* - Compiler toolchain inspection (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`) now passed
+* - Compiler inspection toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`) now passed
 *   directly in the `generate_routes_to_other_vpcs` input object from the calling IR module's `inspect` field.
-* - See [docs/compiler-toolchain.md](docs/compiler-toolchain.md) for updated inspection interface.
+* - See [docs/compiler-toolchain.md](docs/compiler-toolchain.md) for updated compiler inspection toolchain interface.
 * - See [docs/routing-policy-language.md](docs/routing-policy-language.md) for full specification.
 *
 * `v1.10.0`
