@@ -10,7 +10,7 @@ centralized_router = {
     diagnostics  = true
     provenance   = true
     policy_diff = {
-      previous_reachability = jsondecode(file("inspect-centralized-router-name-reachability.json"))
+      previous_reachability = jsondecode(file("inspect/centralized-router-name-reachability.json"))
     }
     equivalence = {
       equivalent_routing_policy = { ... }
@@ -115,7 +115,7 @@ centralized_router = {
   # ...
   inspect = {
     policy_diff = {
-      previous_reachability = jsondecode(file("inspect-myrouter-reachability.json"))
+      previous_reachability = jsondecode(file("inspect/myrouter-reachability.json"))
     }
   }
 }
