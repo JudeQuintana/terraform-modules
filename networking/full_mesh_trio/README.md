@@ -75,6 +75,7 @@ output "full_mesh_trio" {
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >=2.0 |
 
 ## Providers
 
@@ -83,7 +84,7 @@ output "full_mesh_trio" {
 | <a name="provider_aws.one"></a> [aws.one](#provider\_aws.one) | >=5.61 |
 | <a name="provider_aws.three"></a> [aws.three](#provider\_aws.three) | >=5.61 |
 | <a name="provider_aws.two"></a> [aws.two](#provider\_aws.two) | >=5.61 |
-| <a name="provider_local"></a> [local](#provider\_local) | n/a |
+| <a name="provider_local"></a> [local](#provider\_local) | >=2.0 |
 
 ## Modules
 
