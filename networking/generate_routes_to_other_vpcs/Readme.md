@@ -13,8 +13,7 @@ Run the test suites with `terraform init`, then `terraform test` in the top leve
 Success! 103 passed, 0 failed.
 ```
 `v1.11.0`
-- Compiler inspection toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`) now passed
-  directly in the `generate_routes_to_other_vpcs` input object from the calling IR module's `inspect` field.
+- Compiler inspection toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`).
 - See [docs/compiler-inspection-toolchain.md](docs/compiler-inspection-toolchain.md) for updated compiler inspection toolchain interface.
 - See [docs/routing-policy-language.md](docs/routing-policy-language.md) for full specification.
 
