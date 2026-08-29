@@ -12,33 +12,33 @@ resource "local_file" "this_reachability" {
   for_each = local.reachability
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.reachability)
-  filename = format("%s/inspect-%s-reachability.json", path.root, local.centralized_router_full_name)
+  filename = format("%s/inspect/%s-reachability.json", path.root, local.centralized_router_full_name)
 }
 
 resource "local_file" "this_diagnostics" {
   for_each = local.diagnostics
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.diagnostics)
-  filename = format("%s/inspect-%s-diagnostics.json", path.root, local.centralized_router_full_name)
+  filename = format("%s/inspect/%s-diagnostics.json", path.root, local.centralized_router_full_name)
 }
 
 resource "local_file" "this_provenance" {
   for_each = local.provenance
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.provenance)
-  filename = format("%s/inspect-%s-provenance.json", path.root, local.centralized_router_full_name)
+  filename = format("%s/inspect/%s-provenance.json", path.root, local.centralized_router_full_name)
 }
 
 resource "local_file" "this_policy_diff" {
   for_each = local.policy_diff
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.policy_diff)
-  filename = format("%s/inspect-%s-policy-diff.json", path.root, local.centralized_router_full_name)
+  filename = format("%s/inspect/%s-policy-diff.json", path.root, local.centralized_router_full_name)
 }
 
 resource "local_file" "this_equivalence" {
   for_each = local.equivalence
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.equivalence)
-  filename = format("%s/inspect-%s-equivalence.json", path.root, local.centralized_router_full_name)
+  filename = format("%s/inspect/%s-equivalence.json", path.root, local.centralized_router_full_name)
 }
