@@ -3,7 +3,20 @@ locals {
     merge([for this in local.local_tgws : this.vpcs]...),
     merge([for this in local.peer_tgws : this.vpcs]...)
   )
+}
 
+module "this_generate_routes_to_other_vpcs" {
+  source = "../generate_routes_to_other_vpcs"
+
+  generate_routes_to_other_vpcs = {
+    routing_policy            = var.super_router.routing_policy
+    vpcs                      = local.all_vpcs
+    previous_reachability     = var.super_router.inspect.policy_diff.previous_reachability
+    equivalent_routing_policy = var.super_router.inspect.equivalence.equivalent_routing_policy
+  }
+}
+
+locals {
   # ipv4 self-route exclusion sets
   # will be used to remove anything the centralized router's scope already owns, regardless of whether that scope permits or denies it.
   local_tgw_vpc_routes = toset(flatten([
@@ -46,20 +59,7 @@ locals {
         route_table_id              = pair[0]
         destination_ipv6_cidr_block = pair[1]
   }]]))
-}
 
-module "this_generate_routes_to_other_vpcs" {
-  source = "../generate_routes_to_other_vpcs"
-
-  generate_routes_to_other_vpcs = {
-    routing_policy            = var.super_router.routing_policy
-    vpcs                      = local.all_vpcs
-    previous_reachability     = var.super_router.inspect.policy_diff.previous_reachability
-    equivalent_routing_policy = var.super_router.inspect.equivalence.equivalent_routing_policy
-  }
-}
-
-locals {
   # local VPC routes to peer CIDRs (cross-region)
   local_cross_region_ipv4_routes = {
     for this in module.this_generate_routes_to_other_vpcs.ipv4 :
