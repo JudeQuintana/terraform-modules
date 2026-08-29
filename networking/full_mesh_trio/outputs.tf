@@ -1,5 +1,5 @@
 output "name" {
-  value = local.full_mesh_trio_name
+  value = var.full_mesh_trio.name
 }
 
 output "peering" {

@@ -12,60 +12,6 @@ variable "super_router" {
   description = "Super Router configuration"
   type = object({
     name = string
-    local = object({
-      amazon_side_asn = number
-      blackhole = optional(object({
-        cidrs      = optional(list(string), [])
-        ipv6_cidrs = optional(list(string), [])
-      }), {})
-      centralized_routers = optional(map(object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        name            = string
-        region          = string
-        route_table_id  = string
-        vpcs = optional(map(object({
-          id                      = string
-          name                    = string
-          full_name               = string
-          network_cidr            = string
-          secondary_cidrs         = list(string)
-          ipv6_network_cidr       = string
-          ipv6_secondary_cidrs    = list(string)
-          private_route_table_ids = list(string)
-          public_route_table_ids  = list(string)
-        })), {})
-      })), {})
-    })
-    peer = object({
-      amazon_side_asn = number
-      blackhole = optional(object({
-        cidrs      = optional(list(string), [])
-        ipv6_cidrs = optional(list(string), [])
-      }), {})
-      centralized_routers = optional(map(object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        name            = string
-        region          = string
-        route_table_id  = string
-        vpcs = optional(map(object({
-          id                      = string
-          name                    = string
-          full_name               = string
-          network_cidr            = string
-          secondary_cidrs         = list(string)
-          ipv6_network_cidr       = string
-          ipv6_secondary_cidrs    = list(string)
-          private_route_table_ids = list(string)
-          public_route_table_ids  = list(string)
-        })), {})
-      })), {})
-    })
     routing_policy = object({
       default = string
       deny = optional(list(object({
@@ -150,6 +96,60 @@ variable "super_router" {
         }))
       }), {})
     }), {})
+    local = object({
+      amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
+      }), {})
+      centralized_routers = optional(map(object({
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          full_name               = string
+          network_cidr            = string
+          secondary_cidrs         = list(string)
+          ipv6_network_cidr       = string
+          ipv6_secondary_cidrs    = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
+        })), {})
+      })), {})
+    })
+    peer = object({
+      amazon_side_asn = number
+      blackhole = optional(object({
+        cidrs      = optional(list(string), [])
+        ipv6_cidrs = optional(list(string), [])
+      }), {})
+      centralized_routers = optional(map(object({
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          full_name               = string
+          network_cidr            = string
+          secondary_cidrs         = list(string)
+          ipv6_network_cidr       = string
+          ipv6_secondary_cidrs    = list(string)
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
+        })), {})
+      })), {})
+    })
   })
 
   validation {

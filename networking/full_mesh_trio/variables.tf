@@ -6,69 +6,7 @@ variable "env_prefix" {
 variable "full_mesh_trio" {
   description = "full mesh trio configuration"
   type = object({
-    one = object({
-      centralized_router = object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        name            = string
-        region          = string
-        route_table_id  = string
-        vpcs = optional(map(object({
-          id                      = string
-          name                    = string
-          network_cidr            = string
-          secondary_cidrs         = optional(list(string), [])
-          ipv6_network_cidr       = optional(string)
-          ipv6_secondary_cidrs    = optional(list(string), [])
-          private_route_table_ids = list(string)
-          public_route_table_ids  = list(string)
-        })), {})
-      })
-    })
-    two = object({
-      centralized_router = object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        name            = string
-        region          = string
-        route_table_id  = string
-        vpcs = optional(map(object({
-          id                      = string
-          name                    = string
-          network_cidr            = string
-          secondary_cidrs         = optional(list(string), [])
-          ipv6_network_cidr       = optional(string)
-          ipv6_secondary_cidrs    = optional(list(string), [])
-          private_route_table_ids = list(string)
-          public_route_table_ids  = list(string)
-        })), {})
-      })
-    })
-    three = object({
-      centralized_router = object({
-        account_id      = string
-        amazon_side_asn = string
-        full_name       = string
-        id              = string
-        name            = string
-        region          = string
-        route_table_id  = string
-        vpcs = optional(map(object({
-          id                      = string
-          name                    = string
-          network_cidr            = string
-          secondary_cidrs         = optional(list(string), [])
-          ipv6_network_cidr       = optional(string)
-          ipv6_secondary_cidrs    = optional(list(string), [])
-          private_route_table_ids = list(string)
-          public_route_table_ids  = list(string)
-        })), {})
-      })
-    })
+    name = string
     routing_policy = object({
       default = string
       deny = optional(list(object({
@@ -153,6 +91,69 @@ variable "full_mesh_trio" {
         }))
       }), {})
     }), {})
+    one = object({
+      centralized_router = object({
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          network_cidr            = string
+          secondary_cidrs         = optional(list(string), [])
+          ipv6_network_cidr       = optional(string)
+          ipv6_secondary_cidrs    = optional(list(string), [])
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
+        })), {})
+      })
+    })
+    two = object({
+      centralized_router = object({
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          network_cidr            = string
+          secondary_cidrs         = optional(list(string), [])
+          ipv6_network_cidr       = optional(string)
+          ipv6_secondary_cidrs    = optional(list(string), [])
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
+        })), {})
+      })
+    })
+    three = object({
+      centralized_router = object({
+        account_id      = string
+        amazon_side_asn = string
+        full_name       = string
+        id              = string
+        name            = string
+        region          = string
+        route_table_id  = string
+        vpcs = optional(map(object({
+          id                      = string
+          name                    = string
+          network_cidr            = string
+          secondary_cidrs         = optional(list(string), [])
+          ipv6_network_cidr       = optional(string)
+          ipv6_secondary_cidrs    = optional(list(string), [])
+          private_route_table_ids = list(string)
+          public_route_table_ids  = list(string)
+        })), {})
+      })
+    })
   })
 
   validation {
