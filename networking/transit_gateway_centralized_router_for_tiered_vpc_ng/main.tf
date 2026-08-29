@@ -6,6 +6,16 @@
 * (deny > allow > segments > default) into per-VPC route table entries. Operates as
 * the Regional IR, the smallest policy evaluation scope.
 *
+* `v1.11.0`
+* - Breaking change: `for_each` map keys changed from `vpc_id` to `vpc_name` for better state organization.
+*   Users will need `moved` blocks to migrate existing state (a good task for AI).
+* - Breaking change: `inspect` moved from a standalone variable into `var.centralized_router.inspect`.
+*   Enables cross-field validation between `equivalent_routing_policy` and the in-scope VPC set.
+* - Three new validations for `equivalent_routing_policy`: default must be allow or deny,
+*   segment uniqueness with inline duplicate CIDRs, out-of-scope CIDRs with inline error.
+* - Compiler toolchain outputs (reachability, diagnostics, provenance, policy_diff, equivalence)
+*   now reference `var.centralized_router.inspect.*`.
+*
 * `v1.10.0`
 * - Routing policy language integration.
 * - New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
