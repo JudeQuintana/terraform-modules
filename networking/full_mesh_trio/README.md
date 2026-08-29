@@ -8,7 +8,7 @@ in a single declaration.
 
 `v1.11.0`:
 - Breaking change: `routing_policy` is now required (no default). Matches Centralized Router interface.
-- New `inspect` field nested inside `var.full_mesh_trio.inspect` for compiler inspection toolchain outputs.
+- New `inspect` field nested inside `var.full_mesh_trio.inspect` for compiler semantic toolchain outputs.
 - Three validations for `routing_policy`: default must be allow or deny, segment uniqueness
   with inline duplicate CIDRs, out-of-scope CIDRs with inline error.
 - Three validations for `equivalent_routing_policy` with cross-field validation against in-scope VPCs.

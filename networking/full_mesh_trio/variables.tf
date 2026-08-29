@@ -259,13 +259,13 @@ variable "full_mesh_trio" {
     condition = var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy != null ? length(
       distinct(flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]]))
     ) == length(flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : true
-    error_message = format(
+    error_message = var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy != null ? format(
       "Equivalent routing policy has VPCs in multiple segments: %s. Each VPC (network_cidr) must appear in only one segment.",
       join(", ", [
         for cidr in distinct(flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr]])) : cidr
         if length(flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [for vpc in vpcs : vpc.network_cidr if vpc.network_cidr == cidr]])) > 1
       ])
-    )
+    ) : "n/a"
   }
 
   validation {
@@ -278,7 +278,7 @@ variable "full_mesh_trio" {
         for vpc in vpcs : contains(concat([for v in var.full_mesh_trio.one.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.two.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.three.centralized_router.vpcs : v.network_cidr]), vpc.network_cidr)
       ]]),
     )) : true
-    error_message = format(
+    error_message = var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy != null ? format(
       "Equivalent routing policy references network_cidrs not in vpcs: %s. Allow/deny/segment rules can only reference VPCs in this router's scope.",
       join(", ", distinct(concat(
         [for rule in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.deny : rule.from.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
@@ -288,7 +288,7 @@ variable "full_mesh_trio" {
         flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [
           for vpc in vpcs : vpc.network_cidr if !contains(concat([for v in var.full_mesh_trio.one.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.two.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.three.centralized_router.vpcs : v.network_cidr]), vpc.network_cidr)
         ]]),
-    ))))
+    )))) : "n/a"
   }
 }
 
