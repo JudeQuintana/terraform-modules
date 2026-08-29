@@ -14,8 +14,8 @@
 * Success! 103 passed, 0 failed.
 * ```
 * `v1.11.0`
-* - Compiler inspection toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`).
-* - See [docs/compiler-inspection-toolchain.md](docs/compiler-inspection-toolchain.md) for updated compiler inspection toolchain interface.
+* - Compiler semantic toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`).
+* - See [docs/compiler-semantic-toolchain.md](docs/compiler-semantic-toolchain.md) for compiler semantic toolchain interface.
 * - See [docs/routing-policy-language.md](docs/routing-policy-language.md) for full specification.
 *
 * `v1.10.0`
