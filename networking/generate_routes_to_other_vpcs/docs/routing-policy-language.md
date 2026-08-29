@@ -731,7 +731,7 @@ be overridden by a child allow) but is not yet implemented.
 ## Test Coverage
 
 The routing policy integration in the `generate_routes_to_other_vpcs` function
-is validated by 96 passing tests via `terraform test`. These cover:
+is validated by 103 passing tests via `terraform test`. These cover:
 
 - Deny rules (IPv4 and IPv6): explicit pair blocking, bidirectional enforcement
 - Segments (IPv4 and IPv6): isolation between groups, same-segment permitting
