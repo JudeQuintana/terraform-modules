@@ -6,5 +6,9 @@ terraform {
       version               = ">=4.20"
       configuration_aliases = [aws.local, aws.peer]
     }
+    local = {
+      source  = "hashicorp/local"
+      version = ">=2.0"
+    }
   }
 }

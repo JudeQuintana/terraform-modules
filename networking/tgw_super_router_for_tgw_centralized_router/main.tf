@@ -7,6 +7,14 @@
 * into cross-region VPC route table entries. Operates as the Domain IR, evaluating
 * policy across an arbitrary number of Centralized Routers on each side.
 *
+* v1.11.0:
+* - Breaking change: `routing_policy` is now required (no default). Matches Centralized Router interface.
+* - New `inspect` field nested inside `var.super_router.inspect` for compiler semantic toolchain outputs.
+* - Three validations for `routing_policy`: default must be allow or deny, segment uniqueness
+*   with inline duplicate CIDRs, out-of-scope CIDRs with inline error.
+* - Three validations for `equivalent_routing_policy` with cross-field validation against in-scope VPCs.
+* - New `inspect.tf` for reachability, diagnostics, provenance, policy_diff, and equivalence outputs.
+*
 * v1.10.0:
 * - Breaking change: cross-region VPC routes now use policy compilation instead of VPC aggregate setproduct.
 * - Route resource names are consolidated and renamed.

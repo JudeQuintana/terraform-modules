@@ -5,6 +5,16 @@ route table connects all VPC attachments, then compiles an optional routing poli
 (deny > allow > segments > default) into per-VPC route table entries. Operates as
 the Regional IR, the smallest policy evaluation scope.
 
+`v1.11.0`
+- Breaking change: `for_each` map keys changed from `vpc_id` to `vpc_name` for better state organization.
+  Users will need `moved` blocks to migrate existing state (a good task for AI).
+- Breaking change: `inspect` moved from a standalone variable into `var.centralized_router.inspect`.
+  Enables cross-field validation between `equivalent_routing_policy` and the in-scope VPC set.
+- Three new validations for `equivalent_routing_policy`: default must be allow or deny,
+  segment uniqueness with inline duplicate CIDRs, out-of-scope CIDRs with inline error.
+- Compiler semantic toolchain outputs (reachability, diagnostics, provenance, policy\_diff, equivalence)
+  now reference `var.centralized_router.inspect.*`.
+
 `v1.10.0`
 - Routing policy language integration.
 - New `routing_policy` variable with four primitives and fixed precedence: deny > allow > segments > default.
@@ -121,18 +131,20 @@ Main:
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >=2.0 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >=5.61 |
+| <a name="provider_local"></a> [local](#provider\_local) | >=2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 | ---- | ------ | ------- |
-| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | git@github.com:JudeQuintana/terraform-modules.git//networking/generate_routes_to_other_vpcs | v1.10.0 |
+| <a name="module_this_generate_routes_to_other_vpcs"></a> [this\_generate\_routes\_to\_other\_vpcs](#module\_this\_generate\_routes\_to\_other\_vpcs) | ../generate_routes_to_other_vpcs | n/a |
 
 ## Resources
 
@@ -150,6 +162,11 @@ Main:
 | [aws_route.this_centralized_egress_private_vpc_route_any](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_ipv6_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_vpc_routes_to_other_vpcs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [local_file.this_diagnostics](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.this_equivalence](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.this_policy_diff](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.this_provenance](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [local_file.this_reachability](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
@@ -157,10 +174,9 @@ Main:
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      region                     = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      public_natgw_az_to_eip     = map(string)<br/>      centralized_egress_private = bool<br/>      centralized_egress_central = bool<br/>    })), {})<br/>  })</pre> | n/a | yes |
+| <a name="input_centralized_router"></a> [centralized\_router](#input\_centralized\_router) | Centralized Router configuration | <pre>object({<br/>    name             = string<br/>    amazon_side_asn  = number<br/>    propagate_routes = optional(bool, false)<br/>    blackhole = optional(object({<br/>      cidrs      = optional(list(string), [])<br/>      ipv6_cidrs = optional(list(string), [])<br/>    }), {})<br/>    vpcs = optional(map(object({<br/>      account_id                 = string<br/>      region                     = string<br/>      full_name                  = string<br/>      id                         = string<br/>      name                       = string<br/>      network_cidr               = string<br/>      secondary_cidrs            = optional(list(string), [])<br/>      ipv6_network_cidr          = optional(string)<br/>      ipv6_secondary_cidrs       = optional(list(string), [])<br/>      private_route_table_ids    = list(string)<br/>      public_route_table_ids     = list(string)<br/>      private_special_subnet_ids = list(string)<br/>      public_special_subnet_ids  = list(string)<br/>      public_natgw_az_to_eip     = map(string)<br/>      centralized_egress_private = bool<br/>      centralized_egress_central = bool<br/>    })), {})<br/>    routing_policy = object({<br/>      default = string<br/>      deny = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      allow = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      segments = optional(map(list(object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      }))), {})<br/>    })<br/>    inspect = optional(object({<br/>      reachability = optional(bool, false)<br/>      diagnostics  = optional(bool, false)<br/>      provenance   = optional(bool, false)<br/>      policy_diff = optional(object({<br/>        previous_reachability = optional(map(string))<br/>      }), {})<br/>      equivalence = optional(object({<br/>        equivalent_routing_policy = optional(object({<br/>          default = string<br/>          deny = optional(list(object({<br/>            from = object({<br/>              network_cidr         = string<br/>              secondary_cidrs      = optional(list(string), [])<br/>              ipv6_network_cidr    = optional(string)<br/>              ipv6_secondary_cidrs = optional(list(string), [])<br/>            })<br/>            to = object({<br/>              network_cidr         = string<br/>              secondary_cidrs      = optional(list(string), [])<br/>              ipv6_network_cidr    = optional(string)<br/>              ipv6_secondary_cidrs = optional(list(string), [])<br/>            })<br/>          })), [])<br/>          allow = optional(list(object({<br/>            from = object({<br/>              network_cidr         = string<br/>              secondary_cidrs      = optional(list(string), [])<br/>              ipv6_network_cidr    = optional(string)<br/>              ipv6_secondary_cidrs = optional(list(string), [])<br/>            })<br/>            to = object({<br/>              network_cidr         = string<br/>              secondary_cidrs      = optional(list(string), [])<br/>              ipv6_network_cidr    = optional(string)<br/>              ipv6_secondary_cidrs = optional(list(string), [])<br/>            })<br/>          })), [])<br/>          segments = optional(map(list(object({<br/>            network_cidr         = string<br/>            secondary_cidrs      = optional(list(string), [])<br/>            ipv6_network_cidr    = optional(string)<br/>            ipv6_secondary_cidrs = optional(list(string), [])<br/>          }))), {})<br/>        }))<br/>      }), {})<br/>    }), {})<br/>  })</pre> | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_region_az_labels"></a> [region\_az\_labels](#input\_region\_az\_labels) | Region and AZ names mapped to short naming conventions for labeling | `map(string)` | n/a | yes |
-| <a name="input_routing_policy"></a> [routing\_policy](#input\_routing\_policy) | Routing policy for intra-region VPC routes | <pre>object({<br/>    default = optional(string, "allow")<br/>    deny = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    allow = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    segments = optional(map(list(object({<br/>      network_cidr         = string<br/>      secondary_cidrs      = optional(list(string), [])<br/>      ipv6_network_cidr    = optional(string)<br/>      ipv6_secondary_cidrs = optional(list(string), [])<br/>    }))), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional Tags | `map(string)` | `{}` | no |
 
 ## Outputs

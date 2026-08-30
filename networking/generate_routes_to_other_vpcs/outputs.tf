@@ -8,3 +8,23 @@ output "ipv4" {
 output "ipv6" {
   value = local.ipv6_routes
 }
+
+output "reachability" {
+  value = local.reachability
+}
+
+output "diagnostics" {
+  value = local.diagnostics
+}
+
+output "provenance" {
+  value = local.provenance
+}
+
+output "policy_diff" {
+  value = local.policy_diff
+}
+
+output "equivalence" {
+  value = local.equivalence
+}

@@ -15,7 +15,7 @@ output "blackhole_ipv6_cidrs" {
 }
 
 output "full_name" {
-  value = local.centralized_router_name
+  value = local.centralized_router_full_name
 }
 
 output "id" {

@@ -9,88 +9,13 @@ in Centralized Router (Regional IR), Full Mesh Trio (Global IR), and Super Route
 
 Run the test suites with `terraform init`, then `terraform test` in the top level directory in the repo.
 ```
-tests/deny_policy.tftest.hcl... in progress
-  run "setup"... pass
-  run "final_deny"... pass
-  run "ipv4_deny_app_to_cicd"... pass
-  run "ipv4_with_secondary_cidrs_deny_app_to_cicd"... pass
-  run "ipv4_deny_all_pairs"... pass
-  run "ipv4_with_secondary_cidrs_deny_all_pairs"... pass
-  run "final"... pass
-  run "ipv4_empty_deny_unchanged"... pass
-  run "ipv4_default_policy_unchanged"... pass
-  run "ipv6_deny_app_to_cicd"... pass
-  run "ipv6_with_secondary_cidrs_deny_app_to_cicd"... pass
-  run "ipv6_deny_all_pairs"... pass
-  run "ipv6_empty_deny_unchanged"... pass
-  run "ipv6_default_policy_unchanged"... pass
-tests/deny_policy.tftest.hcl... tearing down
-tests/deny_policy.tftest.hcl... pass
-tests/generate_routes.tftest.hcl... in progress
-  run "setup"... pass
-  run "final"... pass
-  run "ipv4_call_with_n_greater_than_one"... pass
-  run "ipv4_call_with_n_equal_to_one"... pass
-  run "ipv4_call_with_n_equal_to_zero"... pass
-  run "ipv4_cidr_validation"... pass
-  run "ipv4_with_secondary_cidrs_call_with_n_greater_than_one"... pass
-  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_one"... pass
-  run "ipv4_with_secondary_cidrs_call_with_n_equal_to_zero"... pass
-  run "ipv6_call_with_n_greater_than_one"... pass
-  run "ipv6_call_with_n_equal_to_one"... pass
-  run "ipv6_call_with_n_equal_to_zero"... pass
-  run "ipv6_call_with_ipv6_secondary_cidrs_with_n_greater_than_zero"... pass
-  run "ipv6_with_secondary_cidrs_call_with_n_equal_to_one"... pass
-  run "ipv6_with_ipv6_secondary_cidrs_call_with_n_equal_to_zero"... pass
-tests/generate_routes.tftest.hcl... tearing down
-tests/generate_routes.tftest.hcl... pass
-tests/precedence_policy.tftest.hcl... in progress
-  run "setup"... pass
-  run "final_precedence"... pass
-  run "final_deny"... pass
-  run "final"... pass
-  run "ipv4_default_deny_no_rules"... pass
-  run "ipv4_default_deny_allow_app_cicd"... pass
-  run "ipv4_default_deny_segment_workers"... pass
-  run "ipv4_deny_beats_allow"... pass
-  run "ipv4_allow_overrides_segments"... pass
-  run "ipv4_with_secondary_cidrs_default_deny_allow_app_cicd"... pass
-  run "ipv4_with_secondary_cidrs_default_deny_segment_workers"... pass
-  run "ipv4_with_secondary_cidrs_deny_beats_allow"... pass
-  run "ipv4_with_secondary_cidrs_allow_overrides_segments"... pass
-  run "ipv4_combined_precedence"... pass
-  run "ipv4_with_secondary_cidrs_combined_precedence"... pass
-  run "ipv4_default_allow_empty_policy"... pass
-  run "ipv6_default_deny_no_rules"... pass
-  run "ipv6_default_deny_allow_app_cicd"... pass
-  run "ipv6_default_deny_segment_workers"... pass
-  run "ipv6_deny_beats_allow"... pass
-  run "ipv6_allow_overrides_segments"... pass
-  run "ipv6_combined_precedence"... pass
-  run "ipv6_default_allow_empty_policy"... pass
-tests/precedence_policy.tftest.hcl... tearing down
-tests/precedence_policy.tftest.hcl... pass
-tests/segments_policy.tftest.hcl... in progress
-  run "setup"... pass
-  run "final_segments"... pass
-  run "final"... pass
-  run "ipv4_one_segment_general_unsegmented"... pass
-  run "ipv4_two_segments_general_unsegmented"... pass
-  run "ipv4_all_separate_segments"... pass
-  run "ipv4_with_secondary_cidrs_two_segments_general_unsegmented"... pass
-  run "ipv4_with_secondary_cidrs_all_separate_segments"... pass
-  run "ipv4_empty_segments_unchanged"... pass
-  run "ipv4_vpc_in_multiple_segments"... pass
-  run "ipv6_two_segments_general_unsegmented"... pass
-  run "ipv6_all_separate_segments"... pass
-  run "ipv6_with_secondary_cidrs_two_segments_general_unsegmented"... pass
-  run "ipv6_empty_segments_unchanged"... pass
-tests/segments_policy.tftest.hcl... tearing down
-tests/segments_policy.tftest.hcl... pass
-
-Success! 66 passed, 0 failed.
- The test suite will help when refactoring is needed.
+...
+Success! 103 passed, 0 failed.
 ```
+`v1.11.0`
+- Compiler semantic toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`).
+- See [docs/compiler-semantic-toolchain.md](docs/compiler-semantic-toolchain.md) for compiler semantic toolchain interface.
+- See [docs/routing-policy-language.md](docs/routing-policy-language.md) for full specification.
 
 `v1.10.0`
 - Routing policy language integration.
@@ -174,12 +99,16 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_routing_policy"></a> [routing\_policy](#input\_routing\_policy) | routing policy constraints | <pre>object({<br/>    default = optional(string, "allow")<br/>    deny = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    allow = optional(list(object({<br/>      from = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>      to = object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      })<br/>    })), [])<br/>    segments = optional(map(list(object({<br/>      network_cidr         = string<br/>      secondary_cidrs      = optional(list(string), [])<br/>      ipv6_network_cidr    = optional(string)<br/>      ipv6_secondary_cidrs = optional(list(string), [])<br/>    }))), {})<br/>  })</pre> | `{}` | no |
-| <a name="input_vpcs"></a> [vpcs](#input\_vpcs) | map of tiered\_vpc\_ng objects | <pre>map(object({<br/>    network_cidr            = string<br/>    secondary_cidrs         = optional(list(string), [])<br/>    ipv6_network_cidr       = optional(string)<br/>    ipv6_secondary_cidrs    = optional(list(string), [])<br/>    private_route_table_ids = list(string)<br/>    public_route_table_ids  = list(string)<br/>  }))</pre> | n/a | yes |
+| <a name="input_generate_routes_to_other_vpcs"></a> [generate\_routes\_to\_other\_vpcs](#input\_generate\_routes\_to\_other\_vpcs) | Configuration for scope-agnostic route compilation: VPCs, routing policy, and optional inspect inputs. | <pre>object({<br/>    vpcs = map(object({<br/>      network_cidr            = string<br/>      secondary_cidrs         = optional(list(string), [])<br/>      ipv6_network_cidr       = optional(string)<br/>      ipv6_secondary_cidrs    = optional(list(string), [])<br/>      private_route_table_ids = list(string)<br/>      public_route_table_ids  = list(string)<br/>    }))<br/>    routing_policy = object({<br/>      default = string<br/>      deny = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      allow = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      segments = optional(map(list(object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      }))), {})<br/>    })<br/>    previous_reachability = optional(map(string))<br/>    equivalent_routing_policy = optional(object({<br/>      default = string<br/>      deny = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      allow = optional(list(object({<br/>        from = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>        to = object({<br/>          network_cidr         = string<br/>          secondary_cidrs      = optional(list(string), [])<br/>          ipv6_network_cidr    = optional(string)<br/>          ipv6_secondary_cidrs = optional(list(string), [])<br/>        })<br/>      })), [])<br/>      segments = optional(map(list(object({<br/>        network_cidr         = string<br/>        secondary_cidrs      = optional(list(string), [])<br/>        ipv6_network_cidr    = optional(string)<br/>        ipv6_secondary_cidrs = optional(list(string), [])<br/>      }))), {})<br/>    }))<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_diagnostics"></a> [diagnostics](#output\_diagnostics) | n/a |
+| <a name="output_equivalence"></a> [equivalence](#output\_equivalence) | n/a |
 | <a name="output_ipv4"></a> [ipv4](#output\_ipv4) | output routes as set of objects instead of a map it makes it easier to handle when passing to other route resource types (vpc, tgw) toset([{ route\_table\_id = "rtb-12345678", destination\_cidr\_block = "x.x.x.x/x" }, ...]) |
 | <a name="output_ipv6"></a> [ipv6](#output\_ipv6) | n/a |
+| <a name="output_policy_diff"></a> [policy\_diff](#output\_policy\_diff) | n/a |
+| <a name="output_provenance"></a> [provenance](#output\_provenance) | n/a |
+| <a name="output_reachability"></a> [reachability](#output\_reachability) | n/a |

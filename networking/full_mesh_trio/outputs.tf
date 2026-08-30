@@ -1,3 +1,7 @@
+output "name" {
+  value = var.full_mesh_trio.name
+}
+
 output "peering" {
   value = {
     one = {
