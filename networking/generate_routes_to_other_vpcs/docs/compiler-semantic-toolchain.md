@@ -133,6 +133,45 @@ The workflow:
 
 This answers "what did this policy change actually do?" at the semantic level. `terraform plan` shows route additions/removals (assembly diff). Policy diff shows reachability changes (source-level diff).
 
+## Blast Radius
+
+Operational impact of a policy change. Given the previous reachability (same input as policy diff), computes which VPCs are affected and how many routes will be added or removed.
+
+```json
+{
+  "affected_vpcs": ["app", "db"],
+  "routes_added": 12,
+  "routes_removed": 4,
+  "pairs_changed": 2,
+  "route_tables_affected": 8
+}
+```
+
+When nothing changed:
+
+```json
+{
+  "affected_vpcs": [],
+  "routes_added": 0,
+  "routes_removed": 0,
+  "pairs_changed": 0,
+  "route_tables_affected": 0
+}
+```
+
+Blast radius is automatically computed whenever `inspect.policy_diff.previous_reachability` is provided. No separate input is needed.
+
+Five metrics:
+- **affected_vpcs** - VPC names that appear in any added or removed pair
+- **routes_added** - total route table entries created by newly permitted pairs (route tables * destination CIDRs, bidirectional)
+- **routes_removed** - total route table entries destroyed by newly denied pairs
+- **pairs_changed** - count of added + removed pairs (sum of policy diff's added and removed lists)
+- **route_tables_affected** - distinct route tables across all affected VPCs
+
+Route counts account for secondary CIDRs. A VPC with 3 route tables and 2 CIDRs (primary + 1 secondary) contributes 6 routes per permitted pair direction, not 3.
+
+The diff tells you what changed semantically. Blast radius tells you how big the change is operationally. That is the difference between "app:db connectivity changed" and "this change touches 2 VPCs and 16 routes across 8 route tables." Engineers and change advisory boards care about scope, not just content.
+
 ## Assertions
 
 Postcondition checks on the compiled reachability. Declare invariants that the policy must satisfy, and the compiler verifies them against the reachability matrix at plan time.

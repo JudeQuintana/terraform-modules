@@ -32,3 +32,7 @@ output "equivalence" {
 output "assertions" {
   value = local.assertions
 }
+
+output "blast_radius" {
+  value = local.blast_radius
+}

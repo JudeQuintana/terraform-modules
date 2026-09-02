@@ -51,3 +51,10 @@ resource "local_file" "this_assertions" {
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.assertions)
   filename = format("%s/inspect/%s-assertions.json", path.root, local.centralized_router_full_name)
 }
+
+resource "local_file" "this_blast_radius" {
+  for_each = local.policy_diff
+
+  content  = jsonencode(module.this_generate_routes_to_other_vpcs.blast_radius)
+  filename = format("%s/inspect/%s-blast-radius.json", path.root, local.centralized_router_full_name)
+}
