@@ -12,6 +12,10 @@ centralized_router = {
     policy_diff = {
       previous_reachability = jsondecode(file("inspect/centralized-router-name-reachability.json"))
     }
+    assertions = {
+      must_deny   = [{ from = vpcs["prod"], to = vpcs["dev"] }]
+      must_permit = [{ from = vpcs["app"], to = vpcs["db"] }]
+    }
     equivalence = {
       equivalent_routing_policy = { ... }
     }
@@ -128,6 +132,72 @@ The workflow:
 4. The diff output shows added/removed/unchanged pairs
 
 This answers "what did this policy change actually do?" at the semantic level. `terraform plan` shows route additions/removals (assembly diff). Policy diff shows reachability changes (source-level diff).
+
+## Assertions
+
+Postcondition checks on the compiled reachability. Declare invariants that the policy must satisfy, and the compiler verifies them against the reachability matrix at plan time.
+
+```json
+{
+  "passed": true,
+  "violations": {
+    "must_deny": [],
+    "must_permit": []
+  }
+}
+```
+
+When an assertion is violated:
+
+```json
+{
+  "passed": false,
+  "violations": {
+    "must_deny": [],
+    "must_permit": [
+      {
+        "pair": "app:db",
+        "verdict": "denied:default"
+      }
+    ]
+  }
+}
+```
+
+Pass assertions via `inspect.assertions` nested inside the IR module's config object:
+
+```hcl
+centralized_router = {
+  # ...
+  inspect = {
+    assertions = {
+      must_deny = [
+        { from = vpcs["prod"], to = vpcs["dev"] },
+      ]
+      must_permit = [
+        { from = vpcs["app"], to = vpcs["db"] },
+        { from = vpcs["app"], to = vpcs["web"] },
+      ]
+    }
+  }
+}
+```
+
+Two assertion types:
+- **must_deny** - the pair must be denied. Fails if the reachability verdict is any `permitted:*` outcome.
+- **must_permit** - the pair must be permitted. Fails if the reachability verdict is any `denied:*` outcome.
+
+Assertions use the same VPC object references as allow/deny rules. Pairs are bidirectional and deduplicated, matching the reachability matrix.
+
+Assertions separate policy authorship from policy verification. The routing policy defines what connectivity should be. Assertions define what connectivity must (or must not) be, regardless of how the policy achieves it. A security team can define assertions independently of the network team's policy decisions.
+
+The assertions output also validates that assertion CIDRs reference VPCs in the router's scope, preventing stale or misconfigured assertions from passing silently.
+
+Use cases:
+- Compliance invariants: "cardholder data VPCs must never reach general workloads" (PCI DSS segmentation)
+- Security boundaries: "production must never reach development" enforced on every plan
+- Connectivity contracts: "monitoring must always reach all application VPCs" guaranteed across policy changes
+- Change safety: policy modifications are checked against standing assertions before any infrastructure is applied
 
 ## Equivalence
 

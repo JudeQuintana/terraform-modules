@@ -28,3 +28,7 @@ output "policy_diff" {
 output "equivalence" {
   value = local.equivalence
 }
+
+output "assertions" {
+  value = local.assertions
+}

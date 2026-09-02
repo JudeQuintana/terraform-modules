@@ -6,6 +6,8 @@ locals {
   policy_diff               = { for this in [local.previous_reachability] : this => this if local.previous_reachability }
   equivalent_routing_policy = var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy != null
   equivalence               = { for this in [local.equivalent_routing_policy] : this => this if local.equivalent_routing_policy }
+  has_assertions            = var.full_mesh_trio.inspect.assertions != null
+  assertions                = { for this in [local.has_assertions] : this => this if local.has_assertions }
 }
 
 resource "local_file" "this_reachability" {
@@ -41,4 +43,11 @@ resource "local_file" "this_equivalence" {
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.equivalence)
   filename = format("%s/inspect/%s-equivalence.json", path.root, local.full_mesh_trio_name)
+}
+
+resource "local_file" "this_assertions" {
+  for_each = local.assertions
+
+  content  = jsonencode(module.this_generate_routes_to_other_vpcs.assertions)
+  filename = format("%s/inspect/%s-assertions.json", path.root, local.full_mesh_trio_name)
 }

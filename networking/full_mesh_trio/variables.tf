@@ -51,6 +51,36 @@ variable "full_mesh_trio" {
       policy_diff = optional(object({
         previous_reachability = optional(map(string))
       }), {})
+      assertions = optional(object({
+        must_deny = optional(list(object({
+          from = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+          to = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+        })), [])
+        must_permit = optional(list(object({
+          from = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+          to = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+        })), [])
+      }))
       equivalence = optional(object({
         equivalent_routing_policy = optional(object({
           default = string
