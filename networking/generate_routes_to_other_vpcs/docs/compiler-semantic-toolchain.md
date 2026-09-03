@@ -11,6 +11,7 @@ centralized_router = {
     provenance     = true
     segment_report       = true
     policy_normalization = true
+    connectivity_graph   = true
     policy_diff = {
       previous_reachability = jsondecode(file("inspect/centralized-router-name-reachability.json"))
     }
@@ -391,3 +392,54 @@ Use cases:
 - Migration proof: rewriting from allow-with-denies to deny-with-allows without changing behavior
 - Simplification: proving a shorter policy is equivalent to a longer one
 - Refactoring: reorganizing segments into explicit allows (or vice versa) with proof of no regression
+
+## Connectivity Graph
+
+DOT format export of the reachability matrix for Graphviz visualization. Nodes are VPCs, edges are permitted pairs, and segment memberships are rendered as subgraph clusters.
+
+```dot
+graph connectivity {
+  graph [rankdir=LR]
+  node [shape=box, style=filled, fillcolor="#f0f0f0"]
+  edge [fontsize=10]
+
+  subgraph cluster_workers {
+    label="workers"
+    style=dashed
+    color="#95a5a6"
+    "app"
+    "cicd"
+  }
+  "general"
+
+  "app" -- "cicd" [color="#2ecc71", label="segment"]
+  "app" -- "general" [color="#3498db", label="allow"]
+}
+```
+
+Enable via `inspect.connectivity_graph = true` nested inside the IR module's config object:
+
+```hcl
+centralized_router = {
+  # ...
+  inspect = {
+    connectivity_graph = true
+  }
+}
+```
+
+The output is a `.dot` file (not JSON) written to `inspect/<router-name>-connectivity-graph.dot`. Render it with Graphviz:
+
+```sh
+dot -Tpng inspect/myrouter-connectivity-graph.dot -o connectivity.png
+dot -Tsvg inspect/myrouter-connectivity-graph.dot -o connectivity.svg
+```
+
+Edge colors encode the verdict reason:
+- **Blue (#3498db)** -- `allow` rule
+- **Green (#2ecc71)** -- `segment` membership
+- **Gray (#95a5a6)** -- `default` fallthrough
+
+Denied pairs produce no edges. A fully denied graph renders all nodes with no connections. Segment clusters appear as dashed boxes grouping their member VPCs. Unsegmented VPCs appear as standalone nodes.
+
+This is the reachability matrix rendered spatially. Engineers scan a DOT graph faster than they read a JSON matrix, especially as VPC count grows. Segment clusters make isolation boundaries visible at a glance, and edge colors distinguish why connectivity exists without reading verdict strings.

@@ -44,3 +44,7 @@ output "segment_report" {
 output "policy_normalization" {
   value = local.policy_normalization
 }
+
+output "connectivity_graph" {
+  value = local.connectivity_graph
+}

@@ -8,6 +8,7 @@ locals {
   equivalence               = { for this in [local.equivalent_routing_policy] : this => this if local.equivalent_routing_policy }
   segment_report            = { for this in [var.full_mesh_trio.inspect.segment_report] : this => this if var.full_mesh_trio.inspect.segment_report }
   policy_normalization      = { for this in [var.full_mesh_trio.inspect.policy_normalization] : this => this if var.full_mesh_trio.inspect.policy_normalization }
+  connectivity_graph        = { for this in [var.full_mesh_trio.inspect.connectivity_graph] : this => this if var.full_mesh_trio.inspect.connectivity_graph }
   has_assertions            = var.full_mesh_trio.inspect.assertions != null
   assertions                = { for this in [local.has_assertions] : this => this if local.has_assertions }
 }
@@ -73,4 +74,11 @@ resource "local_file" "this_blast_radius" {
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.blast_radius)
   filename = format("%s/inspect/%s-blast-radius.json", path.root, local.full_mesh_trio_name)
+}
+
+resource "local_file" "this_connectivity_graph" {
+  for_each = local.connectivity_graph
+
+  content  = module.this_generate_routes_to_other_vpcs.connectivity_graph
+  filename = format("%s/inspect/%s-connectivity-graph.dot", path.root, local.full_mesh_trio_name)
 }

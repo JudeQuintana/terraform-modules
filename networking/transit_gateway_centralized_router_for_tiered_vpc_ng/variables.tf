@@ -79,6 +79,7 @@ variable "centralized_router" {
       provenance      = optional(bool, false)
       segment_report       = optional(bool, false)
       policy_normalization = optional(bool, false)
+      connectivity_graph   = optional(bool, false)
       policy_diff = optional(object({
         previous_reachability = optional(map(string))
       }), {})
