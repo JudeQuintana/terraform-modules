@@ -179,9 +179,9 @@ centralized_router = {
 ```
 
 Three output fields:
-- **current_rule_count** -- total primitives in the current policy (deny rules + allow rules + segments)
-- **normalized_rule_count** -- total primitives in the normalized policy
-- **normalized_policy** -- the reconstructed minimal policy with default, segments, allow, and deny
+- **current_rule_count** - total primitives in the current policy (deny rules + allow rules + segments)
+- **normalized_rule_count** - total primitives in the normalized policy
+- **normalized_policy** - the reconstructed minimal policy with default, segments, allow, and deny
 
 The normalizer:
 1. Tries both `default="deny"` and `default="allow"`
@@ -195,6 +195,14 @@ Examples of what the normalizer detects:
 - 2 allow rules under deny -> `default="allow"` with 1 deny rule
 
 This is the inverse of compilation: reachability matrix in, minimal policy out. It gives engineers confidence their policy is not carrying dead weight and surfaces when a default switch or segment reorganization would simplify the policy.
+
+### Interpreting the output
+
+Compare `current_rule_count` to `normalized_rule_count`. If they are equal, your policy is already minimal for the reachability it produces. If the normalized count is lower, the `normalized_policy` shows a shorter form that produces identical connectivity.
+
+The normalizer may suggest a different `default` than the one you wrote. A policy with `default="deny"`, 2 segments, and 1 allow rule might normalize to `default="allow"` with 1 deny rule. Both produce the same reachability. The normalizer picks whichever form uses fewer primitives.
+
+A lower normalized count does not mean you should switch. The current policy may encode structural intent (segment names, explicit groupings) that the normalizer cannot see. The output tells you the reachability cost of that intent: "you wrote 3 rules but 1 would produce the same connectivity." Whether the extra structure is worth keeping is a judgment call.
 
 ## Policy Diff
 
@@ -437,9 +445,9 @@ dot -Tsvg inspect/myrouter-connectivity-graph.dot -o connectivity.svg
 ```
 
 Edge colors encode the verdict reason:
-- **Blue (#3498db)** -- `allow` rule
-- **Green (#2ecc71)** -- `segment` membership
-- **Gray (#95a5a6)** -- `default` fallthrough
+- **Blue (#3498db)** - `allow` rule
+- **Green (#2ecc71)** - `segment` membership
+- **Gray (#95a5a6)** - `default` fallthrough
 
 Denied pairs produce no edges. A fully denied graph renders all nodes with no connections. Segment clusters appear as dashed boxes grouping their member VPCs. Unsegmented VPCs appear as standalone nodes.
 
