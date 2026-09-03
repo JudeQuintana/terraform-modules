@@ -7,6 +7,7 @@ locals {
   equivalent_routing_policy = var.centralized_router.inspect.equivalence.equivalent_routing_policy != null
   equivalence               = { for this in [local.equivalent_routing_policy] : this => this if local.equivalent_routing_policy }
   segment_report            = { for this in [var.centralized_router.inspect.segment_report] : this => this if var.centralized_router.inspect.segment_report }
+  policy_normalization      = { for this in [var.centralized_router.inspect.policy_normalization] : this => this if var.centralized_router.inspect.policy_normalization }
   has_assertions            = var.centralized_router.inspect.assertions != null
   assertions                = { for this in [local.has_assertions] : this => this if local.has_assertions }
 }
@@ -37,6 +38,13 @@ resource "local_file" "this_segment_report" {
 
   content  = jsonencode(module.this_generate_routes_to_other_vpcs.segment_report)
   filename = format("%s/inspect/%s-segment-report.json", path.root, local.centralized_router_full_name)
+}
+
+resource "local_file" "this_policy_normalization" {
+  for_each = local.policy_normalization
+
+  content  = jsonencode(module.this_generate_routes_to_other_vpcs.policy_normalization)
+  filename = format("%s/inspect/%s-policy-normalization.json", path.root, local.centralized_router_full_name)
 }
 
 resource "local_file" "this_policy_diff" {

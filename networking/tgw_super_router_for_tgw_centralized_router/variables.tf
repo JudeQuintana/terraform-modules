@@ -53,7 +53,8 @@ variable "super_router" {
       reachability = optional(bool, false)
       diagnostics  = optional(bool, false)
       provenance      = optional(bool, false)
-      segment_report  = optional(bool, false)
+      segment_report       = optional(bool, false)
+      policy_normalization = optional(bool, false)
       policy_diff = optional(object({
         previous_reachability = optional(map(string))
       }), {})

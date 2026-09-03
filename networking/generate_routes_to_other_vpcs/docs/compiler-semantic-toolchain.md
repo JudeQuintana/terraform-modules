@@ -9,7 +9,8 @@ centralized_router = {
     reachability    = true
     diagnostics    = true
     provenance     = true
-    segment_report = true
+    segment_report       = true
+    policy_normalization = true
     policy_diff = {
       previous_reachability = jsondecode(file("inspect/centralized-router-name-reachability.json"))
     }
@@ -145,6 +146,54 @@ Three fields per VPC:
 - **denied** - VPC names this VPC is denied connectivity to
 
 The reachability matrix is pair-oriented. The segment report is VPC-oriented. Same information, different axis. Engineers think about "what can my VPC talk to?" not "what is the verdict for this pair?" This matches how they troubleshoot: "why can't app reach db?" starts from one VPC, not from the pair.
+
+## Policy Normalization
+
+Given any policy, emit the minimal equivalent policy. The normalizer walks the compiled reachability matrix and reconstructs the shortest policy that produces the same connectivity.
+
+```json
+{
+  "current_rule_count": 3,
+  "normalized_rule_count": 1,
+  "normalized_policy": {
+    "default": "deny",
+    "segments": {
+      "group_0": ["app", "cicd", "general"]
+    },
+    "allow": [],
+    "deny": []
+  }
+}
+```
+
+Enable via `inspect.policy_normalization = true` nested inside the IR module's config object:
+
+```hcl
+centralized_router = {
+  # ...
+  inspect = {
+    policy_normalization = true
+  }
+}
+```
+
+Three output fields:
+- **current_rule_count** -- total primitives in the current policy (deny rules + allow rules + segments)
+- **normalized_rule_count** -- total primitives in the normalized policy
+- **normalized_policy** -- the reconstructed minimal policy with default, segments, allow, and deny
+
+The normalizer:
+1. Tries both `default="deny"` and `default="allow"`
+2. Under `default="deny"`, detects segment candidates via reachability fingerprinting (VPCs with identical connectivity profiles are natural segment candidates)
+3. Each detected segment replaces multiple allow rules with one segment declaration
+4. Compares the total primitive count under each default and picks the shorter form
+
+Examples of what the normalizer detects:
+- 3 explicit allow rules forming a full mesh -> `default="allow"` with 0 rules
+- 2 deny rules isolating a VPC -> `default="deny"` with 1 segment
+- 2 allow rules under deny -> `default="allow"` with 1 deny rule
+
+This is the inverse of compilation: reachability matrix in, minimal policy out. It gives engineers confidence their policy is not carrying dead weight and surfaces when a default switch or segment reorganization would simplify the policy.
 
 ## Policy Diff
 

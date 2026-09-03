@@ -40,3 +40,7 @@ output "blast_radius" {
 output "segment_report" {
   value = local.segment_report
 }
+
+output "policy_normalization" {
+  value = local.policy_normalization
+}
