@@ -21,8 +21,8 @@ run "full_mesh" {
   }
 
   assert {
-    condition     = output.segment_report["app"].segment == null
-    error_message = "App should have no segment."
+    condition     = output.segment_report["app"].segment == "unsegmented"
+    error_message = "App should be unsegmented."
   }
 
   assert {
@@ -96,8 +96,8 @@ run "with_segments" {
   }
 
   assert {
-    condition     = output.segment_report["general"].segment == null
-    error_message = "General should have no segment."
+    condition     = output.segment_report["general"].segment == "unsegmented"
+    error_message = "General should be unsegmented."
   }
 
   assert {
@@ -226,8 +226,8 @@ run "multiple_segments" {
   }
 
   assert {
-    condition     = output.segment_report["general"].segment == null
-    error_message = "General should have no segment."
+    condition     = output.segment_report["general"].segment == "unsegmented"
+    error_message = "General should be unsegmented."
   }
 
   assert {
@@ -263,8 +263,8 @@ run "single_vpc" {
   }
 
   assert {
-    condition     = output.segment_report["app"].segment == null
-    error_message = "App should have no segment."
+    condition     = output.segment_report["app"].segment == "unsegmented"
+    error_message = "App should be unsegmented."
   }
 
   assert {

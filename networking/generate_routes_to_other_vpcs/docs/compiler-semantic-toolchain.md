@@ -118,12 +118,12 @@ Per-VPC view of segment membership and reachability. A pivot of the reachability
     "denied": []
   },
   "db": {
-    "segment": null,
+    "segment": "unsegmented",
     "reaches": [],
     "denied": ["app", "cicd", "general"]
   },
   "general": {
-    "segment": null,
+    "segment": "unsegmented",
     "reaches": ["app", "cicd"],
     "denied": ["db"]
   }
@@ -142,7 +142,7 @@ centralized_router = {
 ```
 
 Three fields per VPC:
-- **segment** - which segment the VPC belongs to, or `null` if unsegmented
+- **segment** - which segment the VPC belongs to, or `"unsegmented"` if not in any segment
 - **reaches** - VPC names this VPC has permitted connectivity to
 - **denied** - VPC names this VPC is denied connectivity to
 
@@ -431,6 +431,7 @@ centralized_router = {
 The output is a `.dot` file (not JSON) written to `inspect/<router-name>-connectivity-graph.dot`. Render it with Graphviz:
 
 ```sh
+brew install graphviz
 dot -Tpng inspect/myrouter-connectivity-graph.dot -o connectivity.png
 dot -Tsvg inspect/myrouter-connectivity-graph.dot -o connectivity.svg
 ```

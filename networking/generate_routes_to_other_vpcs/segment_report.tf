@@ -9,7 +9,7 @@ locals {
 
   segment_report = {
     for name, vpc in var.generate_routes_to_other_vpcs.vpcs : name => {
-      segment = lookup(local.cidr_to_segment_name, vpc.network_cidr, null)
+      segment = lookup(local.cidr_to_segment_name, vpc.network_cidr, "unsegmented")
       reaches = sort([
         for other_name in keys(var.generate_routes_to_other_vpcs.vpcs) :
         other_name
