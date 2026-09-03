@@ -6,9 +6,10 @@ Semantic outputs that make the compiler's decisions inspectable. Enable via the 
 centralized_router = {
   # ...
   inspect = {
-    reachability = true
-    diagnostics  = true
-    provenance   = true
+    reachability    = true
+    diagnostics    = true
+    provenance     = true
+    segment_report = true
     policy_diff = {
       previous_reachability = jsondecode(file("inspect/centralized-router-name-reachability.json"))
     }
@@ -97,6 +98,53 @@ Debug symbols for emitted routes. Each route carries metadata tracing it back to
 ```
 
 When you see a route in a VPC route table, provenance traces it back to which policy primitive caused it. This is the link between compiled output and source program. It answers "why does this route exist?" and "which policy rule authorized this path?"
+
+## Segment Report
+
+Per-VPC view of segment membership and reachability. A pivot of the reachability matrix from pair-oriented to VPC-oriented.
+
+```json
+{
+  "app": {
+    "segment": "workers",
+    "reaches": ["cicd", "general"],
+    "denied": []
+  },
+  "cicd": {
+    "segment": "workers",
+    "reaches": ["app", "general"],
+    "denied": []
+  },
+  "db": {
+    "segment": null,
+    "reaches": [],
+    "denied": ["app", "cicd", "general"]
+  },
+  "general": {
+    "segment": null,
+    "reaches": ["app", "cicd"],
+    "denied": ["db"]
+  }
+}
+```
+
+Enable via `inspect.segment_report = true` nested inside the IR module's config object:
+
+```hcl
+centralized_router = {
+  # ...
+  inspect = {
+    segment_report = true
+  }
+}
+```
+
+Three fields per VPC:
+- **segment** - which segment the VPC belongs to, or `null` if unsegmented
+- **reaches** - VPC names this VPC has permitted connectivity to
+- **denied** - VPC names this VPC is denied connectivity to
+
+The reachability matrix is pair-oriented. The segment report is VPC-oriented. Same information, different axis. Engineers think about "what can my VPC talk to?" not "what is the verdict for this pair?" This matches how they troubleshoot: "why can't app reach db?" starts from one VPC, not from the pair.
 
 ## Policy Diff
 

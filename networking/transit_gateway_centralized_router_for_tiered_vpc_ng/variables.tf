@@ -76,7 +76,8 @@ variable "centralized_router" {
     inspect = optional(object({
       reachability = optional(bool, false)
       diagnostics  = optional(bool, false)
-      provenance   = optional(bool, false)
+      provenance      = optional(bool, false)
+      segment_report  = optional(bool, false)
       policy_diff = optional(object({
         previous_reachability = optional(map(string))
       }), {})

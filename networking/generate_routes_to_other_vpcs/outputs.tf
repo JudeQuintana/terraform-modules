@@ -36,3 +36,7 @@ output "assertions" {
 output "blast_radius" {
   value = local.blast_radius
 }
+
+output "segment_report" {
+  value = local.segment_report
+}
