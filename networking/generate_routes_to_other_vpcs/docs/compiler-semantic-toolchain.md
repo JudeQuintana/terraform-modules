@@ -2,6 +2,19 @@
 
 Semantic outputs that make the compiler's decisions inspectable. Enable via the `inspect` field nested inside each IR module's config object (`centralized_router.inspect`, `full_mesh_trio.inspect`, `super_router.inspect`) to dump artifacts to JSON files.
 
+| Compiler concept | Toolchain output |
+|---|---|
+| IR dump (`-emit-llvm`) | Reachability matrix |
+| Warnings (`-Wall`) | Diagnostics |
+| Debug symbols / source maps | Provenance |
+| Symbol table (per-entity view) | Segment report |
+| Optimizer / decompiler | Policy normalization |
+| Incremental compilation | Policy diff |
+| Impact analysis (what rebuilds) | Blast radius |
+| Static analysis / postconditions | Assertions |
+| Translation validation | Equivalence |
+| CFG export / visualization | Connectivity graph |
+
 ```hcl
 centralized_router = {
   # ...
@@ -28,7 +41,7 @@ centralized_router = {
 
 ## Reachability Matrix
 
-The algebra's per-pair verdict as structured data. For every VPC pair, shows whether connectivity is permitted or denied and which precedence level determined the outcome.
+IR dump. The algebra's per-pair verdict as structured data. For every VPC pair, shows whether connectivity is permitted or denied and which precedence level determined the outcome.
 
 ```json
 {
@@ -49,7 +62,7 @@ Six possible verdicts mapping directly to the precedence chain:
 - `denied:cross-segment` - different segments under default="allow"
 - `denied:default` - default="deny" fallthrough
 
-This is the compiled intermediate representation made inspectable. It separates "what the policy decided" from "what routes were emitted" and makes the algebra's output auditable without understanding route tables.
+Separates "what the policy decided" from "what routes were emitted," making the algebra's output auditable without understanding route tables. All other toolchain outputs read from or operate on this matrix.
 
 ## Diagnostics
 
@@ -99,11 +112,11 @@ Debug symbols for emitted routes. Each route carries metadata tracing it back to
 ]
 ```
 
-When you see a route in a VPC route table, provenance traces it back to which policy primitive caused it. This is the link between compiled output and source program. It answers "why does this route exist?" and "which policy rule authorized this path?"
+When you see a route in a VPC route table, provenance answers "why does this route exist?" by tracing it back to which policy primitive authorized it.
 
 ## Segment Report
 
-Per-VPC view of segment membership and reachability. A pivot of the reachability matrix from pair-oriented to VPC-oriented.
+Symbol table dump. Per-VPC view of segment membership and reachability. A pivot of the reachability matrix from pair-oriented to VPC-oriented.
 
 ```json
 {
@@ -146,11 +159,11 @@ Three fields per VPC:
 - **reaches** - VPC names this VPC has permitted connectivity to
 - **denied** - VPC names this VPC is denied connectivity to
 
-The reachability matrix is pair-oriented. The segment report is VPC-oriented. Same information, different axis. Engineers think about "what can my VPC talk to?" not "what is the verdict for this pair?" This matches how they troubleshoot: "why can't app reach db?" starts from one VPC, not from the pair.
+The reachability matrix is pair-oriented. The segment report is VPC-oriented. Same information, different axis. Engineers troubleshoot from one VPC ("what can app talk to?"), not from a pair.
 
 ## Policy Normalization
 
-Given any policy, emit the minimal equivalent policy. The normalizer walks the compiled reachability matrix and reconstructs the shortest policy that produces the same connectivity.
+Optimizer and decompiler. Given any policy, emit the minimal equivalent policy. The normalizer walks the compiled reachability matrix and reconstructs the shortest policy that produces the same connectivity.
 
 ```json
 {
@@ -194,7 +207,7 @@ Examples of what the normalizer detects:
 - 2 deny rules isolating a VPC -> `default="deny"` with 1 segment
 - 2 allow rules under deny -> `default="allow"` with 1 deny rule
 
-This is the inverse of compilation: reachability matrix in, minimal policy out. It gives engineers confidence their policy is not carrying dead weight and surfaces when a default switch or segment reorganization would simplify the policy.
+Surfaces when a default switch or segment reorganization would simplify the policy. It gives engineers confidence their policy is not carrying dead weight.
 
 ### Interpreting the output
 
@@ -206,7 +219,7 @@ A lower normalized count does not mean you should switch. The current policy may
 
 ## Policy Diff
 
-Incremental compilation preview. Given the previous reachability matrix (from a prior run), computes what changed in connectivity at the semantic level.
+Incremental compilation. Given the previous reachability matrix (from a prior run), computes what changed in connectivity at the semantic level.
 
 ```json
 {
@@ -216,7 +229,7 @@ Incremental compilation preview. Given the previous reachability matrix (from a 
 }
 ```
 
-Pairs are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown, no redundant mirror entries.
+Pairs follow the same deduplication as the reachability matrix.
 
 Pass the previous reachability via `inspect.policy_diff.previous_reachability` nested inside the IR module's config object:
 
@@ -241,7 +254,7 @@ This answers "what did this policy change actually do?" at the semantic level. `
 
 ## Blast Radius
 
-Operational impact of a policy change. Given the previous reachability (same input as policy diff), computes which VPCs are affected and how many routes will be added or removed.
+Impact analysis. Operational impact of a policy change. Given the previous reachability (same input as policy diff), computes which VPCs are affected and how many routes will be added or removed.
 
 ```json
 {
@@ -280,7 +293,7 @@ The diff tells you what changed semantically. Blast radius tells you how big the
 
 ## Assertions
 
-Postcondition checks on the compiled reachability. Declare invariants that the policy must satisfy, and the compiler verifies them against the reachability matrix at plan time.
+Static analysis. Postcondition checks on the compiled reachability. Declare invariants that the policy must satisfy, and the compiler verifies them against the reachability matrix at plan time.
 
 ```json
 {
@@ -332,7 +345,7 @@ Two assertion types:
 - **must_deny** - the pair must be denied. Fails if the reachability verdict is any `permitted:*` outcome.
 - **must_permit** - the pair must be permitted. Fails if the reachability verdict is any `denied:*` outcome.
 
-Assertions use the same VPC object references as allow/deny rules. Pairs are bidirectional and deduplicated, matching the reachability matrix.
+Assertions use the same VPC object references as allow/deny rules, with the same pair deduplication as the reachability matrix.
 
 Assertions separate policy authorship from policy verification. The routing policy defines what connectivity should be. Assertions define what connectivity must (or must not) be, regardless of how the policy achieves it. A security team can define assertions independently of the network team's policy decisions.
 
@@ -346,7 +359,7 @@ Use cases:
 
 ## Equivalence
 
-Proves that two different policy declarations produce identical reachability. This is the network policy equivalent of "these two programs compute the same function."
+Translation validation. Proves that two different policy declarations produce identical reachability. This is the network policy equivalent of "these two programs compute the same function."
 
 ```json
 {
@@ -369,7 +382,7 @@ When policies differ:
 }
 ```
 
-Mismatches are deduplicated since rules are bidirectional. `"app:db"` implicitly covers `"db:app"`. Only the lexicographically-first key is shown.
+Mismatches follow the same deduplication as the reachability matrix.
 
 Pass the second policy via `inspect.equivalence.equivalent_routing_policy` nested inside the IR module's config object:
 
@@ -403,7 +416,7 @@ Use cases:
 
 ## Connectivity Graph
 
-DOT format export of the reachability matrix for Graphviz visualization. Nodes are VPCs, edges are permitted pairs, and segment memberships are rendered as subgraph clusters.
+CFG export. DOT format rendering of the reachability matrix for Graphviz visualization. Nodes are VPCs, edges are permitted pairs, and segment memberships are rendered as subgraph clusters.
 
 ```dot
 graph connectivity {
