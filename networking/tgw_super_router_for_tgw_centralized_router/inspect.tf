@@ -76,7 +76,8 @@ resource "local_file" "this_blast_radius" {
   filename = format("%s/inspect/%s-blast-radius.json", path.root, local.super_router_name)
 }
 
-resource "local_file" "this_connectivity_graph" {
+# local_sensitive_file suppresses multi-line DOT content from plan/apply output, not because it is sensitive
+resource "local_sensitive_file" "this_connectivity_graph" {
   for_each = local.connectivity_graph
 
   content  = module.this_generate_routes_to_other_vpcs.connectivity_graph
