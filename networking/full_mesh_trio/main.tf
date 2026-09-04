@@ -7,6 +7,13 @@
 * table entries. Operates as the Global IR, evaluating policy across all regions
 * in a single declaration.
 *
+* `v1.12.0`:
+* - Five new inspect toggles: `assertions`, `blast_radius`, `segment_report`, `policy_normalization`, `connectivity_graph`.
+* - Boolean-gated outputs for `segment_report`, `policy_normalization`, and `connectivity_graph`.
+* - Input-gated outputs for `assertions` (object with `must_deny`/`must_permit`) and `blast_radius` (derived from `policy_diff`).
+* - Connectivity graph writes a `.dot` file (raw DOT, not JSON).
+* - Uses `generate_routes_to_other_vpcs` v1.12.0.
+*
 * `v1.11.0`:
 * - Breaking change: `routing_policy` is now required (no default). Matches Centralized Router interface.
 * - New `inspect` field nested inside `var.full_mesh_trio.inspect` for compiler semantic toolchain outputs.

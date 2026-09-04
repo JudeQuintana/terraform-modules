@@ -13,6 +13,16 @@
 * ...
 * Success! 103 passed, 0 failed.
 * ```
+* `v1.12.0`
+* - Five new compiler semantic toolchain outputs: `assertions`, `blast_radius`, `segment_report`, `policy_normalization`, `connectivity_graph`.
+* - Assertions: postcondition checks (`must_deny`, `must_permit`) verified against the reachability matrix at plan time, with out-of-scope CIDR validation.
+* - Blast radius: operational impact of a policy change (affected VPCs, route counts, route tables touched). Automatically computed when `previous_reachability` is provided.
+* - Segment report: per-VPC view of segment membership, reachability, and denied peers. Uses `"unsegmented"` for VPCs not in any segment.
+* - Policy normalization: inverse compilation via reachability fingerprinting. Reconstructs the minimal equivalent policy by trying both defaults and detecting segment candidates.
+* - Connectivity graph: DOT format export of the reachability matrix with colored edges (allow, segment, default) and segment subgraph clusters.
+* - 40 new tests (9 assertions, 8 blast radius, 8 segment report, 8 policy normalization, 7 connectivity graph). 143 total tests.
+* - See [docs/compiler-semantic-toolchain.md](docs/compiler-semantic-toolchain.md) for compiler semantic toolchain interface.
+*
 * `v1.11.0`
 * - Compiler semantic toolchain (`reachability`, `diagnostics`, `provenance`, `policy_diff`, `equivalence`).
 * - See [docs/compiler-semantic-toolchain.md](docs/compiler-semantic-toolchain.md) for compiler semantic toolchain interface.
