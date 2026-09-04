@@ -2,19 +2,6 @@
 
 Semantic outputs that make the compiler's decisions inspectable. Enable via the `inspect` field nested inside each IR module's config object (`centralized_router.inspect`, `full_mesh_trio.inspect`, `super_router.inspect`) to dump artifacts to JSON files.
 
-| Compiler concept | Toolchain output |
-|---|---|
-| IR dump (`-emit-llvm`) | Reachability matrix |
-| Warnings (`-Wall`) | Diagnostics |
-| Debug symbols / source maps | Provenance |
-| Symbol table (per-entity view) | Segment report |
-| Optimizer / decompiler | Policy normalization |
-| Incremental compilation | Policy diff |
-| Impact analysis (what rebuilds) | Blast radius |
-| Static analysis / postconditions | Assertions |
-| Translation validation | Equivalence |
-| CFG export / visualization | Connectivity graph |
-
 ```hcl
 centralized_router = {
   # ...
@@ -41,7 +28,7 @@ centralized_router = {
 
 ## Reachability Matrix
 
-IR dump. The algebra's per-pair verdict as structured data. For every VPC pair, shows whether connectivity is permitted or denied and which precedence level determined the outcome.
+The algebra's per-pair verdict as structured data. For every VPC pair, shows whether connectivity is permitted or denied and which precedence level determined the outcome.
 
 ```json
 {
