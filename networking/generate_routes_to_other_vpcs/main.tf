@@ -11,7 +11,7 @@
 * Run the test suites with `terraform init`, then `terraform test` in the top level directory in the repo.
 * ```
 * ...
-* Success! 103 passed, 0 failed.
+* Success! 143 passed, 0 failed.
 * ```
 * `v1.12.0`
 * - Five new compiler semantic toolchain outputs: `assertions`, `blast_radius`, `segment_report`, `policy_normalization`, `connectivity_graph`.
