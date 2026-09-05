@@ -28,3 +28,23 @@ output "policy_diff" {
 output "equivalence" {
   value = local.equivalence
 }
+
+output "assertions" {
+  value = local.assertions
+}
+
+output "blast_radius" {
+  value = local.blast_radius
+}
+
+output "segment_report" {
+  value = local.segment_report
+}
+
+output "policy_normalization" {
+  value = local.policy_normalization
+}
+
+output "connectivity_graph" {
+  value = local.connectivity_graph
+}

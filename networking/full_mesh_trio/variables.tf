@@ -47,10 +47,43 @@ variable "full_mesh_trio" {
     inspect = optional(object({
       reachability = optional(bool, false)
       diagnostics  = optional(bool, false)
-      provenance   = optional(bool, false)
+      provenance      = optional(bool, false)
+      segment_report       = optional(bool, false)
+      policy_normalization = optional(bool, false)
+      connectivity_graph   = optional(bool, false)
       policy_diff = optional(object({
         previous_reachability = optional(map(string))
       }), {})
+      assertions = optional(object({
+        must_deny = optional(list(object({
+          from = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+          to = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+        })), [])
+        must_permit = optional(list(object({
+          from = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+          to = object({
+            network_cidr         = string
+            secondary_cidrs      = optional(list(string), [])
+            ipv6_network_cidr    = optional(string)
+            ipv6_secondary_cidrs = optional(list(string), [])
+          })
+        })), [])
+      }))
       equivalence = optional(object({
         equivalent_routing_policy = optional(object({
           default = string
@@ -289,6 +322,23 @@ variable "full_mesh_trio" {
         flatten([for vpcs in var.full_mesh_trio.inspect.equivalence.equivalent_routing_policy.segments : [
           for vpc in vpcs : vpc.network_cidr if !contains(concat([for v in var.full_mesh_trio.one.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.two.centralized_router.vpcs : v.network_cidr], [for v in var.full_mesh_trio.three.centralized_router.vpcs : v.network_cidr]), vpc.network_cidr)
         ]]),
+    )))) : "n/a"
+  }
+
+  validation {
+    condition = var.full_mesh_trio.inspect.assertions != null ? alltrue(concat(
+      [for rule in var.full_mesh_trio.inspect.assertions.must_deny : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+      [for rule in var.full_mesh_trio.inspect.assertions.must_deny : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+      [for rule in var.full_mesh_trio.inspect.assertions.must_permit : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+      [for rule in var.full_mesh_trio.inspect.assertions.must_permit : contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+    )) : true
+    error_message = var.full_mesh_trio.inspect.assertions != null ? format(
+      "Assertions reference network_cidrs not in vpcs: %s. Assertions can only reference VPCs in this IR's scope.",
+      join(", ", distinct(concat(
+        [for rule in var.full_mesh_trio.inspect.assertions.must_deny : rule.from.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+        [for rule in var.full_mesh_trio.inspect.assertions.must_deny : rule.to.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
+        [for rule in var.full_mesh_trio.inspect.assertions.must_permit : rule.from.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.from.network_cidr)],
+        [for rule in var.full_mesh_trio.inspect.assertions.must_permit : rule.to.network_cidr if !contains(concat([for vpc in var.full_mesh_trio.one.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.two.centralized_router.vpcs : vpc.network_cidr], [for vpc in var.full_mesh_trio.three.centralized_router.vpcs : vpc.network_cidr]), rule.to.network_cidr)],
     )))) : "n/a"
   }
 }
