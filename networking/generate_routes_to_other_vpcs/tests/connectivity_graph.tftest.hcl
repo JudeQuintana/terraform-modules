@@ -197,6 +197,68 @@ run "mixed_edge_types" {
   }
 }
 
+# explicit deny: dashed red edge for denied:deny pairs
+run "with_explicit_deny_edge" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "allow"
+        deny = [
+          { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "172.16.0.0/20" } }
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "\"app\" -- \"cicd\"")
+    error_message = "Should have app-cicd deny edge."
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "style=dashed")
+    error_message = "Deny edge should be dashed."
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "color=\"#e74c3c\"")
+    error_message = "Deny edge should be red."
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "label=\"deny\"")
+    error_message = "Deny edge should have deny label."
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "\"app\" -- \"general\"")
+    error_message = "Should still have app-general permitted edge."
+  }
+
+  assert {
+    condition     = strcontains(output.connectivity_graph, "\"cicd\" -- \"general\"")
+    error_message = "Should still have cicd-general permitted edge."
+  }
+}
+
+# default deny produces no edges (denied:default, not denied:deny)
+run "default_deny_no_deny_edges" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+      }
+    }
+  }
+
+  assert {
+    condition     = !strcontains(output.connectivity_graph, " -- ")
+    error_message = "Default deny should produce no edges (denied:default pairs are invisible)."
+  }
+}
+
 # single VPC: one node, no edges
 run "single_vpc" {
   variables {

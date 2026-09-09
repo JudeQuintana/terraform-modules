@@ -23,7 +23,7 @@ locals {
     if lookup(local.cidr_to_segment_name, vpc.network_cidr, null) == null
   ]
 
-  connectivity_graph_edges = [
+  connectivity_graph_permitted_edges = [
     for pair, verdict in local.reachability :
     format("  \"%s\" -- \"%s\" [color=\"%s\", label=\"%s\"]",
       element(split(":", pair), 0),
@@ -32,6 +32,15 @@ locals {
       element(split(":", verdict), 1)
     )
     if startswith(verdict, "permitted")
+  ]
+
+  connectivity_graph_deny_edges = [
+    for pair, verdict in local.reachability :
+    format("  \"%s\" -- \"%s\" [color=\"#e74c3c\", style=dashed, label=\"deny\"]",
+      element(split(":", pair), 0),
+      element(split(":", pair), 1)
+    )
+    if verdict == "denied:deny"
   ]
 
   connectivity_graph = join("\n", concat(
@@ -43,7 +52,8 @@ locals {
     local.connectivity_graph_segment_subgraphs,
     local.connectivity_graph_unsegmented_nodes,
     [""],
-    local.connectivity_graph_edges,
+    local.connectivity_graph_permitted_edges,
+    local.connectivity_graph_deny_edges,
     ["}"],
     [""]
   ))

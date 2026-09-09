@@ -449,11 +449,12 @@ dot -Tpng inspect/myrouter-connectivity-graph.dot -o connectivity.png
 dot -Tsvg inspect/myrouter-connectivity-graph.dot -o connectivity.svg
 ```
 
-Edge colors encode the verdict reason:
-- **Blue (#3498db)** - `allow` rule
-- **Green (#2ecc71)** - `segment` membership
-- **Gray (#95a5a6)** - `default` fallthrough
+Edge colors and styles encode the verdict reason:
+- **Blue (#3498db)** solid - `allow` rule
+- **Green (#2ecc71)** solid - `segment` membership
+- **Gray (#95a5a6)** solid - `default` fallthrough
+- **Red (#e74c3c)** dashed - explicit `deny` rule
 
-Denied pairs produce no edges. A fully denied graph renders all nodes with no connections. Segment clusters appear as dashed boxes grouping their member VPCs. Unsegmented VPCs appear as standalone nodes.
+Default-denied pairs (denied by fallthrough, not by an explicit deny rule) produce no edges. A `default="deny"` graph with no explicit deny rules shows only permitted edges. This is intentional: drawing V^2 default-denied non-edges would be noise. Explicit deny rules appear as dashed red edges because they represent intentional policy boundaries — the constraints an auditor looks for. Segment clusters appear as dashed boxes grouping their member VPCs. Unsegmented VPCs appear as standalone nodes.
 
-This is the reachability matrix rendered spatially. Engineers scan a DOT graph faster than they read a JSON matrix, especially as VPC count grows. Segment clusters make isolation boundaries visible at a glance, and edge colors distinguish why connectivity exists without reading verdict strings.
+This is the reachability matrix rendered spatially. Engineers scan a DOT graph faster than they read a JSON matrix, especially as VPC count grows. Segment clusters make isolation boundaries visible at a glance, edge colors distinguish why connectivity exists, and dashed red edges highlight where the policy author deliberately blocked traffic.
