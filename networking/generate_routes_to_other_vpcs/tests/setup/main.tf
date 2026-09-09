@@ -35,6 +35,61 @@ output "ipv4_tiered_vpcs" {
   }
 }
 
+output "ipv4_five_tiered_vpcs" {
+  value = {
+    app = {
+      network_cidr = "10.0.0.0/20"
+      private_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00001",
+        "rtb-0a1b2c3d4e5f00002"
+      ]
+      public_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00003",
+      ]
+    }
+    api = {
+      network_cidr = "10.16.0.0/20"
+      private_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00004",
+        "rtb-0a1b2c3d4e5f00005"
+      ]
+      public_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00006",
+      ]
+    }
+    db = {
+      network_cidr = "10.32.0.0/20"
+      private_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00007",
+        "rtb-0a1b2c3d4e5f00008"
+      ]
+      public_route_table_ids = [
+        "rtb-0a1b2c3d4e5f00009",
+      ]
+    }
+    cache = {
+      network_cidr = "10.48.0.0/20"
+      private_route_table_ids = [
+        "rtb-0a1b2c3d4e5f0000a",
+        "rtb-0a1b2c3d4e5f0000b"
+      ]
+      public_route_table_ids = [
+        "rtb-0a1b2c3d4e5f0000c",
+      ]
+    }
+    monitor = {
+      network_cidr = "10.64.0.0/20"
+      private_route_table_ids = [
+        "rtb-0a1b2c3d4e5f0000d",
+        "rtb-0a1b2c3d4e5f0000e"
+      ]
+      public_route_table_ids = [
+        "rtb-0a1b2c3d4e5f0000f",
+      ]
+    }
+  }
+}
+
 output "ipv4_one_tiered_vpc" {
   value = {
     app = {

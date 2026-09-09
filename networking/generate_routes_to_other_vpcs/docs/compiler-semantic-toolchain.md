@@ -150,7 +150,7 @@ The reachability matrix is pair-oriented. The segment report is VPC-oriented. Sa
 
 ## Policy Normalization
 
-Optimizer and decompiler. Given any policy, emit the minimal equivalent policy. The normalizer walks the compiled reachability matrix and reconstructs the shortest policy that produces the same connectivity.
+Sound simplifier. Given any policy, attempt to find a shorter equivalent policy. The normalizer walks the compiled reachability matrix and reconstructs a policy that produces the same connectivity using fewer primitives when it can. The algorithm is sound (whatever it emits is equivalent) but not a complete minimizer: it uses reachability fingerprinting to detect segments, which is polynomial but may miss segments whose members differ in external connectivity. If the normalizer cannot improve on the current policy, it reports the current rule count unchanged.
 
 ```json
 {
@@ -180,14 +180,15 @@ centralized_router = {
 
 Three output fields:
 - **current_rule_count** - total primitives in the current policy (deny rules + allow rules + segments)
-- **normalized_rule_count** - total primitives in the normalized policy
-- **normalized_policy** - the reconstructed minimal policy with default, segments, allow, and deny
+- **normalized_rule_count** - total primitives in the normalizer's suggestion, clamped to never exceed `current_rule_count`
+- **normalized_policy** - a reconstructed equivalent policy with default, segments, allow, and deny
 
 The normalizer:
 1. Tries both `default="deny"` and `default="allow"`
 2. Under `default="deny"`, detects segment candidates via reachability fingerprinting (VPCs with identical connectivity profiles are natural segment candidates)
 3. Each detected segment replaces multiple allow rules with one segment declaration
 4. Compares the total primitive count under each default and picks the shorter form
+5. Clamps the result: if the normalizer's best candidate isn't shorter than the current policy, reports the current rule count (the normalizer's heuristic can miss optimal forms that use segments with externally-differing members)
 
 Examples of what the normalizer detects:
 - 3 explicit allow rules forming a full mesh -> `default="allow"` with 0 rules
@@ -198,11 +199,15 @@ Surfaces when a default switch or segment reorganization would simplify the poli
 
 ### Interpreting the output
 
-Compare `current_rule_count` to `normalized_rule_count`. If they are equal, your policy is already minimal for the reachability it produces. If the normalized count is lower, the `normalized_policy` shows a shorter form that produces identical connectivity.
+Compare `current_rule_count` to `normalized_rule_count`. If they are equal, the normalizer cannot find a shorter equivalent form — your policy is at or below the normalizer's detection limit. If the normalized count is lower, the `normalized_policy` shows a shorter form that produces identical connectivity.
 
 The normalizer may suggest a different `default` than the one you wrote. A policy with `default="deny"`, 2 segments, and 1 allow rule might normalize to `default="allow"` with 1 deny rule. Both produce the same reachability. The normalizer picks whichever form uses fewer primitives.
 
 A lower normalized count does not mean you should switch. The current policy may encode structural intent (segment names, explicit groupings) that the normalizer cannot see. The output tells you the reachability cost of that intent: "you wrote 3 rules but 1 would produce the same connectivity." Whether the extra structure is worth keeping is a judgment call.
+
+### Limitations
+
+The normalizer uses reachability fingerprinting: VPCs with identical connectivity profiles are grouped as segment candidates. This is polynomial (avoids the NP-hard minimum clique cover problem) but incomplete. It cannot detect segments whose members have different external connectivity. For example, a segment `{A, B, C}` with an additional `allow {A, D}` gives A a different fingerprint than B and C. The normalizer finds only `{B, C}` as a segment candidate, missing the full `{A, B, C}` group. The `normalized_rule_count` is clamped to never exceed `current_rule_count` so that an already-optimal policy is never reported as improvable.
 
 ## Policy Diff
 

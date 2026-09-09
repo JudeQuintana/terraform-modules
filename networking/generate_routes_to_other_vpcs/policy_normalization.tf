@@ -71,10 +71,18 @@ locals {
     ? "deny" : "allow"
   )
 
-  normalization_normalized_rule_count = (
+  # The normalizer's best candidate cost before comparing against the current policy.
+  # Fingerprinting is sound but incomplete: it may miss segments whose members
+  # differ externally, so this can exceed the current policy's rule count.
+  normalization_raw_normalized_cost = (
     local.normalization_suggested_default == "deny"
     ? local.normalization_deny_default_cost
     : local.normalization_allow_default_cost
+  )
+
+  normalization_normalized_rule_count = min(
+    local.normalization_raw_normalized_cost,
+    local.normalization_current_rule_count
   )
 
   normalization_allow_rules = [
@@ -91,6 +99,31 @@ locals {
     }
   ]
 
+  # Round-trip: evaluate the normalized policy through the precedence algebra
+  # and verify it produces the same reachability as the original.
+  normalization_rt_deny_pair_set = toset([
+    for r in local.normalization_deny_rules : join(":", sort([r.from, r.to]))
+  ])
+
+  normalization_rt_allow_pair_set = toset([
+    for r in local.normalization_allow_rules : join(":", sort([r.from, r.to]))
+  ])
+
+  normalization_rt_reachability = {
+    for pair_key, _ in local.reachability : pair_key => (
+      local.normalization_suggested_default == "allow"
+      ? !contains(local.normalization_rt_deny_pair_set, pair_key)
+      : contains(local.normalization_rt_allow_pair_set, pair_key) || contains(local.normalization_segment_covered_pairs, pair_key)
+    )
+  }
+
+  normalization_rt_mismatches = {
+    for pair_key, verdict in local.reachability : pair_key => {
+      original   = verdict
+      normalized = local.normalization_rt_reachability[pair_key] ? "permitted" : "denied"
+    } if startswith(verdict, "permitted") != local.normalization_rt_reachability[pair_key]
+  }
+
   policy_normalization = {
     current_rule_count    = local.normalization_current_rule_count
     normalized_rule_count = local.normalization_normalized_rule_count
@@ -99,6 +132,10 @@ locals {
       segments = local.normalization_suggested_default == "deny" ? local.normalization_named_segments : {}
       allow    = local.normalization_suggested_default == "deny" ? local.normalization_allow_rules : []
       deny     = local.normalization_suggested_default == "allow" ? local.normalization_deny_rules : []
+    }
+    roundtrip = {
+      consistent = length(local.normalization_rt_mismatches) == 0
+      mismatches = local.normalization_rt_mismatches
     }
   }
 }
