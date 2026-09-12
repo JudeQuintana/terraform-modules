@@ -29,14 +29,17 @@ run "full_mesh_to_deny_all" {
       routing_policy = {
         default = "deny"
       }
-      previous_reachability = [
-        { from = "app", to = "cicd", verdict = "permitted", reason = "default" },
-        { from = "app", to = "general", verdict = "permitted", reason = "default" },
-        { from = "cicd", to = "app", verdict = "permitted", reason = "default" },
-        { from = "cicd", to = "general", verdict = "permitted", reason = "default" },
-        { from = "general", to = "app", verdict = "permitted", reason = "default" },
-        { from = "general", to = "cicd", verdict = "permitted", reason = "default" },
-      ]
+      previous_reachability = {
+        schema_version = 1
+        entries = [
+          { from = "app", to = "cicd", verdict = "permitted", reason = "default" },
+          { from = "app", to = "general", verdict = "permitted", reason = "default" },
+          { from = "cicd", to = "app", verdict = "permitted", reason = "default" },
+          { from = "cicd", to = "general", verdict = "permitted", reason = "default" },
+          { from = "general", to = "app", verdict = "permitted", reason = "default" },
+          { from = "general", to = "cicd", verdict = "permitted", reason = "default" },
+        ]
+      }
     }
   }
 
@@ -59,14 +62,17 @@ run "deny_all_to_full_mesh" {
       routing_policy = {
         default = "allow"
       }
-      previous_reachability = [
-        { from = "app", to = "cicd", verdict = "denied", reason = "default" },
-        { from = "app", to = "general", verdict = "denied", reason = "default" },
-        { from = "cicd", to = "app", verdict = "denied", reason = "default" },
-        { from = "cicd", to = "general", verdict = "denied", reason = "default" },
-        { from = "general", to = "app", verdict = "denied", reason = "default" },
-        { from = "general", to = "cicd", verdict = "denied", reason = "default" },
-      ]
+      previous_reachability = {
+        schema_version = 1
+        entries = [
+          { from = "app", to = "cicd", verdict = "denied", reason = "default" },
+          { from = "app", to = "general", verdict = "denied", reason = "default" },
+          { from = "cicd", to = "app", verdict = "denied", reason = "default" },
+          { from = "cicd", to = "general", verdict = "denied", reason = "default" },
+          { from = "general", to = "app", verdict = "denied", reason = "default" },
+          { from = "general", to = "cicd", verdict = "denied", reason = "default" },
+        ]
+      }
     }
   }
 
@@ -95,14 +101,17 @@ run "add_segment_selective" {
           ]
         }
       }
-      previous_reachability = [
-        { from = "app", to = "cicd", verdict = "denied", reason = "default" },
-        { from = "app", to = "general", verdict = "denied", reason = "default" },
-        { from = "cicd", to = "app", verdict = "denied", reason = "default" },
-        { from = "cicd", to = "general", verdict = "denied", reason = "default" },
-        { from = "general", to = "app", verdict = "denied", reason = "default" },
-        { from = "general", to = "cicd", verdict = "denied", reason = "default" },
-      ]
+      previous_reachability = {
+        schema_version = 1
+        entries = [
+          { from = "app", to = "cicd", verdict = "denied", reason = "default" },
+          { from = "app", to = "general", verdict = "denied", reason = "default" },
+          { from = "cicd", to = "app", verdict = "denied", reason = "default" },
+          { from = "cicd", to = "general", verdict = "denied", reason = "default" },
+          { from = "general", to = "app", verdict = "denied", reason = "default" },
+          { from = "general", to = "cicd", verdict = "denied", reason = "default" },
+        ]
+      }
     }
   }
 
@@ -125,14 +134,17 @@ run "no_change" {
       routing_policy = {
         default = "allow"
       }
-      previous_reachability = [
-        { from = "app", to = "cicd", verdict = "permitted", reason = "default" },
-        { from = "app", to = "general", verdict = "permitted", reason = "default" },
-        { from = "cicd", to = "app", verdict = "permitted", reason = "default" },
-        { from = "cicd", to = "general", verdict = "permitted", reason = "default" },
-        { from = "general", to = "app", verdict = "permitted", reason = "default" },
-        { from = "general", to = "cicd", verdict = "permitted", reason = "default" },
-      ]
+      previous_reachability = {
+        schema_version = 1
+        entries = [
+          { from = "app", to = "cicd", verdict = "permitted", reason = "default" },
+          { from = "app", to = "general", verdict = "permitted", reason = "default" },
+          { from = "cicd", to = "app", verdict = "permitted", reason = "default" },
+          { from = "cicd", to = "general", verdict = "permitted", reason = "default" },
+          { from = "general", to = "app", verdict = "permitted", reason = "default" },
+          { from = "general", to = "cicd", verdict = "permitted", reason = "default" },
+        ]
+      }
     }
   }
 

@@ -1,10 +1,10 @@
 locals {
-  has_previous = length(var.generate_routes_to_other_vpcs.previous_reachability) > 0
+  has_previous = var.generate_routes_to_other_vpcs.previous_reachability != null
 
-  previous_reachability_lookup = {
-    for entry in var.generate_routes_to_other_vpcs.previous_reachability :
+  previous_reachability_lookup = local.has_previous ? {
+    for entry in var.generate_routes_to_other_vpcs.previous_reachability.entries :
     format(local.pair_fmt, entry.from, entry.to) => entry
-  }
+  } : {}
 
   policy_diff = local.has_previous ? {
     added = [
@@ -13,7 +13,7 @@ locals {
       && try(lookup(local.previous_reachability_lookup, format(local.pair_fmt, entry.from, entry.to)).verdict, "denied") != "permitted"
     ]
     removed = [
-      for entry in var.generate_routes_to_other_vpcs.previous_reachability : format(local.pair_fmt, entry.from, entry.to)
+      for entry in var.generate_routes_to_other_vpcs.previous_reachability.entries : format(local.pair_fmt, entry.from, entry.to)
       if entry.verdict == "permitted"
       && try(lookup(local.reachability_lookup, format(local.pair_fmt, entry.from, entry.to)).verdict, "denied") != "permitted"
       && format(local.pair_fmt, entry.from, entry.to) == join(":", sort([entry.from, entry.to]))

@@ -46,12 +46,15 @@ variable "generate_routes_to_other_vpcs" {
         ipv6_secondary_cidrs = optional(list(string), [])
       }))), {})
     })
-    previous_reachability = optional(list(object({
-      from    = string
-      to      = string
-      verdict = string
-      reason  = string
-    })), [])
+    previous_reachability = optional(object({
+      schema_version = number
+      entries = list(object({
+        from    = string
+        to      = string
+        verdict = string
+        reason  = string
+      }))
+    }))
     assertions = optional(object({
       must_deny = optional(list(object({
         from = object({
@@ -185,5 +188,35 @@ variable "generate_routes_to_other_vpcs" {
         [for rule in var.generate_routes_to_other_vpcs.assertions.must_permit : rule.from.network_cidr if !contains([for vpc in var.generate_routes_to_other_vpcs.vpcs : vpc.network_cidr], rule.from.network_cidr)],
         [for rule in var.generate_routes_to_other_vpcs.assertions.must_permit : rule.to.network_cidr if !contains([for vpc in var.generate_routes_to_other_vpcs.vpcs : vpc.network_cidr], rule.to.network_cidr)],
     )))) : "n/a"
+  }
+
+  validation {
+    condition = (
+      var.generate_routes_to_other_vpcs.previous_reachability == null
+      || var.generate_routes_to_other_vpcs.previous_reachability.schema_version == 1
+    )
+    error_message = "previous_reachability schema_version must be 1. The provided reachability was produced by a different schema version."
+  }
+
+  validation {
+    condition = (
+      var.generate_routes_to_other_vpcs.previous_reachability == null
+      || alltrue([
+        for entry in var.generate_routes_to_other_vpcs.previous_reachability.entries :
+        contains(["permitted", "denied"], entry.verdict)
+      ])
+    )
+    error_message = "previous_reachability entries must have verdict \"permitted\" or \"denied\"."
+  }
+
+  validation {
+    condition = (
+      var.generate_routes_to_other_vpcs.previous_reachability == null
+      || alltrue([
+        for entry in var.generate_routes_to_other_vpcs.previous_reachability.entries :
+        contains(["deny", "allow", "segment", "default", "cross-segment"], entry.reason)
+      ])
+    )
+    error_message = "previous_reachability entries must have reason \"deny\", \"allow\", \"segment\", \"default\", or \"cross-segment\"."
   }
 }

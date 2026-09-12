@@ -31,15 +31,22 @@ centralized_router = {
 The algebra's per-pair verdict as structured data. For every VPC pair, shows whether connectivity is permitted or denied and which precedence level determined the outcome.
 
 ```json
-[
-  { "from": "app", "to": "cache", "verdict": "permitted", "reason": "allow" },
-  { "from": "app", "to": "db", "verdict": "permitted", "reason": "segment" },
-  { "from": "db", "to": "web", "verdict": "denied", "reason": "cross-segment" },
-  { "from": "db", "to": "monitor", "verdict": "denied", "reason": "default" }
-]
+{
+  "schema_version": 1,
+  "entries": [
+    { "from": "app", "to": "cache", "verdict": "permitted", "reason": "allow" },
+    { "from": "app", "to": "db", "verdict": "permitted", "reason": "segment" },
+    { "from": "db", "to": "web", "verdict": "denied", "reason": "cross-segment" },
+    { "from": "db", "to": "monitor", "verdict": "denied", "reason": "default" }
+  ]
+}
 ```
 
-Each entry is a structured object with four fields:
+The output is a versioned envelope with two fields:
+- **schema_version** - integer version of the reachability schema (currently `1`). Validated on round-trip: passing a reachability JSON with a different schema version as `previous_reachability` fails at plan time.
+- **entries** - list of structured objects, one per deduplicated VPC pair
+
+Each entry has four fields:
 - **from** - first VPC name in the pair (lexicographically ordered)
 - **to** - second VPC name in the pair (lexicographically ordered)
 - **verdict** - `"permitted"` or `"denied"`
@@ -244,7 +251,7 @@ Incremental compilation. Given the previous reachability (from a prior run), com
 
 Pairs follow the same deduplication as the reachability matrix.
 
-Pass the previous reachability as a list of objects via `inspect.policy_diff.previous_reachability` nested inside the IR module's config object. The format matches the reachability output:
+Pass the previous reachability via `inspect.policy_diff.previous_reachability` nested inside the IR module's config object. The input accepts the same `{ schema_version, entries }` envelope as the reachability output, so the JSON file from a prior run passes straight through:
 
 ```hcl
 centralized_router = {
@@ -257,7 +264,12 @@ centralized_router = {
 }
 ```
 
-The `previous_reachability` input accepts a `list(object({ from, to, verdict, reason }))` matching the reachability output structure. It defaults to `[]` (no previous reachability), in which case policy diff and blast radius are not computed.
+The `previous_reachability` input accepts `object({ schema_version = number, entries = list(object({ from, to, verdict, reason })) })`. It defaults to `null` (no previous reachability), in which case policy diff and blast radius are not computed. When provided, three validations run at plan time:
+- `schema_version` must equal `1` (catches format changes across versions)
+- each entry's `verdict` must be `"permitted"` or `"denied"`
+- each entry's `reason` must be one of `"deny"`, `"allow"`, `"segment"`, `"default"`, `"cross-segment"`
+
+A mismatch fails with a clear error rather than silently producing wrong diffs.
 
 The workflow:
 1. Enable `inspect.reachability = true` to dump the reachability matrix to a JSON file
@@ -265,7 +277,7 @@ The workflow:
 3. Pass the previous JSON file via `inspect.policy_diff.previous_reachability`
 4. The diff output shows added/removed/unchanged pairs
 
-Since the reachability output is already a list of objects, the JSON file written from a prior run can be passed directly back as `previous_reachability` without transformation.
+No transformation needed between output and input - the reachability output is the `previous_reachability` input.
 
 This answers "what did this policy change actually do?" at the semantic level. `terraform plan` shows route additions/removals (assembly diff). Policy diff shows reachability changes (source-level diff).
 
@@ -295,7 +307,7 @@ When nothing changed:
 }
 ```
 
-Blast radius is automatically computed whenever `previous_reachability` contains entries. No separate input is needed.
+Blast radius is automatically computed whenever `previous_reachability` is provided. No separate input is needed.
 
 Five metrics:
 - **affected_vpcs** - VPC names that appear in any added or removed pair
