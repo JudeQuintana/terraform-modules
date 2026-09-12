@@ -16,7 +16,12 @@ run "ipv4_full_mesh_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition     = output.reachability.schema_version == 1
+    error_message = "Reachability schema version should be 1."
+  }
+
+  assert {
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "permitted", reason = "default" },
       { from = "app", to = "general", verdict = "permitted", reason = "default" },
       { from = "cicd", to = "general", verdict = "permitted", reason = "default" },
@@ -37,7 +42,7 @@ run "ipv4_zero_trust_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "denied", reason = "default" },
       { from = "app", to = "general", verdict = "denied", reason = "default" },
       { from = "cicd", to = "general", verdict = "denied", reason = "default" },
@@ -64,7 +69,7 @@ run "ipv4_allow_pair_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "permitted", reason = "allow" },
       { from = "app", to = "general", verdict = "denied", reason = "default" },
       { from = "cicd", to = "general", verdict = "denied", reason = "default" },
@@ -91,7 +96,7 @@ run "ipv4_segment_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "permitted", reason = "segment" },
       { from = "app", to = "general", verdict = "denied", reason = "default" },
       { from = "cicd", to = "general", verdict = "denied", reason = "default" },
@@ -124,7 +129,7 @@ run "ipv4_deny_beats_allow_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "denied", reason = "deny" },
       { from = "app", to = "general", verdict = "denied", reason = "default" },
       { from = "cicd", to = "general", verdict = "denied", reason = "default" },
@@ -153,7 +158,7 @@ run "ipv4_cross_segment_reachability" {
   }
 
   assert {
-    condition = output.reachability == [
+    condition = output.reachability.entries == [
       { from = "app", to = "cicd", verdict = "denied", reason = "cross-segment" },
       { from = "app", to = "general", verdict = "permitted", reason = "default" },
       { from = "cicd", to = "general", verdict = "permitted", reason = "default" },

@@ -57,6 +57,21 @@ Six possible verdict/reason combinations mapping directly to the precedence chai
 
 Separates "what the policy decided" from "what routes were emitted," making the algebra's output auditable without understanding route tables. All other toolchain outputs read from or operate on this matrix.
 
+### Simplified Reachability
+
+A flat map projection of the reachability matrix for quick lookups and compact display. Same data as the structured list, collapsed to `"from:to" => "verdict:reason"` string pairs.
+
+```json
+{
+  "app:cache": "permitted:allow",
+  "app:db": "permitted:segment",
+  "db:monitor": "denied:default",
+  "db:web": "denied:cross-segment"
+}
+```
+
+Available as the `reachability_simplified` output. Useful when piping to `jq` or other tools that work more naturally with key-value maps than lists of objects.
+
 ## Diagnostics
 
 Compiler warnings for policy states that are valid but likely unintentional.

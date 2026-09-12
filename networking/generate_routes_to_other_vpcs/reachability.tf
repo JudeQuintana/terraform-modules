@@ -52,4 +52,9 @@ locals {
     for entry in local.reachability_with_bidirectional_duplicates :
     format(local.pair_fmt, entry.from, entry.to) => entry
   }
+
+  reachability_simplified = {
+    for entry in local.reachability :
+    format(local.pair_fmt, entry.from, entry.to) => format(local.pair_fmt, entry.verdict, entry.reason)
+  }
 }
