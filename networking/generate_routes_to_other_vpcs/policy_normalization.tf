@@ -1,12 +1,12 @@
 locals {
   normalization_permitted_pairs = [
-    for pair, verdict in local.reachability : pair
-    if startswith(verdict, "permitted")
+    for entry in local.reachability : format(local.pair_fmt, entry.from, entry.to)
+    if entry.verdict == "permitted"
   ]
 
   normalization_denied_pairs = [
-    for pair, verdict in local.reachability : pair
-    if startswith(verdict, "denied")
+    for entry in local.reachability : format(local.pair_fmt, entry.from, entry.to)
+    if entry.verdict == "denied"
   ]
 
   normalization_current_rule_count = (
@@ -21,8 +21,8 @@ locals {
     for name in keys(var.generate_routes_to_other_vpcs.vpcs) : name => join(",", sort(concat(
       [name],
       [for other_name in keys(var.generate_routes_to_other_vpcs.vpcs) : other_name
-       if other_name != name
-       && startswith(lookup(local.reachability, join(":", sort([name, other_name])), "denied:default"), "permitted")
+        if other_name != name
+        && lookup(local.reachability_lookup, join(":", sort([name, other_name]))).verdict == "permitted"
       ]
     )))
   }
@@ -110,18 +110,18 @@ locals {
   ])
 
   normalization_rt_reachability = {
-    for pair_key, _ in local.reachability : pair_key => (
+    for entry in local.reachability : format(local.pair_fmt, entry.from, entry.to) => (
       local.normalization_suggested_default == "allow"
-      ? !contains(local.normalization_rt_deny_pair_set, pair_key)
-      : contains(local.normalization_rt_allow_pair_set, pair_key) || contains(local.normalization_segment_covered_pairs, pair_key)
+      ? !contains(local.normalization_rt_deny_pair_set, format(local.pair_fmt, entry.from, entry.to))
+      : contains(local.normalization_rt_allow_pair_set, format(local.pair_fmt, entry.from, entry.to)) || contains(local.normalization_segment_covered_pairs, format(local.pair_fmt, entry.from, entry.to))
     )
   }
 
   normalization_rt_mismatches = {
-    for pair_key, verdict in local.reachability : pair_key => {
-      original   = verdict
-      normalized = local.normalization_rt_reachability[pair_key] ? "permitted" : "denied"
-    } if startswith(verdict, "permitted") != local.normalization_rt_reachability[pair_key]
+    for entry in local.reachability : format(local.pair_fmt, entry.from, entry.to) => {
+      original   = format(local.pair_fmt, entry.verdict, entry.reason)
+      normalized = lookup(local.normalization_rt_reachability, format(local.pair_fmt, entry.from, entry.to)) ? "permitted" : "denied"
+    } if(entry.verdict == "permitted") != lookup(local.normalization_rt_reachability, format(local.pair_fmt, entry.from, entry.to))
   }
 
   policy_normalization = {

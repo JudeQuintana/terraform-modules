@@ -3,8 +3,8 @@ locals {
   zero_connectivity_vpcs = [
     for name, vpc in var.generate_routes_to_other_vpcs.vpcs : name
     if alltrue([
-      for vpc_name_pair, verdict_and_reason in local.reachability_with_bidirectional_duplicates : startswith(verdict_and_reason, "denied")
-      if startswith(vpc_name_pair, format("%s:", name))
+      for entry in local.reachability_with_bidirectional_duplicates : entry.verdict == "denied"
+      if entry.from == name
     ]) && length(var.generate_routes_to_other_vpcs.vpcs) > 1
   ]
 
@@ -18,8 +18,8 @@ locals {
   redundant_deny_rules = [
     for rule in var.generate_routes_to_other_vpcs.routing_policy.deny : format(
       "%s -> %s",
-      lookup(local.cidr_to_vpc_name, rule.from.network_cidr, rule.from.network_cidr),
-      lookup(local.cidr_to_vpc_name, rule.to.network_cidr, rule.to.network_cidr)
+      lookup(local.cidr_to_vpc_name, rule.from.network_cidr),
+      lookup(local.cidr_to_vpc_name, rule.to.network_cidr)
     )
     if(
       var.generate_routes_to_other_vpcs.routing_policy.default == "deny"
@@ -38,8 +38,8 @@ locals {
   redundant_allow_rules = [
     for rule in var.generate_routes_to_other_vpcs.routing_policy.allow : format(
       "%s -> %s",
-      lookup(local.cidr_to_vpc_name, rule.from.network_cidr, rule.from.network_cidr),
-      lookup(local.cidr_to_vpc_name, rule.to.network_cidr, rule.to.network_cidr)
+      lookup(local.cidr_to_vpc_name, rule.from.network_cidr),
+      lookup(local.cidr_to_vpc_name, rule.to.network_cidr)
     )
     if(
       var.generate_routes_to_other_vpcs.routing_policy.default == "allow"

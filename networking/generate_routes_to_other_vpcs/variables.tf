@@ -46,7 +46,12 @@ variable "generate_routes_to_other_vpcs" {
         ipv6_secondary_cidrs = optional(list(string), [])
       }))), {})
     })
-    previous_reachability = optional(map(string))
+    previous_reachability = optional(list(object({
+      from    = string
+      to      = string
+      verdict = string
+      reason  = string
+    })), [])
     assertions = optional(object({
       must_deny = optional(list(object({
         from = object({

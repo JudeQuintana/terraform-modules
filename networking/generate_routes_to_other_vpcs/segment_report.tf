@@ -14,19 +14,13 @@ locals {
         for other_name in keys(var.generate_routes_to_other_vpcs.vpcs) :
         other_name
         if other_name != name
-        && startswith(
-          lookup(local.reachability, join(":", sort([name, other_name])), "denied:default"),
-          "permitted"
-        )
+        && lookup(local.reachability_lookup, join(":", sort([name, other_name]))).verdict == "permitted"
       ])
       denied = sort([
         for other_name in keys(var.generate_routes_to_other_vpcs.vpcs) :
         other_name
         if other_name != name
-        && startswith(
-          lookup(local.reachability, join(":", sort([name, other_name])), "denied:default"),
-          "denied"
-        )
+        && lookup(local.reachability_lookup, join(":", sort([name, other_name]))).verdict == "denied"
       ])
     }
   }
