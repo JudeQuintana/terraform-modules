@@ -60,8 +60,8 @@ locals {
   ]) }
 
   # evaluate verdict per pair using equivalent policy
-  eq_reachability = local.has_equivalent ? {
-    for pair in local.vpc_pairs : pair.key => (
+  eq_reachability_combined = local.has_equivalent ? {
+    for pair in local.vpc_pairs : format(local.pair_fmt, pair.from_name, pair.to_name) => (
       contains(lookup(local.eq_deny_lookup, pair.from_cidr, []), pair.to_cidr)
       ? "denied:deny"
       : contains(lookup(local.eq_allow_lookup, pair.from_cidr, []), pair.to_cidr)
@@ -76,13 +76,20 @@ locals {
     )
   } : {}
 
+  eq_reachability_lookup = local.has_equivalent ? {
+    for pair in local.vpc_pairs : format(local.pair_fmt, pair.from_name, pair.to_name) => {
+      verdict = element(split(":", lookup(local.eq_reachability_combined, format(local.pair_fmt, pair.from_name, pair.to_name))), 0)
+      reason  = element(split(":", lookup(local.eq_reachability_combined, format(local.pair_fmt, pair.from_name, pair.to_name))), 1)
+    }
+  } : {}
+
   # compare: same permit/deny outcome for every pair (verdict reason is irrelevant)
   eq_mismatches = {
-    for vpc_name_pair, verdict_and_reason in local.reachability : vpc_name_pair => {
-      routing_policy            = verdict_and_reason
-      equivalent_routing_policy = lookup(local.eq_reachability, vpc_name_pair, "missing")
+    for entry in local.reachability : format(local.pair_fmt, entry.from, entry.to) => {
+      routing_policy            = format(local.pair_fmt, entry.verdict, entry.reason)
+      equivalent_routing_policy = format(local.pair_fmt, lookup(local.eq_reachability_lookup, format(local.pair_fmt, entry.from, entry.to)).verdict, lookup(local.eq_reachability_lookup, format(local.pair_fmt, entry.from, entry.to)).reason)
     } if local.has_equivalent
-    && startswith(verdict_and_reason, "permitted") != startswith(lookup(local.eq_reachability, vpc_name_pair, "denied:"), "permitted")
+    && entry.verdict != lookup(local.eq_reachability_lookup, format(local.pair_fmt, entry.from, entry.to)).verdict
   }
 
   equivalence = local.has_equivalent ? {

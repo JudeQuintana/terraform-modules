@@ -1,18 +1,18 @@
 locals {
-  # all VPC pairs (cartesian product, excluding self)
+  pair_fmt = "%s:%s"
   vpc_pairs = flatten([
     for name, this in var.generate_routes_to_other_vpcs.vpcs : [
       for other_name, other_this in var.generate_routes_to_other_vpcs.vpcs : {
-        key       = format("%s:%s", name, other_name)
+        from_name = name
+        to_name   = other_name
         from_cidr = this.network_cidr
         to_cidr   = other_this.network_cidr
       } if name != other_name
   ]])
 
   # evaluate verdict per pair: deny > allow > segments > default
-  # contiains bidirectional duplicates: "app:db" is equal to "db:app"
-  reachability_with_bidirectional_duplicates = {
-    for pair in local.vpc_pairs : pair.key => (
+  reachability_combined = {
+    for pair in local.vpc_pairs : format(local.pair_fmt, pair.from_name, pair.to_name) => (
       contains(lookup(local.deny_lookup, pair.from_cidr, []), pair.to_cidr)
       ? "denied:deny"
       : contains(lookup(local.allow_lookup, pair.from_cidr, []), pair.to_cidr)
@@ -27,9 +27,34 @@ locals {
     )
   }
 
-  # deduplicated: keep lexicographically-first key only ("app:db", not "db:app")
-  reachability = {
-    for vpc_name_pair, verdict_and_reason in local.reachability_with_bidirectional_duplicates : vpc_name_pair => verdict_and_reason
-    if vpc_name_pair == join(":", sort(split(":", vpc_name_pair)))
+  # contains bidirectional duplicates: {from=app, to=db} and {from=db, to=app}
+  reachability_with_bidirectional_duplicates = [
+    for pair in local.vpc_pairs : {
+      from    = pair.from_name
+      to      = pair.to_name
+      verdict = element(split(":", lookup(local.reachability_combined, format(local.pair_fmt, pair.from_name, pair.to_name))), 0)
+      reason  = element(split(":", lookup(local.reachability_combined, format(local.pair_fmt, pair.from_name, pair.to_name))), 1)
+    }
+  ]
+
+  # deduplicated: keep lexicographically-first pair only
+  reachability = [
+    for entry in local.reachability_with_bidirectional_duplicates : entry
+    if format(local.pair_fmt, entry.from, entry.to) == join(":", sort([entry.from, entry.to]))
+  ]
+
+  reachability_lookup = {
+    for entry in local.reachability :
+    format(local.pair_fmt, entry.from, entry.to) => entry
+  }
+
+  reachability_bidirectional_lookup = {
+    for entry in local.reachability_with_bidirectional_duplicates :
+    format(local.pair_fmt, entry.from, entry.to) => entry
+  }
+
+  reachability_simplified = {
+    for entry in local.reachability :
+    format(local.pair_fmt, entry.from, entry.to) => format(local.pair_fmt, entry.verdict, entry.reason)
   }
 }

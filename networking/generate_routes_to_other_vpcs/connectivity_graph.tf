@@ -12,7 +12,7 @@ locals {
       [format("    label=\"%s\"", segment_name)],
       ["    style=dashed"],
       ["    color=\"#95a5a6\""],
-      [for vpc in vpcs : format("    \"%s\"", lookup(local.cidr_to_vpc_name, vpc.network_cidr, vpc.network_cidr))],
+      [for vpc in vpcs : format("    \"%s\"", lookup(local.cidr_to_vpc_name, vpc.network_cidr))],
       ["  }"]
     ))
   ]
@@ -23,15 +23,24 @@ locals {
     if lookup(local.cidr_to_segment_name, vpc.network_cidr, null) == null
   ]
 
-  connectivity_graph_edges = [
-    for pair, verdict in local.reachability :
+  connectivity_graph_permitted_edges = [
+    for entry in local.reachability :
     format("  \"%s\" -- \"%s\" [color=\"%s\", label=\"%s\"]",
-      element(split(":", pair), 0),
-      element(split(":", pair), 1),
-      lookup(local.connectivity_graph_verdict_color, element(split(":", verdict), 1), "#95a5a6"),
-      element(split(":", verdict), 1)
+      entry.from,
+      entry.to,
+      lookup(local.connectivity_graph_verdict_color, entry.reason),
+      entry.reason
     )
-    if startswith(verdict, "permitted")
+    if entry.verdict == "permitted"
+  ]
+
+  connectivity_graph_deny_edges = [
+    for entry in local.reachability :
+    format("  \"%s\" -- \"%s\" [color=\"#e74c3c\", style=dashed, label=\"deny\"]",
+      entry.from,
+      entry.to
+    )
+    if entry.verdict == "denied" && entry.reason == "deny"
   ]
 
   connectivity_graph = join("\n", concat(
@@ -43,7 +52,8 @@ locals {
     local.connectivity_graph_segment_subgraphs,
     local.connectivity_graph_unsegmented_nodes,
     [""],
-    local.connectivity_graph_edges,
+    local.connectivity_graph_permitted_edges,
+    local.connectivity_graph_deny_edges,
     ["}"],
     [""]
   ))

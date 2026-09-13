@@ -11,8 +11,19 @@
 * Run the test suites with `terraform init`, then `terraform test` in the top level directory in the repo.
 * ```
 * ...
-* Success! 143 passed, 0 failed.
+* Success! 152 passed, 0 failed.
 * ```
+* `v1.13.0`
+* - Breaking change: `reachability` output restructured from `map(string)` to versioned envelope `{ schema_version = 1, entries = [{ from, to, verdict, reason }] }`.
+* - New `reachability_simplified` output: flat `map(string)` projection (`"from:to" => "verdict:reason"`) for quick lookups.
+* - `previous_reachability` type changed to accept the same envelope format as the reachability output (zero-transformation round-trip).
+* - Three new validations on `previous_reachability`: schema_version must equal 1, verdict must be "permitted" or "denied", reason must be one of the six precedence outcomes.
+* - All consumers refactored from `split()`/`startswith()` string parsing to structured field access (`.verdict`, `.reason`).
+* - Equivalence refactored: `eq_reachability` decomposed into `eq_reachability_combined` + `eq_reachability_lookup` (same pattern as reachability).
+* - Unnecessary `lookup()` defaults removed where keys are guaranteed to exist.
+* - 152 total tests (6 new validation tests).
+* - See [docs/compiler-semantic-toolchain.md](docs/compiler-semantic-toolchain.md) for compiler semantic toolchain interface.
+*
 * `v1.12.0`
 * - Five new compiler semantic toolchain outputs: `assertions`, `blast_radius`, `segment_report`, `policy_normalization`, `connectivity_graph`.
 * - Assertions: postcondition checks (`must_deny`, `must_permit`) verified against the reachability matrix at plan time, with out-of-scope CIDR validation.

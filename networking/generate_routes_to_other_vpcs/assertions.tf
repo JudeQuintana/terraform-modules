@@ -4,8 +4,8 @@ locals {
   must_deny_checks = local.has_assertions ? [
     for rule in var.generate_routes_to_other_vpcs.assertions.must_deny : {
       key = join(":", sort([
-        lookup(local.cidr_to_vpc_name, rule.from.network_cidr, rule.from.network_cidr),
-        lookup(local.cidr_to_vpc_name, rule.to.network_cidr, rule.to.network_cidr)
+        lookup(local.cidr_to_vpc_name, rule.from.network_cidr),
+        lookup(local.cidr_to_vpc_name, rule.to.network_cidr)
       ]))
     }
   ] : []
@@ -13,8 +13,8 @@ locals {
   must_permit_checks = local.has_assertions ? [
     for rule in var.generate_routes_to_other_vpcs.assertions.must_permit : {
       key = join(":", sort([
-        lookup(local.cidr_to_vpc_name, rule.from.network_cidr, rule.from.network_cidr),
-        lookup(local.cidr_to_vpc_name, rule.to.network_cidr, rule.to.network_cidr)
+        lookup(local.cidr_to_vpc_name, rule.from.network_cidr),
+        lookup(local.cidr_to_vpc_name, rule.to.network_cidr)
       ]))
     }
   ] : []
@@ -22,15 +22,15 @@ locals {
   must_deny_violations = [
     for check in local.must_deny_checks : {
       pair    = check.key
-      verdict = lookup(local.reachability, check.key, "unknown")
-    } if startswith(lookup(local.reachability, check.key, "denied:default"), "permitted")
+      verdict = format(local.pair_fmt, lookup(local.reachability_lookup, check.key).verdict, lookup(local.reachability_lookup, check.key).reason)
+    } if lookup(local.reachability_lookup, check.key).verdict == "permitted"
   ]
 
   must_permit_violations = [
     for check in local.must_permit_checks : {
       pair    = check.key
-      verdict = lookup(local.reachability, check.key, "unknown")
-    } if startswith(lookup(local.reachability, check.key, "permitted:default"), "denied")
+      verdict = format(local.pair_fmt, lookup(local.reachability_lookup, check.key).verdict, lookup(local.reachability_lookup, check.key).reason)
+    } if lookup(local.reachability_lookup, check.key).verdict == "denied"
   ]
 
   assertions = local.has_assertions ? {

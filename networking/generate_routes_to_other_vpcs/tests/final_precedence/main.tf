@@ -39,7 +39,7 @@ output "ipv4_default_deny_allow_app_cicd" {
 # general: unsegmented, but default=deny so unsegmented <-> unsegmented only
 # general has no other unsegmented VPCs to reach, so general gets nothing
 # app/cicd don't reach general (general is unsegmented but they are segmented, cross-boundary)
-# wait — unsegmented VPCs are not segment-denied from anyone. segment_deny only applies between segments.
+# wait - unsegmented VPCs are not segment-denied from anyone. segment_deny only applies between segments.
 # but default=deny means: if no other rule permits, deny.
 # for segmented VPC reaching unsegmented VPC: not in deny, not in allow, not segment-denied (segment_deny only between segments)
 # so falls through to default=deny -> blocked.

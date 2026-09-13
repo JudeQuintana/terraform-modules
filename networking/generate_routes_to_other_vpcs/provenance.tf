@@ -11,23 +11,9 @@ locals {
     for route in local.routes : {
       route_table_id         = route.route_table_id
       destination_cidr_block = route.destination_cidr_block
-      from                   = lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown")
-      to                     = lookup(local.cidr_to_vpc_name, route.destination_cidr_block, "unknown")
-      verdict = element(split(":", lookup(
-        local.reachability_with_bidirectional_duplicates,
-        format("%s:%s",
-          lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
-          lookup(local.cidr_to_vpc_name, route.destination_cidr_block, "unknown")
-        ),
-        "unknown:unknown"
-      )), 0)
-      reason = element(split(":", lookup(
-        local.reachability_with_bidirectional_duplicates,
-        format("%s:%s",
-          lookup(local.route_table_to_vpc_name, route.route_table_id, "unknown"),
-          lookup(local.cidr_to_vpc_name, route.destination_cidr_block, "unknown")
-        ),
-        "unknown:unknown"
-      )), 1)
+      from                   = lookup(local.route_table_to_vpc_name, route.route_table_id)
+      to                     = lookup(local.cidr_to_vpc_name, route.destination_cidr_block)
+      verdict                = lookup(local.reachability_bidirectional_lookup, format(local.pair_fmt, lookup(local.route_table_to_vpc_name, route.route_table_id), lookup(local.cidr_to_vpc_name, route.destination_cidr_block))).verdict
+      reason                 = lookup(local.reachability_bidirectional_lookup, format(local.pair_fmt, lookup(local.route_table_to_vpc_name, route.route_table_id), lookup(local.cidr_to_vpc_name, route.destination_cidr_block))).reason
   }]
 }

@@ -29,6 +29,11 @@ run "full_mesh_already_minimal" {
     condition     = output.policy_normalization.normalized_policy.default == "allow"
     error_message = "Full mesh is best expressed as default=allow."
   }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
+  }
 }
 
 # deny all under default=deny is already minimal (0 rules)
@@ -55,6 +60,11 @@ run "deny_all_already_minimal" {
   assert {
     condition     = output.policy_normalization.normalized_policy.default == "deny"
     error_message = "Zero trust is best expressed as default=deny."
+  }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
   }
 }
 
@@ -87,6 +97,11 @@ run "explicit_allows_to_default_allow" {
   assert {
     condition     = output.policy_normalization.normalized_policy.default == "allow"
     error_message = "Should suggest default=allow for full mesh."
+  }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
   }
 }
 
@@ -141,6 +156,11 @@ run "deny_rules_to_segment" {
     condition     = length(output.policy_normalization.normalized_policy.deny) == 0
     error_message = "No deny rules needed under default=deny."
   }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
+  }
 }
 
 # 2 allow rules under deny -> 1 deny rule under allow is shorter
@@ -188,6 +208,11 @@ run "suggest_fewer_rules" {
     condition     = output.policy_normalization.normalized_policy.deny[0].from == "general" || output.policy_normalization.normalized_policy.deny[0].to == "general"
     error_message = "Deny rule should involve general."
   }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
+  }
 }
 
 # existing segment already optimal
@@ -226,6 +251,51 @@ run "existing_segment_optimal" {
     condition     = length(output.policy_normalization.normalized_policy.segments) == 1
     error_message = "Should suggest 1 segment."
   }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
+  }
+}
+
+# normalizer can't improve: segment {app,api,db,cache} + allow {app,monitor} = 2 primitives.
+# fingerprinting misses the full segment because app's reach set differs (app reaches monitor).
+# normalizer's best is 3 (default=allow + 3 deny rules), so the clamp keeps it at 2.
+run "normalizer_cannot_improve" {
+  variables {
+    generate_routes_to_other_vpcs = {
+      vpcs = run.setup.ipv4_five_tiered_vpcs
+      routing_policy = {
+        default = "deny"
+        segments = {
+          core = [
+            { network_cidr = "10.0.0.0/20" },
+            { network_cidr = "10.16.0.0/20" },
+            { network_cidr = "10.32.0.0/20" },
+            { network_cidr = "10.48.0.0/20" },
+          ]
+        }
+        allow = [
+          { from = { network_cidr = "10.0.0.0/20" }, to = { network_cidr = "10.64.0.0/20" } },
+        ]
+      }
+    }
+  }
+
+  assert {
+    condition     = output.policy_normalization.current_rule_count == 2
+    error_message = "Current policy has 1 segment + 1 allow = 2 primitives."
+  }
+
+  assert {
+    condition     = output.policy_normalization.normalized_rule_count == 2
+    error_message = "Normalizer cannot improve on 2 primitives, should clamp to current."
+  }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
+  }
 }
 
 # single VPC: trivially minimal
@@ -247,5 +317,10 @@ run "single_vpc" {
   assert {
     condition     = output.policy_normalization.normalized_rule_count == 0
     error_message = "Normalized to 0 rules."
+  }
+
+  assert {
+    condition     = output.policy_normalization.roundtrip.consistent == true
+    error_message = "Normalized policy must be equivalent to the original."
   }
 }

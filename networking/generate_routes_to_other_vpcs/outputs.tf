@@ -10,7 +10,14 @@ output "ipv6" {
 }
 
 output "reachability" {
-  value = local.reachability
+  value = {
+    schema_version = 1
+    entries        = local.reachability
+  }
+}
+
+output "reachability_simplified" {
+  value = local.reachability_simplified
 }
 
 output "diagnostics" {
