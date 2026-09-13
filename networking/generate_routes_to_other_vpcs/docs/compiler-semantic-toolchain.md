@@ -77,7 +77,7 @@ A flat map projection of the reachability matrix for quick lookups and compact d
 }
 ```
 
-Available as the `reachability_simplified` output. Useful when piping to `jq` or other tools that work more naturally with key-value maps than lists of objects.
+Available as the `reachability_simplified` output. When `inspect.reachability = true`, the simplified map is also written to `inspect/<router-name>-reachability-simplified.json` alongside the main reachability file. Useful when piping to `jq` or other tools that work more naturally with key-value maps than lists of objects.
 
 ## Diagnostics
 
