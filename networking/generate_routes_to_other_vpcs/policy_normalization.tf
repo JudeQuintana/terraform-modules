@@ -102,11 +102,11 @@ locals {
   # Round-trip: evaluate the normalized policy through the precedence algebra
   # and verify it produces the same reachability as the original.
   normalization_rt_deny_pair_set = toset([
-    for r in local.normalization_deny_rules : join(":", sort([r.from, r.to]))
+    for rule in local.normalization_deny_rules : join(":", sort([rule.from, rule.to]))
   ])
 
   normalization_rt_allow_pair_set = toset([
-    for r in local.normalization_allow_rules : join(":", sort([r.from, r.to]))
+    for rule in local.normalization_allow_rules : join(":", sort([rule.from, rule.to]))
   ])
 
   normalization_rt_reachability = {

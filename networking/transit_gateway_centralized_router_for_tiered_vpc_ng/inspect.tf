@@ -20,6 +20,13 @@ resource "local_file" "this_reachability" {
   filename = format("%s/inspect/%s-reachability.json", path.root, local.centralized_router_full_name)
 }
 
+resource "local_file" "this_reachability_simplified" {
+  for_each = local.reachability
+
+  content  = jsonencode(module.this_generate_routes_to_other_vpcs.reachability_simplified)
+  filename = format("%s/inspect/%s-reachability-simplified.json", path.root, local.centralized_router_full_name)
+}
+
 resource "local_file" "this_diagnostics" {
   for_each = local.diagnostics
 
